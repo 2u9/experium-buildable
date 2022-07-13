@@ -9,6 +9,7 @@ popbobik wins
 gradlew setupDecompWorkspace
 gradlew buildNeeded
 ```
+![image](https://cdn.discordapp.com/attachments/993510055100022784/994630522942787725/2022-07-07_17.44.56.png)
 
 https://user-images.githubusercontent.com/74490227/178793630-7a8d6d9c-8dd1-4f3d-b377-912e8b8194e7.mp4
 
