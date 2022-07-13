@@ -7,4 +7,4 @@ popbobik wins
 gradlew setupDecompWorkspace\
 gradlew buildNeeded
 
-https://cdn.discordapp.com/attachments/905442421364645918/996827771118555196/regularphobos_online-video-cutter.com.mp4
+https://github.com/2u9/experium-buildable/raw/main/incident.mp4
