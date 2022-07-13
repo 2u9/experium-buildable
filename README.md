@@ -7,4 +7,4 @@ popbobik wins
 gradlew setupDecompWorkspace\
 gradlew buildNeeded
 
-https://github.com/2u9/experium-buildable/raw/main/incident.mp4
+https://user-images.githubusercontent.com/74490227/178793630-7a8d6d9c-8dd1-4f3d-b377-912e8b8194e7.mp4
