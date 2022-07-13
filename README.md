@@ -4,7 +4,11 @@ somewhat decent phobos 1.9.0 paste\
 [3000iqplay](https://github.com/3000IQPlay) (dev) was ratting other ppl, so i decided i would leak his client and make it buildable :^)\
 popbobik wins
 
-gradlew setupDecompWorkspace\
+```
+gradlew setupDecompWorkspace
 gradlew buildNeeded
+```
 
-https://cdn.discordapp.com/attachments/905442421364645918/996827771118555196/regularphobos_online-video-cutter.com.mp4
+https://user-images.githubusercontent.com/74490227/178793630-7a8d6d9c-8dd1-4f3d-b377-912e8b8194e7.mp4
+
+![image](https://media.discordapp.net/attachments/990146806191116288/995752617198223461/unknown.png)
