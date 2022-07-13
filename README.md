@@ -1,6 +1,6 @@
 # Experium 1.0.1 Buildable
 
-somewhat decent phobos 1.9.0 paste
+somewhat decent phobos 1.9.0 paste + fixed future support
 ```
 gradlew setupDecompWorkspace
 gradlew buildNeeded
