@@ -1,0 +1,26 @@
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
+
+// 
+// Decompiled by Procyon v0.5.36
+// 
+
+package dev._3000IQPlay.experium.mixin.mixins;
+
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.renderer.entity.Render;
+import org.spongepowered.asm.mixin.Mixin;
+import net.minecraft.entity.Entity;
+
+@Mixin({ Render.class })
+public class MixinRender<T extends Entity>
+{
+    @Inject(method = { "shouldRender" }, at = { @At("HEAD") }, cancellable = true)
+    public void shouldRender(final T livingEntity, final ICamera camera, final double camX, final double camY, final double camZ, final CallbackInfoReturnable<Boolean> info) {
+        if (livingEntity == null || camera == null || livingEntity.getRenderBoundingBox() == null) {
+            info.setReturnValue(false);
+        }
+    }
+}
