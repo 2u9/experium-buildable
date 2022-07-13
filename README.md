@@ -2,6 +2,6 @@
 
 somewhat decent phobos 1.9.0 paste
 
-gradlew setupDecompWorkspace
+gradlew setupDecompWorkspace\
 gradlew build
 
