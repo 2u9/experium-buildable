@@ -1,16 +1,18 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.inventory.Container
+ */
 package dev._3000IQPlay.experium.mixin.mixins.accessors;
 
-import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ Container.class })
-public interface IContainer
-{
-    @Accessor("transactionID")
-    void setTransactionID(final short p0);
+@Mixin(value={Container.class})
+public interface IContainer {
+    @Accessor(value="transactionID")
+    public void setTransactionID(short var1);
 }
+

@@ -1,140 +1,142 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.entity.EntityOtherPlayerMP
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketChatMessage
+ *  net.minecraft.network.play.client.CPacketClientStatus
+ *  net.minecraft.network.play.client.CPacketConfirmTeleport
+ *  net.minecraft.network.play.client.CPacketKeepAlive
+ *  net.minecraft.network.play.client.CPacketPlayer
+ *  net.minecraft.network.play.client.CPacketTabComplete
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.world.World
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.player;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.network.play.client.CPacketClientStatus;
-import net.minecraft.network.play.client.CPacketTabComplete;
-import net.minecraft.network.play.client.CPacketKeepAlive;
-import net.minecraft.network.play.client.CPacketConfirmTeleport;
-import net.minecraft.network.play.client.CPacketChatMessage;
-import net.minecraft.network.play.client.CPacketPlayer;
 import dev._3000IQPlay.experium.event.events.PacketEvent;
-import dev._3000IQPlay.experium.util.MathUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import dev._3000IQPlay.experium.features.Feature;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import net.minecraft.network.Packet;
-import java.util.Queue;
-import dev._3000IQPlay.experium.util.Timer;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.MathUtil;
+import dev._3000IQPlay.experium.util.Timer;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketChatMessage;
+import net.minecraft.network.play.client.CPacketClientStatus;
+import net.minecraft.network.play.client.CPacketConfirmTeleport;
+import net.minecraft.network.play.client.CPacketKeepAlive;
+import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.network.play.client.CPacketTabComplete;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Blink extends Module
-{
-    private static Blink INSTANCE;
-    private final Timer timer;
-    private final Queue<Packet<?>> packets;
-    public Setting<Boolean> cPacketPlayer;
-    public Setting<Mode> autoOff;
-    public Setting<Integer> timeLimit;
-    public Setting<Integer> packetLimit;
-    public Setting<Float> distance;
+public class Blink
+extends Module {
+    private static Blink INSTANCE = new Blink();
+    private final Timer timer = new Timer();
+    private final Queue<Packet<?>> packets = new ConcurrentLinkedQueue();
+    public Setting<Boolean> cPacketPlayer = this.register(new Setting<Boolean>("CPacketPlayer", true));
+    public Setting<Mode> autoOff = this.register(new Setting<Mode>("AutoOff", Mode.MANUAL));
+    public Setting<Integer> timeLimit = this.register(new Setting<Object>("Time", Integer.valueOf(20), Integer.valueOf(1), Integer.valueOf(500), v -> this.autoOff.getValue() == Mode.TIME));
+    public Setting<Integer> packetLimit = this.register(new Setting<Object>("Packets", Integer.valueOf(20), Integer.valueOf(1), Integer.valueOf(500), v -> this.autoOff.getValue() == Mode.PACKETS));
+    public Setting<Float> distance = this.register(new Setting<Object>("Distance", Float.valueOf(10.0f), Float.valueOf(1.0f), Float.valueOf(100.0f), v -> this.autoOff.getValue() == Mode.DISTANCE));
     private EntityOtherPlayerMP entity;
     private int packetsCanceled;
     private BlockPos startPos;
-    
+
     public Blink() {
-        super("Blink", "Fakelag.", Category.PLAYER, true, false, false);
-        this.timer = new Timer();
-        this.packets = new ConcurrentLinkedQueue<Packet<?>>();
-        this.cPacketPlayer = (Setting<Boolean>)this.register(new Setting("CPacketPlayer", (T)true));
-        this.autoOff = (Setting<Mode>)this.register(new Setting("AutoOff", (T)Mode.MANUAL));
-        this.timeLimit = (Setting<Integer>)this.register(new Setting("Time", (T)20, (T)1, (T)500, v -> this.autoOff.getValue() == Mode.TIME));
-        this.packetLimit = (Setting<Integer>)this.register(new Setting("Packets", (T)20, (T)1, (T)500, v -> this.autoOff.getValue() == Mode.PACKETS));
-        this.distance = (Setting<Float>)this.register(new Setting("Distance", (T)10.0f, (T)1.0f, (T)100.0f, v -> this.autoOff.getValue() == Mode.DISTANCE));
+        super("Blink", "Fakelag.", Module.Category.PLAYER, true, false, false);
         this.setInstance();
     }
-    
+
     public static Blink getInstance() {
-        if (Blink.INSTANCE == null) {
-            Blink.INSTANCE = new Blink();
+        if (INSTANCE == null) {
+            INSTANCE = new Blink();
         }
-        return Blink.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        Blink.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @Override
     public void onEnable() {
-        if (!Feature.fullNullCheck()) {
-            (this.entity = new EntityOtherPlayerMP((World)Blink.mc.world, Blink.mc.session.getProfile())).copyLocationAndAnglesFrom((Entity)Blink.mc.player);
+        if (!Blink.fullNullCheck()) {
+            this.entity = new EntityOtherPlayerMP((World)Blink.mc.world, Blink.mc.session.getProfile());
+            this.entity.copyLocationAndAnglesFrom((Entity)Blink.mc.player);
             this.entity.rotationYaw = Blink.mc.player.rotationYaw;
             this.entity.rotationYawHead = Blink.mc.player.rotationYawHead;
             this.entity.inventory.copyInventory(Blink.mc.player.inventory);
             Blink.mc.world.addEntityToWorld(6942069, (Entity)this.entity);
             this.startPos = Blink.mc.player.getPosition();
-        }
-        else {
+        } else {
             this.disable();
         }
         this.packetsCanceled = 0;
         this.timer.reset();
     }
-    
+
     @Override
     public void onUpdate() {
-        if (Feature.nullCheck() || (this.autoOff.getValue() == Mode.TIME && this.timer.passedS(this.timeLimit.getValue())) || (this.autoOff.getValue() == Mode.DISTANCE && this.startPos != null && Blink.mc.player.getDistanceSq(this.startPos) >= MathUtil.square(this.distance.getValue())) || (this.autoOff.getValue() == Mode.PACKETS && this.packetsCanceled >= this.packetLimit.getValue())) {
+        if (Blink.nullCheck() || this.autoOff.getValue() == Mode.TIME && this.timer.passedS(this.timeLimit.getValue().intValue()) || this.autoOff.getValue() == Mode.DISTANCE && this.startPos != null && Blink.mc.player.getDistanceSq(this.startPos) >= MathUtil.square(this.distance.getValue().floatValue()) || this.autoOff.getValue() == Mode.PACKETS && this.packetsCanceled >= this.packetLimit.getValue()) {
             this.disable();
         }
     }
-    
+
     @Override
     public void onLogout() {
         if (this.isOn()) {
             this.disable();
         }
     }
-    
+
     @SubscribeEvent
-    public void onSendPacket(final PacketEvent.Send event) {
-        if (event.getStage() == 0 && Blink.mc.world != null && !Blink.mc.isSingleplayer()) {
-            final Object packet = event.getPacket();
-            if (this.cPacketPlayer.getValue() && packet instanceof CPacketPlayer) {
+    public void onSendPacket(PacketEvent.Send event) {
+        if (event.getStage() == 0 && Blink.mc.world != null && !mc.isSingleplayer()) {
+            Object packet = event.getPacket();
+            if (this.cPacketPlayer.getValue().booleanValue() && packet instanceof CPacketPlayer) {
                 event.setCanceled(true);
-                this.packets.add((Packet<?>)packet);
+                this.packets.add((Packet)packet);
                 ++this.packetsCanceled;
             }
-            if (!this.cPacketPlayer.getValue()) {
+            if (!this.cPacketPlayer.getValue().booleanValue()) {
                 if (packet instanceof CPacketChatMessage || packet instanceof CPacketConfirmTeleport || packet instanceof CPacketKeepAlive || packet instanceof CPacketTabComplete || packet instanceof CPacketClientStatus) {
                     return;
                 }
-                this.packets.add((Packet<?>)packet);
+                this.packets.add((Packet)packet);
                 event.setCanceled(true);
                 ++this.packetsCanceled;
             }
         }
     }
-    
+
     @Override
     public void onDisable() {
-        if (!Feature.fullNullCheck()) {
+        if (!Blink.fullNullCheck()) {
             Blink.mc.world.removeEntity((Entity)this.entity);
             while (!this.packets.isEmpty()) {
-                Blink.mc.player.connection.sendPacket((Packet)this.packets.poll());
+                Blink.mc.player.connection.sendPacket(this.packets.poll());
             }
         }
         this.startPos = null;
     }
-    
-    static {
-        Blink.INSTANCE = new Blink();
-    }
-    
-    public enum Mode
-    {
-        MANUAL, 
-        TIME, 
-        DISTANCE, 
+
+    public static enum Mode {
+        MANUAL,
+        TIME,
+        DISTANCE,
         PACKETS;
+
     }
 }
+

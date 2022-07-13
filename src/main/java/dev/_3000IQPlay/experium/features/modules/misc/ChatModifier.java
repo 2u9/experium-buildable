@@ -1,88 +1,82 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.network.play.client.CPacketChatMessage
+ *  net.minecraft.network.play.server.SPacketChat
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.util.text.TextComponentString
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.misc;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.entity.player.EntityPlayer;
-import dev._3000IQPlay.experium.features.modules.client.Managers;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.network.play.server.SPacketChat;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.network.play.client.CPacketChatMessage;
 import dev._3000IQPlay.experium.event.events.PacketEvent;
-import dev._3000IQPlay.experium.util.TextUtil;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.util.Timer;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.client.Managers;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.TextUtil;
+import dev._3000IQPlay.experium.util.Timer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.client.CPacketChatMessage;
+import net.minecraft.network.play.server.SPacketChat;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class ChatModifier extends Module
-{
-    private static ChatModifier INSTANCE;
-    private final Timer timer;
-    public Setting<Suffix> suffix;
-    public Setting<TextColor> textcolor;
-    public Setting<StiTextColor> stiTextColor;
-    public Setting<Boolean> clean;
-    public Setting<Boolean> infinite;
-    public Setting<TextUtil.Color> timeStamps;
-    public Setting<Boolean> rainbowTimeStamps;
-    public Setting<TextUtil.Color> bracket;
-    public Setting<Boolean> space;
-    public Setting<Boolean> all;
-    
+public class ChatModifier
+extends Module {
+    private static ChatModifier INSTANCE = new ChatModifier();
+    private final Timer timer = new Timer();
+    public Setting<Suffix> suffix = this.register(new Setting<Suffix>("Suffix", Suffix.NONE, "Your Suffix."));
+    public Setting<TextColor> textcolor = this.register(new Setting<TextColor>("TextColor", TextColor.NONE, "Your text color."));
+    public Setting<StiTextColor> stiTextColor = this.register(new Setting<StiTextColor>("StiTextColor", StiTextColor.NONE, "Your sti text color."));
+    public Setting<Boolean> clean = this.register(new Setting<Boolean>("CleanChat", Boolean.valueOf(false), "Cleans your chat"));
+    public Setting<Boolean> infinite = this.register(new Setting<Boolean>("Infinite", Boolean.valueOf(false), "Makes your chat infinite."));
+    public Setting<TextUtil.Color> timeStamps = this.register(new Setting<TextUtil.Color>("Time", TextUtil.Color.NONE));
+    public Setting<Boolean> rainbowTimeStamps = this.register(new Setting<Object>("RainbowTimeStamps", Boolean.valueOf(false), v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
+    public Setting<TextUtil.Color> bracket = this.register(new Setting<Object>("Bracket", (Object)TextUtil.Color.WHITE, v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
+    public Setting<Boolean> space = this.register(new Setting<Object>("Space", Boolean.valueOf(true), v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
+    public Setting<Boolean> all = this.register(new Setting<Object>("All", Boolean.valueOf(false), v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
+
     public ChatModifier() {
-        super("ChatModifier", "Modifies your chat", Category.MISC, true, false, false);
-        this.timer = new Timer();
-        this.suffix = (Setting<Suffix>)this.register(new Setting("Suffix", (T)Suffix.NONE, "Your Suffix."));
-        this.textcolor = (Setting<TextColor>)this.register(new Setting("TextColor", (T)TextColor.NONE, "Your text color."));
-        this.stiTextColor = (Setting<StiTextColor>)this.register(new Setting("StiTextColor", (T)StiTextColor.NONE, "Your sti text color."));
-        this.clean = (Setting<Boolean>)this.register(new Setting("CleanChat", (T)false, "Cleans your chat"));
-        this.infinite = (Setting<Boolean>)this.register(new Setting("Infinite", (T)false, "Makes your chat infinite."));
-        this.timeStamps = (Setting<TextUtil.Color>)this.register(new Setting("Time", (T)TextUtil.Color.NONE));
-        this.rainbowTimeStamps = (Setting<Boolean>)this.register(new Setting("RainbowTimeStamps", (T)false, v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
-        this.bracket = (Setting<TextUtil.Color>)this.register(new Setting("Bracket", (T)TextUtil.Color.WHITE, v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
-        this.space = (Setting<Boolean>)this.register(new Setting("Space", (T)true, v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
-        this.all = (Setting<Boolean>)this.register(new Setting("All", (T)false, v -> this.timeStamps.getValue() != TextUtil.Color.NONE));
+        super("ChatModifier", "Modifies your chat", Module.Category.MISC, true, false, false);
         this.setInstance();
     }
-    
+
     public static ChatModifier getInstance() {
-        if (ChatModifier.INSTANCE == null) {
-            ChatModifier.INSTANCE = new ChatModifier();
+        if (INSTANCE == null) {
+            INSTANCE = new ChatModifier();
         }
-        return ChatModifier.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        ChatModifier.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @SubscribeEvent
-    public void onPacketSend(final PacketEvent.Send event) {
+    public void onPacketSend(PacketEvent.Send event) {
         if (event.getStage() == 0 && event.getPacket() instanceof CPacketChatMessage) {
-            final CPacketChatMessage packet = event.getPacket();
+            CPacketChatMessage packet = (CPacketChatMessage)event.getPacket();
             String s = packet.getMessage();
             if (s.startsWith("/") || s.startsWith("!")) {
                 return;
             }
             switch (this.suffix.getValue()) {
                 case EXPERIUM: {
-                    s += " | Experium";
-                    break;
+                    s = s + " | Experium";
                 }
             }
             switch (this.stiTextColor.getValue()) {
                 case RANDOM: {
-                    final int minNum = 1;
-                    final int maxNum = 16;
-                    final int randomNumber = (int)Math.floor(Math.random() * (maxNum - minNum + 1) + minNum);
+                    int minNum = 1;
+                    int maxNum = 16;
+                    int randomNumber = (int)Math.floor(Math.random() * (double)(maxNum - minNum + 1) + (double)minNum);
                     if (randomNumber == 1) {
                         s = "!2" + s;
                     }
@@ -128,10 +122,8 @@ public class ChatModifier extends Module
                     if (randomNumber == 15) {
                         s = "!1" + s;
                     }
-                    if (randomNumber == 16) {
-                        s = "!6" + s;
-                        break;
-                    }
+                    if (randomNumber != 16) break;
+                    s = "!6" + s;
                     break;
                 }
                 case LIGHT_GREEN: {
@@ -211,7 +203,6 @@ public class ChatModifier extends Module
                 }
                 case BOLD: {
                     s = "!j" + s;
-                    break;
                 }
             }
             switch (this.textcolor.getValue()) {
@@ -248,7 +239,6 @@ public class ChatModifier extends Module
                 }
                 case GRAY: {
                     s = ". " + s;
-                    break;
                 }
             }
             if (s.length() >= 256) {
@@ -257,89 +247,91 @@ public class ChatModifier extends Module
             packet.message = s;
         }
     }
-    
+
     @SubscribeEvent
-    public void onChatPacketReceive(final PacketEvent.Receive event) {
-        if (event.getStage() != 0 || event.getPacket() instanceof SPacketChat) {}
-    }
-    
-    @SubscribeEvent
-    public void onPacketReceive(final PacketEvent.Receive event) {
-        if (event.getStage() == 0 && this.timeStamps.getValue() != TextUtil.Color.NONE && event.getPacket() instanceof SPacketChat) {
-            if (!event.getPacket().isSystem()) {
-                return;
-            }
-            final String originalMessage = event.getPacket().chatComponent.getFormattedText();
-            final String message = this.getTimeString(originalMessage) + originalMessage;
-            event.getPacket().chatComponent = (ITextComponent)new TextComponentString(message);
+    public void onChatPacketReceive(PacketEvent.Receive event) {
+        if (event.getStage() != 0 || event.getPacket() instanceof SPacketChat) {
+            // empty if block
         }
     }
-    
-    public String getTimeString(final String message) {
-        final String date = new SimpleDateFormat("k:mm").format(new Date());
-        if (this.rainbowTimeStamps.getValue()) {
-            final String timeString = "[" + date + "]" + (this.space.getValue() ? " " : "");
-            final StringBuilder builder = new StringBuilder(timeString);
-            builder.insert(0, "§+");
+
+    @SubscribeEvent
+    public void onPacketReceive(PacketEvent.Receive event) {
+        if (event.getStage() == 0 && this.timeStamps.getValue() != TextUtil.Color.NONE && event.getPacket() instanceof SPacketChat) {
+            if (!((SPacketChat)event.getPacket()).isSystem()) {
+                return;
+            }
+            String originalMessage = ((SPacketChat)event.getPacket()).chatComponent.getFormattedText();
+            String message = this.getTimeString(originalMessage) + originalMessage;
+            ((SPacketChat)event.getPacket()).chatComponent = new TextComponentString(message);
+        }
+    }
+
+    public String getTimeString(String message) {
+        String date = new SimpleDateFormat("k:mm").format(new Date());
+        if (this.rainbowTimeStamps.getValue().booleanValue()) {
+            String timeString = "[" + date + "]" + (this.space.getValue() != false ? " " : "");
+            StringBuilder builder = new StringBuilder(timeString);
+            builder.insert(0, "\u00a7+");
             if (!message.contains(Managers.getInstance().getRainbowCommandMessage())) {
-                builder.append("§r");
+                builder.append("\u00a7r");
             }
             return builder.toString();
         }
-        return ((this.bracket.getValue() == TextUtil.Color.NONE) ? "" : TextUtil.coloredString("<", this.bracket.getValue())) + TextUtil.coloredString(date, this.timeStamps.getValue()) + ((this.bracket.getValue() == TextUtil.Color.NONE) ? "" : TextUtil.coloredString(">", this.bracket.getValue())) + (this.space.getValue() ? " " : "") + "§r";
+        return (this.bracket.getValue() == TextUtil.Color.NONE ? "" : TextUtil.coloredString("<", this.bracket.getValue())) + TextUtil.coloredString(date, this.timeStamps.getValue()) + (this.bracket.getValue() == TextUtil.Color.NONE ? "" : TextUtil.coloredString(">", this.bracket.getValue())) + (this.space.getValue() != false ? " " : "") + "\u00a7r";
     }
-    
-    private boolean shouldSendMessage(final EntityPlayer player) {
-        return player.dimension == 1 && player.getPosition().equals((Object)new Vec3i(0, 240, 0));
+
+    private boolean shouldSendMessage(EntityPlayer player) {
+        if (player.dimension != 1) {
+            return false;
+        }
+        return player.getPosition().equals((Object)new Vec3i(0, 240, 0));
     }
-    
-    static {
-        ChatModifier.INSTANCE = new ChatModifier();
-    }
-    
-    public enum Suffix
-    {
-        NONE, 
-        EXPERIUM;
-    }
-    
-    public enum TextColor
-    {
-        NONE, 
-        GREEN, 
-        YELLOW, 
-        GOLD, 
-        BLUE, 
-        AQUA, 
-        PURPLE, 
-        RED, 
-        DARKRED, 
-        GRAY;
-    }
-    
-    public enum StiTextColor
-    {
-        NONE, 
-        RANDOM, 
-        GREEN, 
-        BLUE, 
-        AQUA, 
-        YELLOW, 
-        GOLD, 
-        RED, 
-        PURPLE, 
-        LIGHT_BLUE, 
-        LIGHT_GREEN, 
-        LIGHT_AQUA, 
-        LIGHT_RED, 
-        LIGHT_PURPLE, 
-        LIGHT_GRAY, 
-        GRAY, 
-        BLACK, 
-        WHITE, 
-        BOLD, 
-        STRIKE, 
-        UNDERLINE, 
+
+    public static enum StiTextColor {
+        NONE,
+        RANDOM,
+        GREEN,
+        BLUE,
+        AQUA,
+        YELLOW,
+        GOLD,
+        RED,
+        PURPLE,
+        LIGHT_BLUE,
+        LIGHT_GREEN,
+        LIGHT_AQUA,
+        LIGHT_RED,
+        LIGHT_PURPLE,
+        LIGHT_GRAY,
+        GRAY,
+        BLACK,
+        WHITE,
+        BOLD,
+        STRIKE,
+        UNDERLINE,
         ITALIC;
+
+    }
+
+    public static enum TextColor {
+        NONE,
+        GREEN,
+        YELLOW,
+        GOLD,
+        BLUE,
+        AQUA,
+        PURPLE,
+        RED,
+        DARKRED,
+        GRAY;
+
+    }
+
+    public static enum Suffix {
+        NONE,
+        EXPERIUM;
+
     }
 }
+

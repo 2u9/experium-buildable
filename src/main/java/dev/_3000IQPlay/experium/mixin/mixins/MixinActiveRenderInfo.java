@@ -1,22 +1,25 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.renderer.ActiveRenderInfo
+ *  net.minecraft.entity.Entity
+ */
 package dev._3000IQPlay.experium.mixin.mixins;
 
+import dev._3000IQPlay.experium.util.RenderUtil;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import dev._3000IQPlay.experium.util.RenderUtil;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin({ ActiveRenderInfo.class })
-public class MixinActiveRenderInfo
-{
-    @Inject(method = { "updateRenderInfo(Lnet/minecraft/entity/Entity;Z)V" }, at = { @At("HEAD") }, remap = false)
-    private static void updateRenderInfo(final Entity entity, final boolean wtf, final CallbackInfo ci) {
+@Mixin(value={ActiveRenderInfo.class})
+public class MixinActiveRenderInfo {
+    @Inject(method={"updateRenderInfo(Lnet/minecraft/entity/Entity;Z)V"}, at={@At(value="HEAD")}, remap=false)
+    private static void updateRenderInfo(Entity entity, boolean wtf, CallbackInfo ci) {
         RenderUtil.updateModelViewProjectionMatrix();
     }
 }
+

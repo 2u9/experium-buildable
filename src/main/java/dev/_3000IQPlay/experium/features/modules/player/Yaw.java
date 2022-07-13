@@ -1,41 +1,36 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.player;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import java.util.Objects;
-import net.minecraft.entity.Entity;
 import dev._3000IQPlay.experium.event.events.UpdateWalkingPlayerEvent;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import java.util.Objects;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Yaw extends Module
-{
-    public Setting<Boolean> lockYaw;
-    public Setting<Boolean> byDirection;
-    public Setting<Direction> direction;
-    public Setting<Integer> yaw;
-    public Setting<Boolean> lockPitch;
-    public Setting<Integer> pitch;
-    
+public class Yaw
+extends Module {
+    public Setting<Boolean> lockYaw = this.register(new Setting<Boolean>("LockYaw", false));
+    public Setting<Boolean> byDirection = this.register(new Setting<Boolean>("ByDirection", false));
+    public Setting<Direction> direction = this.register(new Setting<Object>("Direction", (Object)Direction.NORTH, v -> this.byDirection.getValue()));
+    public Setting<Integer> yaw = this.register(new Setting<Object>("Yaw", Integer.valueOf(0), Integer.valueOf(-180), Integer.valueOf(180), v -> this.byDirection.getValue() == false));
+    public Setting<Boolean> lockPitch = this.register(new Setting<Boolean>("LockPitch", false));
+    public Setting<Integer> pitch = this.register(new Setting<Integer>("Pitch", 0, -180, 180));
+
     public Yaw() {
-        super("Yaw", "Locks your yaw", Category.PLAYER, true, false, false);
-        this.lockYaw = (Setting<Boolean>)this.register(new Setting("LockYaw", (T)false));
-        this.byDirection = (Setting<Boolean>)this.register(new Setting("ByDirection", (T)false));
-        this.direction = (Setting<Direction>)this.register(new Setting("Direction", (T)Direction.NORTH, v -> this.byDirection.getValue()));
-        this.yaw = (Setting<Integer>)this.register(new Setting("Yaw", (T)0, (T)(-180), (T)180, v -> !this.byDirection.getValue()));
-        this.lockPitch = (Setting<Boolean>)this.register(new Setting("LockPitch", (T)false));
-        this.pitch = (Setting<Integer>)this.register(new Setting("Pitch", (T)0, (T)(-180), (T)180));
+        super("Yaw", "Locks your yaw", Module.Category.PLAYER, true, false, false);
     }
-    
+
     @SubscribeEvent
-    public void onUpdateWalkingPlayer(final UpdateWalkingPlayerEvent event) {
-        if (this.lockYaw.getValue()) {
-            if (this.byDirection.getValue()) {
+    public void onUpdateWalkingPlayer(UpdateWalkingPlayerEvent event) {
+        if (this.lockYaw.getValue().booleanValue()) {
+            if (this.byDirection.getValue().booleanValue()) {
                 switch (this.direction.getValue()) {
                     case NORTH: {
                         this.setYaw(180);
@@ -67,38 +62,37 @@ public class Yaw extends Module
                     }
                     case NW: {
                         this.setYaw(135);
-                        break;
                     }
                 }
-            }
-            else {
+            } else {
                 this.setYaw(this.yaw.getValue());
             }
         }
-        if (this.lockPitch.getValue()) {
+        if (this.lockPitch.getValue().booleanValue()) {
             if (Yaw.mc.player.isRiding()) {
-                Objects.requireNonNull(Yaw.mc.player.getRidingEntity()).rotationPitch = this.pitch.getValue();
+                Objects.requireNonNull(Yaw.mc.player.getRidingEntity()).rotationPitch = this.pitch.getValue().intValue();
             }
-            Yaw.mc.player.rotationPitch = this.pitch.getValue();
+            Yaw.mc.player.rotationPitch = this.pitch.getValue().intValue();
         }
     }
-    
-    private void setYaw(final int yaw) {
+
+    private void setYaw(int yaw) {
         if (Yaw.mc.player.isRiding()) {
-            Objects.requireNonNull(Yaw.mc.player.getRidingEntity()).rotationYaw = (float)yaw;
+            Objects.requireNonNull(Yaw.mc.player.getRidingEntity()).rotationYaw = yaw;
         }
-        Yaw.mc.player.rotationYaw = (float)yaw;
+        Yaw.mc.player.rotationYaw = yaw;
     }
-    
-    public enum Direction
-    {
-        NORTH, 
-        NE, 
-        EAST, 
-        SE, 
-        SOUTH, 
-        SW, 
-        WEST, 
+
+    public static enum Direction {
+        NORTH,
+        NE,
+        EAST,
+        SE,
+        SOUTH,
+        SW,
+        WEST,
         NW;
+
     }
 }
+

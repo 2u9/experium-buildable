@@ -1,100 +1,93 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.item.EntityEnderCrystal
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.util.math.BlockPos
+ */
 package dev._3000IQPlay.experium.manager;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Executors;
-import java.util.Iterator;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import dev._3000IQPlay.experium.util.BlockUtil;
-import dev._3000IQPlay.experium.util.DamageUtil;
-import net.minecraft.entity.item.EntityEnderCrystal;
-import java.util.Collection;
-import net.minecraft.entity.Entity;
-import java.util.ArrayList;
-import dev._3000IQPlay.experium.util.EntityUtil;
+import dev._3000IQPlay.experium.features.Feature;
 import dev._3000IQPlay.experium.features.modules.client.Managers;
 import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
+import dev._3000IQPlay.experium.util.BlockUtil;
+import dev._3000IQPlay.experium.util.DamageUtil;
+import dev._3000IQPlay.experium.util.EntityUtil;
 import dev._3000IQPlay.experium.util.Timer;
-import dev._3000IQPlay.experium.features.Feature;
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityEnderCrystal;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
 
-public class SafetyManager extends Feature implements Runnable
-{
-    private final Timer syncTimer;
-    private final AtomicBoolean SAFE;
+public class SafetyManager
+extends Feature
+implements Runnable {
+    private final Timer syncTimer = new Timer();
+    private final AtomicBoolean SAFE = new AtomicBoolean(false);
     private ScheduledExecutorService service;
-    
-    public SafetyManager() {
-        this.syncTimer = new Timer();
-        this.SAFE = new AtomicBoolean(false);
-    }
-    
+
     @Override
     public void run() {
         if (AutoCrystal.getInstance().isOff() || AutoCrystal.getInstance().threadMode.getValue() == AutoCrystal.ThreadMode.NONE) {
             this.doSafetyCheck();
         }
     }
-    
+
     public void doSafetyCheck() {
-        if (!Feature.fullNullCheck()) {
+        if (!SafetyManager.fullNullCheck()) {
             boolean safe = true;
-            final EntityPlayer entityPlayer;
-            final EntityPlayer closest = entityPlayer = (Managers.getInstance().safety.getValue() ? EntityUtil.getClosestEnemy(18.0) : null);
-            if (Managers.getInstance().safety.getValue() && closest == null) {
+            EntityPlayer closest = Managers.getInstance().safety.getValue() != false ? EntityUtil.getClosestEnemy(18.0) : null;
+            EntityPlayer entityPlayer = closest;
+            if (Managers.getInstance().safety.getValue().booleanValue() && closest == null) {
                 this.SAFE.set(true);
                 return;
             }
-            final ArrayList<Entity> crystals = new ArrayList<Entity>(SafetyManager.mc.world.loadedEntityList);
-            for (final Entity crystal : crystals) {
-                if (crystal instanceof EntityEnderCrystal && DamageUtil.calculateDamage(crystal, (Entity)SafetyManager.mc.player) > 4.0) {
-                    if (closest != null && closest.getDistanceSq(crystal) >= 40.0) {
-                        continue;
-                    }
-                    safe = false;
-                    break;
-                }
+            ArrayList<Entity> crystals = new ArrayList<>(SafetyManager.mc.world.loadedEntityList);
+            for (Entity crystal : crystals) {
+                if (!(crystal instanceof EntityEnderCrystal) || !((double) DamageUtil.calculateDamage(crystal, SafetyManager.mc.player) > 4.0) || closest != null && !(closest.getDistanceSq(crystal) < 40.0))
+                    continue;
+                safe = false;
+                break;
             }
             if (safe) {
-                for (final BlockPos pos : BlockUtil.possiblePlacePositions(4.0f, false, Managers.getInstance().oneDot15.getValue())) {
-                    if (DamageUtil.calculateDamage(pos, (Entity)SafetyManager.mc.player) > 4.0) {
-                        if (closest != null && closest.getDistanceSq(pos) >= 40.0) {
-                            continue;
-                        }
-                        safe = false;
-                        break;
-                    }
+                for (BlockPos pos : BlockUtil.possiblePlacePositions(4.0f, false, Managers.getInstance().oneDot15.getValue())) {
+                    if (!((double)DamageUtil.calculateDamage(pos, (Entity)SafetyManager.mc.player) > 4.0) || closest != null && !(closest.getDistanceSq(pos) < 40.0)) continue;
+                    safe = false;
+                    break;
                 }
             }
             this.SAFE.set(safe);
         }
     }
-    
+
     public void onUpdate() {
         this.run();
     }
-    
+
     public String getSafetyString() {
         if (this.SAFE.get()) {
-            return "§aSecure";
+            return "\u00a7aSecure";
         }
-        return "§cUnsafe";
+        return "\u00a7cUnsafe";
     }
-    
+
     public boolean isSafe() {
         return this.SAFE.get();
     }
-    
+
     public ScheduledExecutorService getService() {
-        final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(this, 0L, Managers.getInstance().safetyCheck.getValue(), TimeUnit.MILLISECONDS);
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(this, 0L, Managers.getInstance().safetyCheck.getValue().intValue(), TimeUnit.MILLISECONDS);
         return service;
     }
 }
+

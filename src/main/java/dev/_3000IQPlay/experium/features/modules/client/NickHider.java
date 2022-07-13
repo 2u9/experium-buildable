@@ -1,44 +1,42 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package dev._3000IQPlay.experium.features.modules.client;
 
-import dev._3000IQPlay.experium.util.Util;
-import dev._3000IQPlay.experium.features.Feature;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.client.PingBypass;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.Util;
 
-public class NickHider extends Module
-{
+public class NickHider
+extends Module {
     private static NickHider instance;
-    public final Setting<Boolean> changeOwn;
-    public final Setting<String> ownName;
-    
+    public final Setting<Boolean> changeOwn = this.register(new Setting<Boolean>("MyName", true));
+    public final Setting<String> ownName = this.register(new Setting<Object>("Name", "Name here...", v -> this.changeOwn.getValue()));
+
     public NickHider() {
-        super("NickHider", "Helps with creating media", Category.CLIENT, false, false, false);
-        this.changeOwn = (Setting<Boolean>)this.register(new Setting("MyName", (T)true));
-        this.ownName = (Setting<String>)this.register(new Setting("Name", (T)"Name here...", v -> this.changeOwn.getValue()));
-        NickHider.instance = this;
+        super("NickHider", "Helps with creating media", Module.Category.CLIENT, false, false, false);
+        instance = this;
     }
-    
+
     public static NickHider getInstance() {
-        if (NickHider.instance == null) {
-            NickHider.instance = new NickHider();
+        if (instance == null) {
+            instance = new NickHider();
         }
-        return NickHider.instance;
+        return instance;
     }
-    
+
     public static String getPlayerName() {
-        if (Feature.fullNullCheck() || !PingBypass.getInstance().isConnected()) {
+        if (NickHider.fullNullCheck() || !PingBypass.getInstance().isConnected()) {
             return Util.mc.getSession().getUsername();
         }
-        final String name = PingBypass.getInstance().getPlayerName();
+        String name = PingBypass.getInstance().getPlayerName();
         if (name == null || name.isEmpty()) {
             return Util.mc.getSession().getUsername();
         }
         return name;
     }
 }
+

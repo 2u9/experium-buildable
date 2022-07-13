@@ -1,72 +1,86 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.entity.EntityOtherPlayerMP
+ *  net.minecraft.client.entity.EntityPlayerSP
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketChatMessage
+ *  net.minecraft.network.play.client.CPacketConfirmTeleport
+ *  net.minecraft.network.play.client.CPacketKeepAlive
+ *  net.minecraft.network.play.client.CPacketPlayer
+ *  net.minecraft.network.play.client.CPacketPlayerTryUseItem
+ *  net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock
+ *  net.minecraft.network.play.client.CPacketUseEntity
+ *  net.minecraft.network.play.client.CPacketVehicleMove
+ *  net.minecraft.network.play.server.SPacketPlayerPosLook
+ *  net.minecraft.network.play.server.SPacketSetPassengers
+ *  net.minecraft.util.math.AxisAlignedBB
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.world.World
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.player;
 
+import dev._3000IQPlay.experium.event.events.PacketEvent;
 import dev._3000IQPlay.experium.event.events.PushEvent;
+import dev._3000IQPlay.experium.features.Feature;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.MathUtil;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketChatMessage;
 import net.minecraft.network.play.client.CPacketConfirmTeleport;
+import net.minecraft.network.play.client.CPacketKeepAlive;
+import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
+import net.minecraft.network.play.client.CPacketUseEntity;
+import net.minecraft.network.play.client.CPacketVehicleMove;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.network.play.server.SPacketSetPassengers;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.network.play.client.CPacketKeepAlive;
-import net.minecraft.network.play.client.CPacketChatMessage;
-import net.minecraft.network.play.client.CPacketVehicleMove;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
-import net.minecraft.network.play.client.CPacketUseEntity;
-import net.minecraft.network.play.client.CPacketPlayer;
-import dev._3000IQPlay.experium.event.events.PacketEvent;
-import net.minecraft.client.entity.EntityPlayerSP;
-import dev._3000IQPlay.experium.util.MathUtil;
-import net.minecraft.world.World;
-import dev._3000IQPlay.experium.features.Feature;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.util.math.AxisAlignedBB;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Freecam extends Module
-{
-    private static Freecam INSTANCE;
-    public Setting<Double> speed;
-    public Setting<Boolean> view;
-    public Setting<Boolean> packet;
-    public Setting<Boolean> disable;
-    public Setting<Boolean> legit;
+public class Freecam
+extends Module {
+    private static Freecam INSTANCE = new Freecam();
+    public Setting<Double> speed = this.register(new Setting<Double>("Speed", 0.5, 0.1, 5.0));
+    public Setting<Boolean> view = this.register(new Setting<Boolean>("3D", false));
+    public Setting<Boolean> packet = this.register(new Setting<Boolean>("Packet", true));
+    public Setting<Boolean> disable = this.register(new Setting<Boolean>("Logout/Off", true));
+    public Setting<Boolean> legit = this.register(new Setting<Boolean>("Legit", false));
     private AxisAlignedBB oldBoundingBox;
     private EntityOtherPlayerMP entity;
     private Vec3d position;
     private Entity riding;
     private float yaw;
     private float pitch;
-    
+
     public Freecam() {
-        super("Freecam", "Look around freely.", Category.PLAYER, true, false, false);
-        this.speed = (Setting<Double>)this.register(new Setting("Speed", (T)0.5, (T)0.1, (T)5.0));
-        this.view = (Setting<Boolean>)this.register(new Setting("3D", (T)false));
-        this.packet = (Setting<Boolean>)this.register(new Setting("Packet", (T)true));
-        this.disable = (Setting<Boolean>)this.register(new Setting("Logout/Off", (T)true));
-        this.legit = (Setting<Boolean>)this.register(new Setting("Legit", (T)false));
+        super("Freecam", "Look around freely.", Module.Category.PLAYER, true, false, false);
         this.setInstance();
     }
-    
+
     public static Freecam getInstance() {
-        if (Freecam.INSTANCE == null) {
-            Freecam.INSTANCE = new Freecam();
+        if (INSTANCE == null) {
+            INSTANCE = new Freecam();
         }
-        return Freecam.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        Freecam.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @Override
     public void onEnable() {
         if (!Feature.fullNullCheck()) {
@@ -76,7 +90,8 @@ public class Freecam extends Module
                 this.riding = Freecam.mc.player.getRidingEntity();
                 Freecam.mc.player.dismountRidingEntity();
             }
-            (this.entity = new EntityOtherPlayerMP((World)Freecam.mc.world, Freecam.mc.session.getProfile())).copyLocationAndAnglesFrom((Entity)Freecam.mc.player);
+            this.entity = new EntityOtherPlayerMP((World)Freecam.mc.world, Freecam.mc.session.getProfile());
+            this.entity.copyLocationAndAnglesFrom((Entity)Freecam.mc.player);
             this.entity.rotationYaw = Freecam.mc.player.rotationYaw;
             this.entity.rotationYawHead = Freecam.mc.player.rotationYawHead;
             this.entity.inventory.copyInventory(Freecam.mc.player.inventory);
@@ -87,7 +102,7 @@ public class Freecam extends Module
             Freecam.mc.player.noClip = true;
         }
     }
-    
+
     @Override
     public void onDisable() {
         if (!Feature.fullNullCheck()) {
@@ -106,96 +121,86 @@ public class Freecam extends Module
             Freecam.mc.player.noClip = false;
         }
     }
-    
+
     @Override
     public void onUpdate() {
         Freecam.mc.player.noClip = true;
         Freecam.mc.player.setVelocity(0.0, 0.0, 0.0);
         Freecam.mc.player.jumpMovementFactor = this.speed.getValue().floatValue();
-        final double[] dir = MathUtil.directionSpeed(this.speed.getValue());
+        double[] dir = MathUtil.directionSpeed(this.speed.getValue());
         if (Freecam.mc.player.movementInput.moveStrafe != 0.0f || Freecam.mc.player.movementInput.moveForward != 0.0f) {
             Freecam.mc.player.motionX = dir[0];
             Freecam.mc.player.motionZ = dir[1];
-        }
-        else {
+        } else {
             Freecam.mc.player.motionX = 0.0;
             Freecam.mc.player.motionZ = 0.0;
         }
         Freecam.mc.player.setSprinting(false);
-        if (this.view.getValue() && !Freecam.mc.gameSettings.keyBindSneak.isKeyDown() && !Freecam.mc.gameSettings.keyBindJump.isKeyDown()) {
-            Freecam.mc.player.motionY = this.speed.getValue() * -MathUtil.degToRad(Freecam.mc.player.rotationPitch) * Freecam.mc.player.movementInput.moveForward;
+        if (this.view.getValue().booleanValue() && !Freecam.mc.gameSettings.keyBindSneak.isKeyDown() && !Freecam.mc.gameSettings.keyBindJump.isKeyDown()) {
+            Freecam.mc.player.motionY = this.speed.getValue() * -MathUtil.degToRad(Freecam.mc.player.rotationPitch) * (double)Freecam.mc.player.movementInput.moveForward;
         }
         if (Freecam.mc.gameSettings.keyBindJump.isKeyDown()) {
-            final EntityPlayerSP player;
-            final EntityPlayerSP player = player = Freecam.mc.player;
-            player.motionY += this.speed.getValue();
+            EntityPlayerSP player = Freecam.mc.player;
+            player.motionY += this.speed.getValue().doubleValue();
         }
         if (Freecam.mc.gameSettings.keyBindSneak.isKeyDown()) {
-            final EntityPlayerSP player2;
-            final EntityPlayerSP player2 = player2 = Freecam.mc.player;
-            player2.motionY -= this.speed.getValue();
+            EntityPlayerSP player2 = Freecam.mc.player;
+            player2.motionY -= this.speed.getValue().doubleValue();
         }
     }
-    
+
     @Override
     public void onLogout() {
-        if (this.disable.getValue()) {
+        if (this.disable.getValue().booleanValue()) {
             this.disable();
         }
     }
-    
+
     @SubscribeEvent
-    public void onPacketSend(final PacketEvent.Send event) {
-        if (this.legit.getValue() && this.entity != null && event.getPacket() instanceof CPacketPlayer) {
-            final CPacketPlayer packetPlayer = event.getPacket();
+    public void onPacketSend(PacketEvent.Send event) {
+        if (this.legit.getValue().booleanValue() && this.entity != null && event.getPacket() instanceof CPacketPlayer) {
+            CPacketPlayer packetPlayer = (CPacketPlayer)event.getPacket();
             packetPlayer.x = this.entity.posX;
             packetPlayer.y = this.entity.posY;
             packetPlayer.z = this.entity.posZ;
             return;
         }
-        if (this.packet.getValue()) {
+        if (this.packet.getValue().booleanValue()) {
             if (event.getPacket() instanceof CPacketPlayer) {
                 event.setCanceled(true);
             }
-        }
-        else if (!(event.getPacket() instanceof CPacketUseEntity) && !(event.getPacket() instanceof CPacketPlayerTryUseItem) && !(event.getPacket() instanceof CPacketPlayerTryUseItemOnBlock) && !(event.getPacket() instanceof CPacketPlayer) && !(event.getPacket() instanceof CPacketVehicleMove) && !(event.getPacket() instanceof CPacketChatMessage) && !(event.getPacket() instanceof CPacketKeepAlive)) {
+        } else if (!(event.getPacket() instanceof CPacketUseEntity || event.getPacket() instanceof CPacketPlayerTryUseItem || event.getPacket() instanceof CPacketPlayerTryUseItemOnBlock || event.getPacket() instanceof CPacketPlayer || event.getPacket() instanceof CPacketVehicleMove || event.getPacket() instanceof CPacketChatMessage || event.getPacket() instanceof CPacketKeepAlive)) {
             event.setCanceled(true);
         }
     }
-    
+
     @SubscribeEvent
-    public void onPacketReceive(final PacketEvent.Receive event) {
-        if (event.getPacket() instanceof SPacketSetPassengers) {
-            final SPacketSetPassengers packet = event.getPacket();
-            final Entity riding = Freecam.mc.world.getEntityByID(packet.getEntityId());
-            if (riding != null && riding == this.riding) {
-                this.riding = null;
-            }
+    public void onPacketReceive(PacketEvent.Receive event) {
+        SPacketSetPassengers packet;
+        Entity riding;
+        if (event.getPacket() instanceof SPacketSetPassengers && (riding = Freecam.mc.world.getEntityByID((packet = (SPacketSetPassengers)event.getPacket()).getEntityId())) != null && riding == this.riding) {
+            this.riding = null;
         }
         if (event.getPacket() instanceof SPacketPlayerPosLook) {
-            final SPacketPlayerPosLook packet2 = event.getPacket();
-            if (this.packet.getValue()) {
+            SPacketPlayerPosLook packet2 = (SPacketPlayerPosLook)event.getPacket();
+            if (this.packet.getValue().booleanValue()) {
                 if (this.entity != null) {
                     this.entity.setPositionAndRotation(packet2.getX(), packet2.getY(), packet2.getZ(), packet2.getYaw(), packet2.getPitch());
                 }
                 this.position = new Vec3d(packet2.getX(), packet2.getY(), packet2.getZ());
                 Freecam.mc.player.connection.sendPacket((Packet)new CPacketConfirmTeleport(packet2.getTeleportId()));
                 event.setCanceled(true);
-            }
-            else {
+            } else {
                 event.setCanceled(true);
             }
         }
     }
-    
+
     @SubscribeEvent
-    public void onPush(final PushEvent event) {
+    public void onPush(PushEvent event) {
         if (event.getStage() == 1) {
             event.setCanceled(true);
         }
     }
-    
-    static {
-        Freecam.INSTANCE = new Freecam();
-    }
 }
+

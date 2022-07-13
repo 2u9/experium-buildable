@@ -1,49 +1,51 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.item.ItemShulkerBox
+ *  net.minecraft.item.ItemStack
+ */
 package dev._3000IQPlay.experium.features.command.commands;
 
-import java.util.Iterator;
-import net.minecraft.item.ItemStack;
-import net.minecraft.entity.player.EntityPlayer;
-import java.util.Map;
-import dev._3000IQPlay.experium.features.modules.misc.ToolTips;
-import net.minecraft.item.ItemShulkerBox;
 import dev._3000IQPlay.experium.features.command.Command;
+import dev._3000IQPlay.experium.features.modules.misc.ToolTips;
+import java.util.Map;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemShulkerBox;
+import net.minecraft.item.ItemStack;
 
-public class PeekCommand extends Command
-{
+public class PeekCommand
+extends Command {
     public PeekCommand() {
-        super("peek", new String[] { "<player>" });
+        super("peek", new String[]{"<player>"});
     }
-    
+
     @Override
-    public void execute(final String[] commands) {
+    public void execute(String[] commands) {
         if (commands.length == 1) {
-            final ItemStack stack = PeekCommand.mc.player.getHeldItemMainhand();
-            if (stack == null || !(stack.getItem() instanceof ItemShulkerBox)) {
-                Command.sendMessage("§cYou need to hold a Shulker in your mainhand.");
+            ItemStack stack = PeekCommand.mc.player.getHeldItemMainhand();
+            if (stack != null && stack.getItem() instanceof ItemShulkerBox) {
+                ToolTips.displayInv(stack, null);
+            } else {
+                Command.sendMessage("\u00a7cYou need to hold a Shulker in your mainhand.");
                 return;
             }
-            ToolTips.displayInv(stack, null);
         }
         if (commands.length > 1) {
-            if (ToolTips.getInstance().isOn() && ToolTips.getInstance().shulkerSpy.getValue()) {
-                for (final Map.Entry<EntityPlayer, ItemStack> entry : ToolTips.getInstance().spiedPlayers.entrySet()) {
-                    if (!entry.getKey().getName().equalsIgnoreCase(commands[0])) {
-                        continue;
-                    }
-                    final ItemStack stack2 = entry.getValue();
-                    ToolTips.displayInv(stack2, entry.getKey().getName());
+            if (ToolTips.getInstance().isOn() && ToolTips.getInstance().shulkerSpy.getValue().booleanValue()) {
+                for (Map.Entry<EntityPlayer, ItemStack> entry : ToolTips.getInstance().spiedPlayers.entrySet()) {
+                    if (!entry.getKey().getName().equalsIgnoreCase(commands[0])) continue;
+                    ItemStack stack = entry.getValue();
+                    ToolTips.displayInv(stack, entry.getKey().getName());
                     break;
                 }
-            }
-            else {
-                Command.sendMessage("§cYou need to turn on Tooltips - ShulkerSpy");
+            } else {
+                Command.sendMessage("\u00a7cYou need to turn on Tooltips - ShulkerSpy");
             }
         }
     }
 }
+

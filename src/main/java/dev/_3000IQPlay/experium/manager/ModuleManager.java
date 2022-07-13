@@ -1,169 +1,163 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.common.MinecraftForge
+ *  net.minecraftforge.fml.common.eventhandler.EventBus
+ *  org.lwjgl.input.Keyboard
+ */
 package dev._3000IQPlay.experium.manager;
 
-import dev._3000IQPlay.experium.features.gui.ExperiumGui;
-import org.lwjgl.input.Keyboard;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.Comparator;
-import dev._3000IQPlay.experium.event.events.Render3DEvent;
 import dev._3000IQPlay.experium.event.events.Render2DEvent;
-import java.util.function.Consumer;
-import net.minecraftforge.common.MinecraftForge;
-import java.util.Arrays;
-import java.util.Iterator;
-import dev._3000IQPlay.experium.features.modules.combat.Blocker;
-import dev._3000IQPlay.experium.features.modules.render.ChinaHat;
-import dev._3000IQPlay.experium.features.modules.render.EnchantColor;
-import dev._3000IQPlay.experium.features.modules.misc.AntiSpam;
-import dev._3000IQPlay.experium.features.modules.exploit.PacketmineOLD;
-import dev._3000IQPlay.experium.features.modules.combat.PistonPush;
-import dev._3000IQPlay.experium.features.modules.misc.KeyChorus;
-import dev._3000IQPlay.experium.features.modules.player.AntiHunger;
-import dev._3000IQPlay.experium.features.modules.render.BurrowESP;
-import dev._3000IQPlay.experium.features.modules.exploit.PearlBait;
-import dev._3000IQPlay.experium.features.modules.exploit.Backpack;
-import dev._3000IQPlay.experium.features.modules.render.ExplosionChams;
-import dev._3000IQPlay.experium.features.modules.movement.NoWeb;
-import dev._3000IQPlay.experium.features.modules.exploit.EntityDesync;
-import dev._3000IQPlay.experium.features.modules.exploit.PhaseWalk;
-import dev._3000IQPlay.experium.features.modules.misc.AntiVanish;
-import dev._3000IQPlay.experium.features.modules.exploit.ManualIllegalStack;
-import dev._3000IQPlay.experium.features.modules.client.FakeVanilla;
-import dev._3000IQPlay.experium.features.modules.movement.SpeedNew;
-import dev._3000IQPlay.experium.features.modules.misc.AntiChunkBan;
-import dev._3000IQPlay.experium.features.modules.misc.AntiBookBan;
-import dev._3000IQPlay.experium.features.modules.render.Aspect;
-import dev._3000IQPlay.experium.features.modules.render.BreadCrumbs;
-import dev._3000IQPlay.experium.features.modules.player.Scaffold;
-import dev._3000IQPlay.experium.features.modules.player.AutoBuilder;
-import dev._3000IQPlay.experium.features.modules.client.ExperiumCSGO;
-import dev._3000IQPlay.experium.features.modules.render.HitMarkers;
-import dev._3000IQPlay.experium.features.modules.exploit.TickShift;
-import dev._3000IQPlay.experium.features.modules.render.Trails;
-import dev._3000IQPlay.experium.features.modules.exploit.Clip;
-import dev._3000IQPlay.experium.features.modules.misc.AntiPackets;
-import dev._3000IQPlay.experium.features.modules.exploit.ChorusPostpone;
-import dev._3000IQPlay.experium.features.modules.combat.AutoCity;
-import dev._3000IQPlay.experium.features.modules.player.AntiPing;
-import dev._3000IQPlay.experium.features.modules.exploit.PacketEat;
-import dev._3000IQPlay.experium.features.modules.combat.PistonAura;
-import dev._3000IQPlay.experium.features.modules.player.NoGlitchBlocks;
-import dev._3000IQPlay.experium.features.modules.combat.CevBreaker;
-import dev._3000IQPlay.experium.features.modules.render.PenisESP;
-import dev._3000IQPlay.experium.features.modules.misc.PingSpoof;
-import dev._3000IQPlay.experium.features.modules.exploit.OldFagDupe;
-import dev._3000IQPlay.experium.features.modules.exploit.AutoSignKick;
-import dev._3000IQPlay.experium.features.modules.exploit.ChorusLag;
-import dev._3000IQPlay.experium.features.modules.misc.Suicide;
-import dev._3000IQPlay.experium.features.modules.render.SkyColor;
-import dev._3000IQPlay.experium.features.modules.combat.Offhand;
-import dev._3000IQPlay.experium.features.modules.movement.Flight;
-import dev._3000IQPlay.experium.features.modules.combat.BowAim;
-import dev._3000IQPlay.experium.features.modules.movement.NoFall;
-import dev._3000IQPlay.experium.features.modules.exploit.PacketFly;
-import dev._3000IQPlay.experium.features.modules.movement.BoatFly;
-import dev._3000IQPlay.experium.features.modules.exploit.FastProjectiles;
-import dev._3000IQPlay.experium.features.modules.misc.NoSoundLag;
-import dev._3000IQPlay.experium.features.modules.player.Blink;
-import dev._3000IQPlay.experium.features.modules.player.NoEntityTrace;
-import dev._3000IQPlay.experium.features.modules.movement.Anchor;
-import dev._3000IQPlay.experium.features.modules.render.ViewModel;
-import dev._3000IQPlay.experium.features.modules.movement.Sprint;
-import dev._3000IQPlay.experium.features.modules.combat.AutoArmor;
-import dev._3000IQPlay.experium.features.modules.player.SilentXP;
-import dev._3000IQPlay.experium.features.modules.render.Nametags;
-import dev._3000IQPlay.experium.features.modules.combat.Quiver;
-import dev._3000IQPlay.experium.features.modules.combat.Flatten;
-import dev._3000IQPlay.experium.features.modules.combat.BowSpam;
-import dev._3000IQPlay.experium.features.modules.combat.Burrow;
-import dev._3000IQPlay.experium.features.modules.render.PopChams;
-import dev._3000IQPlay.experium.features.modules.client.NickHider;
-import dev._3000IQPlay.experium.features.modules.client.PingBypass;
+import dev._3000IQPlay.experium.event.events.Render3DEvent;
+import dev._3000IQPlay.experium.features.Feature;
+import dev._3000IQPlay.experium.features.gui.ExperiumGui;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.client.ClickGui;
 import dev._3000IQPlay.experium.features.modules.client.Colors;
 import dev._3000IQPlay.experium.features.modules.client.Components;
-import dev._3000IQPlay.experium.features.modules.client.Managers;
-import dev._3000IQPlay.experium.features.modules.client.ClickGui;
+import dev._3000IQPlay.experium.features.modules.client.ExperiumCSGO;
+import dev._3000IQPlay.experium.features.modules.client.FakeVanilla;
 import dev._3000IQPlay.experium.features.modules.client.FontMod;
-import dev._3000IQPlay.experium.features.modules.misc.ToolTips;
+import dev._3000IQPlay.experium.features.modules.client.FriendSettings;
 import dev._3000IQPlay.experium.features.modules.client.HUD;
+import dev._3000IQPlay.experium.features.modules.client.Managers;
+import dev._3000IQPlay.experium.features.modules.client.ModuleTools;
+import dev._3000IQPlay.experium.features.modules.client.NickHider;
 import dev._3000IQPlay.experium.features.modules.client.Notifications;
-import dev._3000IQPlay.experium.features.modules.render.CrystalModify;
-import dev._3000IQPlay.experium.features.modules.render.VoidESP;
-import dev._3000IQPlay.experium.features.modules.render.XRay;
-import dev._3000IQPlay.experium.features.modules.render.LogoutSpots;
-import dev._3000IQPlay.experium.features.modules.render.Trajectories;
-import dev._3000IQPlay.experium.features.modules.render.BlockHighlight;
-import dev._3000IQPlay.experium.features.modules.render.HoleESP;
-import dev._3000IQPlay.experium.features.modules.render.ESP;
-import dev._3000IQPlay.experium.features.modules.render.CameraClip;
-import dev._3000IQPlay.experium.features.modules.render.Fullbright;
-import dev._3000IQPlay.experium.features.modules.render.NoRender;
-import dev._3000IQPlay.experium.features.modules.player.Yaw;
-import dev._3000IQPlay.experium.features.modules.player.MCP;
-import dev._3000IQPlay.experium.features.modules.player.Replenish;
-import dev._3000IQPlay.experium.features.modules.player.XCarry;
-import dev._3000IQPlay.experium.features.modules.player.MultiTask;
-import dev._3000IQPlay.experium.features.modules.exploit.Speedmine;
-import dev._3000IQPlay.experium.features.modules.player.Freecam;
-import dev._3000IQPlay.experium.features.modules.player.FastUse;
-import dev._3000IQPlay.experium.features.modules.player.TimerSpeed;
-import dev._3000IQPlay.experium.features.modules.player.FakePlayer;
-import dev._3000IQPlay.experium.features.modules.movement.NoSlowDown;
-import dev._3000IQPlay.experium.features.modules.movement.ElytraFlight;
-import dev._3000IQPlay.experium.features.modules.movement.AntiVoid;
-import dev._3000IQPlay.experium.features.modules.movement.Step;
-import dev._3000IQPlay.experium.features.modules.movement.Speed;
-import dev._3000IQPlay.experium.features.modules.movement.Velocity;
-import dev._3000IQPlay.experium.features.modules.movement.Strafe;
-import dev._3000IQPlay.experium.features.modules.movement.FastFall;
-import dev._3000IQPlay.experium.features.modules.misc.AutoGG;
+import dev._3000IQPlay.experium.features.modules.client.PingBypass;
 import dev._3000IQPlay.experium.features.modules.client.RPC;
-import dev._3000IQPlay.experium.features.modules.misc.AutoReconnect;
+import dev._3000IQPlay.experium.features.modules.combat.AutoArmor;
+import dev._3000IQPlay.experium.features.modules.combat.AutoCity;
+import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
+import dev._3000IQPlay.experium.features.modules.combat.AutoTrap;
+import dev._3000IQPlay.experium.features.modules.combat.AutoWeb;
+import dev._3000IQPlay.experium.features.modules.combat.Blocker;
+import dev._3000IQPlay.experium.features.modules.combat.BowAim;
+import dev._3000IQPlay.experium.features.modules.combat.BowSpam;
+import dev._3000IQPlay.experium.features.modules.combat.Burrow;
+import dev._3000IQPlay.experium.features.modules.combat.CevBreaker;
+import dev._3000IQPlay.experium.features.modules.combat.Criticals;
+import dev._3000IQPlay.experium.features.modules.combat.Flatten;
+import dev._3000IQPlay.experium.features.modules.combat.HoleFiller;
+import dev._3000IQPlay.experium.features.modules.combat.Killaura;
+import dev._3000IQPlay.experium.features.modules.combat.Offhand;
+import dev._3000IQPlay.experium.features.modules.combat.OffhandRewrite;
+import dev._3000IQPlay.experium.features.modules.combat.PistonAura;
+import dev._3000IQPlay.experium.features.modules.combat.PistonPush;
+import dev._3000IQPlay.experium.features.modules.combat.Quiver;
+import dev._3000IQPlay.experium.features.modules.combat.Surround;
+import dev._3000IQPlay.experium.features.modules.exploit.AutoSignKick;
+import dev._3000IQPlay.experium.features.modules.exploit.Backpack;
+import dev._3000IQPlay.experium.features.modules.exploit.ChorusLag;
+import dev._3000IQPlay.experium.features.modules.exploit.ChorusPostpone;
+import dev._3000IQPlay.experium.features.modules.exploit.Clip;
+import dev._3000IQPlay.experium.features.modules.exploit.EntityDesync;
+import dev._3000IQPlay.experium.features.modules.exploit.FastProjectiles;
+import dev._3000IQPlay.experium.features.modules.exploit.ManualIllegalStack;
+import dev._3000IQPlay.experium.features.modules.exploit.OldFagDupe;
+import dev._3000IQPlay.experium.features.modules.exploit.PacketEat;
+import dev._3000IQPlay.experium.features.modules.exploit.PacketFly;
+import dev._3000IQPlay.experium.features.modules.exploit.PacketmineOLD;
+import dev._3000IQPlay.experium.features.modules.exploit.PearlBait;
+import dev._3000IQPlay.experium.features.modules.exploit.PhaseWalk;
+import dev._3000IQPlay.experium.features.modules.exploit.Speedmine;
+import dev._3000IQPlay.experium.features.modules.exploit.TickShift;
+import dev._3000IQPlay.experium.features.modules.misc.AntiBookBan;
+import dev._3000IQPlay.experium.features.modules.misc.AntiChunkBan;
+import dev._3000IQPlay.experium.features.modules.misc.AntiPackets;
+import dev._3000IQPlay.experium.features.modules.misc.AntiSpam;
+import dev._3000IQPlay.experium.features.modules.misc.AntiVanish;
+import dev._3000IQPlay.experium.features.modules.misc.AutoGG;
 import dev._3000IQPlay.experium.features.modules.misc.AutoLog;
-import dev._3000IQPlay.experium.features.modules.player.MCF;
-import dev._3000IQPlay.experium.features.modules.misc.NoRotate;
+import dev._3000IQPlay.experium.features.modules.misc.AutoReconnect;
 import dev._3000IQPlay.experium.features.modules.misc.AutoRespawn;
 import dev._3000IQPlay.experium.features.modules.misc.BuildHeight;
 import dev._3000IQPlay.experium.features.modules.misc.ChatModifier;
-import dev._3000IQPlay.experium.features.modules.combat.AutoWeb;
-import dev._3000IQPlay.experium.features.modules.combat.HoleFiller;
-import dev._3000IQPlay.experium.features.modules.combat.Killaura;
-import dev._3000IQPlay.experium.features.modules.combat.Criticals;
-import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
-import dev._3000IQPlay.experium.features.modules.combat.AutoTrap;
-import dev._3000IQPlay.experium.features.modules.combat.Surround;
-import dev._3000IQPlay.experium.features.modules.combat.OffhandRewrite;
-import dev._3000IQPlay.experium.features.modules.client.FriendSettings;
-import dev._3000IQPlay.experium.features.modules.client.ModuleTools;
-import java.util.HashMap;
+import dev._3000IQPlay.experium.features.modules.misc.KeyChorus;
+import dev._3000IQPlay.experium.features.modules.misc.NoRotate;
+import dev._3000IQPlay.experium.features.modules.misc.NoSoundLag;
+import dev._3000IQPlay.experium.features.modules.misc.PingSpoof;
+import dev._3000IQPlay.experium.features.modules.misc.Suicide;
+import dev._3000IQPlay.experium.features.modules.misc.ToolTips;
+import dev._3000IQPlay.experium.features.modules.movement.Anchor;
+import dev._3000IQPlay.experium.features.modules.movement.AntiVoid;
+import dev._3000IQPlay.experium.features.modules.movement.BoatFly;
+import dev._3000IQPlay.experium.features.modules.movement.ElytraFlight;
+import dev._3000IQPlay.experium.features.modules.movement.FastFall;
+import dev._3000IQPlay.experium.features.modules.movement.Flight;
+import dev._3000IQPlay.experium.features.modules.movement.NoFall;
+import dev._3000IQPlay.experium.features.modules.movement.NoSlowDown;
+import dev._3000IQPlay.experium.features.modules.movement.NoWeb;
+import dev._3000IQPlay.experium.features.modules.movement.Speed;
+import dev._3000IQPlay.experium.features.modules.movement.SpeedNew;
+import dev._3000IQPlay.experium.features.modules.movement.Sprint;
+import dev._3000IQPlay.experium.features.modules.movement.Step;
+import dev._3000IQPlay.experium.features.modules.movement.Strafe;
+import dev._3000IQPlay.experium.features.modules.movement.Velocity;
+import dev._3000IQPlay.experium.features.modules.player.AntiHunger;
+import dev._3000IQPlay.experium.features.modules.player.AntiPing;
+import dev._3000IQPlay.experium.features.modules.player.AutoBuilder;
+import dev._3000IQPlay.experium.features.modules.player.Blink;
+import dev._3000IQPlay.experium.features.modules.player.FakePlayer;
+import dev._3000IQPlay.experium.features.modules.player.FastUse;
+import dev._3000IQPlay.experium.features.modules.player.Freecam;
+import dev._3000IQPlay.experium.features.modules.player.MCF;
+import dev._3000IQPlay.experium.features.modules.player.MCP;
+import dev._3000IQPlay.experium.features.modules.player.MultiTask;
+import dev._3000IQPlay.experium.features.modules.player.NoEntityTrace;
+import dev._3000IQPlay.experium.features.modules.player.NoGlitchBlocks;
+import dev._3000IQPlay.experium.features.modules.player.Replenish;
+import dev._3000IQPlay.experium.features.modules.player.Scaffold;
+import dev._3000IQPlay.experium.features.modules.player.SilentXP;
+import dev._3000IQPlay.experium.features.modules.player.TimerSpeed;
+import dev._3000IQPlay.experium.features.modules.player.XCarry;
+import dev._3000IQPlay.experium.features.modules.player.Yaw;
+import dev._3000IQPlay.experium.features.modules.render.Aspect;
+import dev._3000IQPlay.experium.features.modules.render.BlockHighlight;
+import dev._3000IQPlay.experium.features.modules.render.BreadCrumbs;
+import dev._3000IQPlay.experium.features.modules.render.BurrowESP;
+import dev._3000IQPlay.experium.features.modules.render.CameraClip;
+import dev._3000IQPlay.experium.features.modules.render.ChinaHat;
+import dev._3000IQPlay.experium.features.modules.render.CrystalModify;
+import dev._3000IQPlay.experium.features.modules.render.ESP;
+import dev._3000IQPlay.experium.features.modules.render.EnchantColor;
+import dev._3000IQPlay.experium.features.modules.render.ExplosionChams;
+import dev._3000IQPlay.experium.features.modules.render.Fullbright;
+import dev._3000IQPlay.experium.features.modules.render.HitMarkers;
+import dev._3000IQPlay.experium.features.modules.render.HoleESP;
+import dev._3000IQPlay.experium.features.modules.render.LogoutSpots;
+import dev._3000IQPlay.experium.features.modules.render.Nametags;
+import dev._3000IQPlay.experium.features.modules.render.NoRender;
+import dev._3000IQPlay.experium.features.modules.render.PenisESP;
+import dev._3000IQPlay.experium.features.modules.render.PopChams;
+import dev._3000IQPlay.experium.features.modules.render.SkyColor;
+import dev._3000IQPlay.experium.features.modules.render.Trails;
+import dev._3000IQPlay.experium.features.modules.render.Trajectories;
+import dev._3000IQPlay.experium.features.modules.render.ViewModel;
+import dev._3000IQPlay.experium.features.modules.render.VoidESP;
+import dev._3000IQPlay.experium.features.modules.render.XRay;
 import java.awt.Color;
-import java.util.Map;
-import java.util.List;
-import dev._3000IQPlay.experium.features.modules.Module;
 import java.util.ArrayList;
-import dev._3000IQPlay.experium.features.Feature;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
+import org.lwjgl.input.Keyboard;
 
-public class ModuleManager extends Feature
-{
-    public ArrayList<Module> modules;
-    public List<Module> sortedModules;
-    public List<Module> alphabeticallySortedModules;
-    public Map<Module, Color> moduleColorMap;
-    
-    public ModuleManager() {
-        this.modules = new ArrayList<Module>();
-        this.sortedModules = new ArrayList<Module>();
-        this.alphabeticallySortedModules = new ArrayList<Module>();
-        this.moduleColorMap = new HashMap<Module, Color>();
-    }
-    
+public class ModuleManager
+extends Feature {
+    public ArrayList<Module> modules = new ArrayList();
+    public List<Module> sortedModules = new ArrayList<Module>();
+    public List<Module> alphabeticallySortedModules = new ArrayList<Module>();
+    public Map<Module, Color> moduleColorMap = new HashMap<Module, Color>();
+
     public void init() {
         this.modules.add(new ModuleTools());
         this.modules.add(new FriendSettings());
@@ -409,27 +403,26 @@ public class ModuleManager extends Feature
         this.moduleColorMap.put(this.getModuleByClass(Notifications.class), new Color(170, 153, 255));
         this.moduleColorMap.put(this.getModuleByClass(PingBypass.class), new Color(60, 110, 175));
         this.moduleColorMap.put(this.getModuleByClass(NickHider.class), new Color(138, 45, 13));
-        for (final Module module : this.modules) {
+        for (Module module : this.modules) {
             module.animation.start();
         }
     }
 
-    
-    public Module getModuleByName(final String name) {
-        for (final Module module : this.modules) {
-            if (!module.getName().equalsIgnoreCase(name)) {
-                continue;
-            }
+    public <T extends Module> T getModuleT(Class<T> clazz) {
+        return (T)((Module)this.modules.stream().filter(module -> module.getClass() == clazz).map(module -> module).findFirst().orElse(null));
+    }
+
+    public Module getModuleByName(String name) {
+        for (Module module : this.modules) {
+            if (!module.getName().equalsIgnoreCase(name)) continue;
             return module;
         }
         return null;
     }
-    
-    public <T extends Module> T getModuleByClass(final Class<T> clazz) {
-        for (final Module module : this.modules) {
-            if (!clazz.isInstance(module)) {
-                continue;
-            }
+
+    public <T extends Module> T getModuleByClass(Class<T> clazz) {
+        for (Module module : this.modules) {
+            if (!clazz.isInstance(module)) continue;
             return (T)module;
         }
         return null;
@@ -438,57 +431,53 @@ public class ModuleManager extends Feature
     public void enableModule(Class clazz) {
         Object module = this.getModuleByClass(clazz);
         if (module != null) {
-            ((Module) module).enable();
+            ((Module)module).enable();
         }
     }
 
     public void disableModule(Class clazz) {
         Object module = this.getModuleByClass(clazz);
         if (module != null) {
-            ((Module) module).disable();
+            ((Module)module).disable();
         }
     }
-    
-    public void enableModule(final String name) {
-        final Module module = this.getModuleByName(name);
+
+    public void enableModule(String name) {
+        Module module = this.getModuleByName(name);
         if (module != null) {
             module.enable();
         }
     }
-    
-    public void disableModule(final String name) {
-        final Module module = this.getModuleByName(name);
+
+    public void disableModule(String name) {
+        Module module = this.getModuleByName(name);
         if (module != null) {
             module.disable();
         }
     }
-    
-    public boolean isModuleEnabled(final String name) {
-        final Module module = this.getModuleByName(name);
+
+    public boolean isModuleEnabled(String name) {
+        Module module = this.getModuleByName(name);
         return module != null && module.isOn();
     }
 
     public boolean isModuleEnabled(Class clazz) {
         Object module = this.getModuleByClass(clazz);
-        return module != null && ((Module) module).isOn();
+        return module != null && ((Module)module).isOn();
     }
-    
-    public Module getModuleByDisplayName(final String displayName) {
-        for (final Module module : this.modules) {
-            if (!module.getDisplayName().equalsIgnoreCase(displayName)) {
-                continue;
-            }
+
+    public Module getModuleByDisplayName(String displayName) {
+        for (Module module : this.modules) {
+            if (!module.getDisplayName().equalsIgnoreCase(displayName)) continue;
             return module;
         }
         return null;
     }
-    
+
     public ArrayList<Module> getEnabledModules() {
-        final ArrayList<Module> enabledModules = new ArrayList<Module>();
-        for (final Module module : this.modules) {
-            if (!module.isEnabled() && !module.isSliding()) {
-                continue;
-            }
+        ArrayList<Module> enabledModules = new ArrayList<Module>();
+        for (Module module : this.modules) {
+            if (!module.isEnabled() && !module.isSliding()) continue;
             enabledModules.add(module);
         }
         return enabledModules;
@@ -498,34 +487,34 @@ public class ModuleManager extends Feature
         ArrayList<Module> modulesCategory = new ArrayList<Module>();
         this.modules.forEach(module -> {
             if (module.getCategory() == category) {
-                modulesCategory.add(module);
+                modulesCategory.add((Module)module);
             }
         });
         return modulesCategory;
     }
-    
+
     public List<Module.Category> getCategories() {
         return Arrays.asList(Module.Category.values());
     }
-    
+
     public void onLoad() {
-        this.modules.stream().filter(Module::listening).forEach(MinecraftForge.EVENT_BUS::register);
+        this.modules.stream().filter(Module::listening).forEach(((EventBus)MinecraftForge.EVENT_BUS)::register);
         this.modules.forEach(Module::onLoad);
     }
-    
+
     public void onUpdate() {
         this.modules.stream().filter(Feature::isEnabled).forEach(Module::onUpdate);
     }
-    
+
     public void onTick() {
         this.modules.stream().filter(Feature::isEnabled).forEach(Module::onTick);
     }
-    
-    public void onRender2D(final Render2DEvent event) {
+
+    public void onRender2D(Render2DEvent event) {
         this.modules.stream().filter(Feature::isEnabled).forEach(module -> module.onRender2D(event));
     }
-    
-    public void onRender3D(final Render3DEvent event) {
+
+    public void onRender3D(Render3DEvent event) {
         this.modules.stream().filter(Feature::isEnabled).forEach(module -> module.onRender3D(event));
     }
 
@@ -536,27 +525,27 @@ public class ModuleManager extends Feature
     public void alphabeticallySortModules() {
         this.alphabeticallySortedModules = this.getEnabledModules().stream().filter(Module::isDrawn).sorted(Comparator.comparing(Module::getDisplayName)).collect(Collectors.toList());
     }
-    
+
     public void onLogout() {
         this.modules.forEach(Module::onLogout);
     }
-    
+
     public void onLogin() {
         this.modules.forEach(Module::onLogin);
     }
-    
+
     public void onUnload() {
-        this.modules.forEach(MinecraftForge.EVENT_BUS::unregister);
+        this.modules.forEach(((EventBus)MinecraftForge.EVENT_BUS)::unregister);
         this.modules.forEach(Module::onUnload);
     }
-    
+
     public void onUnloadPost() {
-        for (final Module module : this.modules) {
+        for (Module module : this.modules) {
             module.enabled.setValue(false);
         }
     }
-    
-    public void onKeyPressed(final int eventKey) {
+
+    public void onKeyPressed(int eventKey) {
         if (eventKey == 0 || !Keyboard.getEventKeyState() || ModuleManager.mc.currentScreen instanceof ExperiumGui) {
             return;
         }
@@ -566,17 +555,14 @@ public class ModuleManager extends Feature
             }
         });
     }
-    
-    public List<Module> getAnimationModules(final Module.Category category) {
-        final ArrayList<Module> animationModules = new ArrayList<Module>();
-        for (final Module module : this.getEnabledModules()) {
-            if (module.getCategory() == category && !module.isDisabled() && module.isSliding()) {
-                if (!module.isDrawn()) {
-                    continue;
-                }
-                animationModules.add(module);
-            }
+
+    public List<Module> getAnimationModules(Module.Category category) {
+        ArrayList<Module> animationModules = new ArrayList<Module>();
+        for (Module module : this.getEnabledModules()) {
+            if (module.getCategory() != category || module.isDisabled() || !module.isSliding() || !module.isDrawn()) continue;
+            animationModules.add(module);
         }
         return animationModules;
     }
 }
+

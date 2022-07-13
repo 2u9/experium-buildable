@@ -1,66 +1,61 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package dev._3000IQPlay.experium.features.command.commands;
 
-import java.util.Iterator;
 import dev._3000IQPlay.experium.Experium;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import dev._3000IQPlay.experium.features.command.Command;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.io.File;
-import dev._3000IQPlay.experium.features.command.Command;
+import java.util.stream.Collectors;
 
-public class ConfigCommand extends Command
-{
+public class ConfigCommand
+extends Command {
     public ConfigCommand() {
-        super("config", new String[] { "<save/load>" });
+        super("config", new String[]{"<save/load>"});
     }
-    
+
     @Override
-    public void execute(final String[] commands) {
+    public void execute(String[] commands) {
         if (commands.length == 1) {
-            Command.sendMessage("You`ll find the config files in your gameProfile directory under experium/config");
+            ConfigCommand.sendMessage("You`ll find the config files in your gameProfile directory under experium/config");
             return;
         }
         if (commands.length == 2) {
             if ("list".equals(commands[0])) {
                 String configs = "Configs: ";
-                final File file = new File("experium/");
-                final List<File> directories = Arrays.stream(file.listFiles()).filter(File::isDirectory).filter(f -> !f.getName().equals("util")).collect((Collector<? super File, ?, List<File>>)Collectors.toList());
-                final StringBuilder builder = new StringBuilder(configs);
-                for (final File file2 : directories) {
-                    builder.append(file2.getName() + ", ");
+                File file = new File("experium/");
+                List<File> directories = Arrays.stream(file.listFiles()).filter(File::isDirectory).filter(f -> !f.getName().equals("util")).collect(Collectors.toList());
+                StringBuilder builder = new StringBuilder(configs);
+                for (File file1 : directories) {
+                    builder.append(file1.getName() + ", ");
                 }
                 configs = builder.toString();
-                Command.sendMessage("§a" + configs);
-            }
-            else {
-                Command.sendMessage("§cNot a valid command... Possible usage: <list>");
+                ConfigCommand.sendMessage("\u00a7a" + configs);
+            } else {
+                ConfigCommand.sendMessage("\u00a7cNot a valid command... Possible usage: <list>");
             }
         }
         if (commands.length >= 3) {
-            final String s = commands[0];
-            switch (s) {
+            switch (commands[0]) {
                 case "save": {
                     Experium.configManager.saveConfig(commands[1]);
-                    Command.sendMessage("§aConfig has been saved.");
+                    ConfigCommand.sendMessage("\u00a7aConfig has been saved.");
                     break;
                 }
                 case "load": {
                     Experium.moduleManager.onUnload();
                     Experium.configManager.loadConfig(commands[1]);
                     Experium.moduleManager.onLoad();
-                    Command.sendMessage("§aConfig has been loaded.");
+                    ConfigCommand.sendMessage("\u00a7aConfig has been loaded.");
                     break;
                 }
                 default: {
-                    Command.sendMessage("§cNot a valid command... Possible usage: <save/load>");
-                    break;
+                    ConfigCommand.sendMessage("\u00a7cNot a valid command... Possible usage: <save/load>");
                 }
             }
         }
     }
 }
+

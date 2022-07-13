@@ -1,17 +1,21 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.model.ModelBase
+ *  net.minecraft.entity.Entity
+ *  net.minecraftforge.fml.common.eventhandler.Cancelable
+ */
 package dev._3000IQPlay.experium.event.events;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.client.model.ModelBase;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import dev._3000IQPlay.experium.event.EventStage;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.entity.Entity;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 @Cancelable
-public class RenderEntityModelEvent extends EventStage
-{
+public class RenderEntityModelEvent
+extends EventStage {
     public ModelBase modelBase;
     public Entity entity;
     public float limbSwing;
@@ -20,8 +24,8 @@ public class RenderEntityModelEvent extends EventStage
     public float headYaw;
     public float headPitch;
     public float scale;
-    
-    public RenderEntityModelEvent(final int stage, final ModelBase modelBase, final Entity entity, final float limbSwing, final float limbSwingAmount, final float age, final float headYaw, final float headPitch, final float scale) {
+
+    public RenderEntityModelEvent(int stage, ModelBase modelBase, Entity entity, float limbSwing, float limbSwingAmount, float age, float headYaw, float headPitch, float scale) {
         super(stage);
         this.modelBase = modelBase;
         this.entity = entity;
@@ -33,3 +37,4 @@ public class RenderEntityModelEvent extends EventStage
         this.scale = scale;
     }
 }
+

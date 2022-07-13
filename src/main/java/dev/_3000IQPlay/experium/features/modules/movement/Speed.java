@@ -1,45 +1,48 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.EntityLivingBase
+ *  net.minecraft.init.MobEffects
+ *  net.minecraft.util.MovementInput
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.movement;
 
-import dev._3000IQPlay.experium.util.MathUtil;
-import net.minecraft.util.MovementInput;
-import dev._3000IQPlay.experium.event.events.MoveEvent;
+import dev._3000IQPlay.experium.Experium;
 import dev._3000IQPlay.experium.event.events.ClientEvent;
-import java.util.Random;
+import dev._3000IQPlay.experium.event.events.MoveEvent;
+import dev._3000IQPlay.experium.event.events.UpdateWalkingPlayerEvent;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.util.BlockUtil;
-import net.minecraft.entity.Entity;
 import dev._3000IQPlay.experium.util.EntityUtil;
-import net.minecraft.entity.EntityLivingBase;
+import dev._3000IQPlay.experium.util.MathUtil;
 import dev._3000IQPlay.experium.util.MovementUtil;
 import java.util.Objects;
-import net.minecraft.potion.PotionEffect;
+import java.util.Random;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
+import net.minecraft.util.MovementInput;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.client.entity.EntityPlayerSP;
-import dev._3000IQPlay.experium.features.Feature;
-import dev._3000IQPlay.experium.event.events.UpdateWalkingPlayerEvent;
-import dev._3000IQPlay.experium.Experium;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
 
-public class Speed extends Module
-{
-    private static Speed INSTANCE;
-    public Setting<Mode> mode;
-    public Setting<Boolean> strafeJump;
-    public Setting<Boolean> noShake;
-    public Setting<Boolean> useTimer;
-    public Setting<Double> zeroSpeed;
-    public Setting<Double> speed;
-    public Setting<Double> blocked;
-    public Setting<Double> unblocked;
-    public Setting<Boolean> motionyonoff;
-    public Setting<Double> yspeed;
+public class Speed
+extends Module {
+    private static Speed INSTANCE = new Speed();
+    public Setting<Mode> mode = this.register(new Setting<Mode>("Mode", Mode.INSTANT));
+    public Setting<Boolean> strafeJump = this.register(new Setting<Object>("Jump", Boolean.valueOf(false), v -> this.mode.getValue() == Mode.INSTANT));
+    public Setting<Boolean> noShake = this.register(new Setting<Object>("NoShake", Boolean.valueOf(true), v -> this.mode.getValue() != Mode.INSTANT));
+    public Setting<Boolean> useTimer = this.register(new Setting<Object>("UseTimer", Boolean.valueOf(false), v -> this.mode.getValue() != Mode.INSTANT));
+    public Setting<Double> zeroSpeed = this.register(new Setting<Object>("0-Speed", Double.valueOf(0.0), Double.valueOf(0.0), Double.valueOf(100.0), v -> this.mode.getValue() == Mode.VANILLA));
+    public Setting<Double> speed = this.register(new Setting<Object>("Speed", Double.valueOf(10.0), Double.valueOf(0.1), Double.valueOf(100.0), v -> this.mode.getValue() == Mode.VANILLA));
+    public Setting<Double> blocked = this.register(new Setting<Object>("Blocked", Double.valueOf(10.0), Double.valueOf(0.0), Double.valueOf(100.0), v -> this.mode.getValue() == Mode.VANILLA));
+    public Setting<Double> unblocked = this.register(new Setting<Object>("Unblocked", Double.valueOf(10.0), Double.valueOf(0.0), Double.valueOf(100.0), v -> this.mode.getValue() == Mode.VANILLA));
+    public Setting<Boolean> motionyonoff = this.register(new Setting<Object>("MotionYOnOff", Boolean.valueOf(false), v -> this.mode.getValue() == Mode.YPORT));
+    public Setting<Double> yspeed = this.register(new Setting<Object>("YSpeed", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(10.0), v -> this.mode.getValue() == Mode.YPORT));
     public double startY;
     public boolean antiShake;
     public double minY;
@@ -47,42 +50,30 @@ public class Speed extends Module
     private double highChainVal;
     private double lowChainVal;
     private boolean oneTime;
-    private double bounceHeight;
-    private float move;
+    private double bounceHeight = 0.4;
+    private float move = 0.26f;
     private int vanillaCounter;
-    
+
     public Speed() {
-        super("Speed", "Makes you faster.", Category.MOVEMENT, true, false, false);
-        this.mode = (Setting<Mode>)this.register(new Setting("Mode", (T)Mode.INSTANT));
-        this.strafeJump = (Setting<Boolean>)this.register(new Setting("Jump", (T)false, v -> this.mode.getValue() == Mode.INSTANT));
-        this.noShake = (Setting<Boolean>)this.register(new Setting("NoShake", (T)true, v -> this.mode.getValue() != Mode.INSTANT));
-        this.useTimer = (Setting<Boolean>)this.register(new Setting("UseTimer", (T)false, v -> this.mode.getValue() != Mode.INSTANT));
-        this.zeroSpeed = (Setting<Double>)this.register(new Setting("0-Speed", (T)0.0, (T)0.0, (T)100.0, v -> this.mode.getValue() == Mode.VANILLA));
-        this.speed = (Setting<Double>)this.register(new Setting("Speed", (T)10.0, (T)0.1, (T)100.0, v -> this.mode.getValue() == Mode.VANILLA));
-        this.blocked = (Setting<Double>)this.register(new Setting("Blocked", (T)10.0, (T)0.0, (T)100.0, v -> this.mode.getValue() == Mode.VANILLA));
-        this.unblocked = (Setting<Double>)this.register(new Setting("Unblocked", (T)10.0, (T)0.0, (T)100.0, v -> this.mode.getValue() == Mode.VANILLA));
-        this.motionyonoff = (Setting<Boolean>)this.register(new Setting("MotionYOnOff", (T)false, v -> this.mode.getValue() == Mode.YPORT));
-        this.yspeed = (Setting<Double>)this.register(new Setting("YSpeed", (T)1.0, (T)0.1, (T)10.0, v -> this.mode.getValue() == Mode.YPORT));
-        this.bounceHeight = 0.4;
-        this.move = 0.26f;
+        super("Speed", "Makes you faster.", Module.Category.MOVEMENT, true, false, false);
         this.setInstance();
     }
-    
+
     public static Speed getInstance() {
-        if (Speed.INSTANCE == null) {
-            Speed.INSTANCE = new Speed();
+        if (INSTANCE == null) {
+            INSTANCE = new Speed();
         }
-        return Speed.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        Speed.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     private boolean shouldReturn() {
         return Experium.moduleManager.isModuleEnabled("Freecam") || Experium.moduleManager.isModuleEnabled("PacketFly") || Experium.moduleManager.isModuleEnabled("ElytraFlight") || Experium.moduleManager.isModuleEnabled("Strafe") || Experium.moduleManager.isModuleEnabled("Flight");
     }
-    
+
     @Override
     public void onUpdate() {
         if (this.shouldReturn() || Speed.mc.player.isSneaking() || Speed.mc.player.isInWater() || Speed.mc.player.isInLava()) {
@@ -103,81 +94,63 @@ public class Speed extends Module
             }
             case ONGROUND: {
                 this.doOnground();
-                break;
             }
         }
     }
-    
+
     @SubscribeEvent
-    public void onUpdateWalkingPlayer(final UpdateWalkingPlayerEvent event) {
-        if (this.mode.getValue() != Mode.VANILLA || Feature.nullCheck()) {
+    public void onUpdateWalkingPlayer(UpdateWalkingPlayerEvent event) {
+        if (this.mode.getValue() != Mode.VANILLA || Speed.nullCheck()) {
             return;
         }
         switch (event.getStage()) {
             case 0: {
-                int n2;
-                int vanillaCounter;
-                if (this.vanilla()) {
-                    vanillaCounter = (this.vanillaCounter = (n2 = this.vanillaCounter + 1));
-                }
-                else {
-                    n2 = (vanillaCounter = 0);
-                }
-                this.vanillaCounter = vanillaCounter;
-                final int n = n2;
-                if (this.vanillaCounter != 4) {
-                    break;
-                }
+                this.vanillaCounter = this.vanilla() ? (this.vanillaCounter = this.vanillaCounter + 1) : 0;
+                int n = this.vanillaCounter;
+                if (this.vanillaCounter != 4) break;
                 this.changeY = true;
-                this.minY = Speed.mc.player.getEntityBoundingBox().minY + (Speed.mc.world.getBlockState(Speed.mc.player.getPosition()).getMaterial().blocksMovement() ? (-this.blocked.getValue() / 10.0) : (this.unblocked.getValue() / 10.0)) + this.getJumpBoostModifier();
+                this.minY = Speed.mc.player.getEntityBoundingBox().minY + (Speed.mc.world.getBlockState(Speed.mc.player.getPosition()).getMaterial().blocksMovement() ? -this.blocked.getValue().doubleValue() / 10.0 : this.unblocked.getValue() / 10.0) + this.getJumpBoostModifier();
+                return;
             }
             case 1: {
                 if (this.vanillaCounter == 3) {
-                    final EntityPlayerSP player = Speed.mc.player;
-                    player.motionX *= this.zeroSpeed.getValue() / 10.0;
-                    final EntityPlayerSP player2 = Speed.mc.player;
-                    player2.motionZ *= this.zeroSpeed.getValue() / 10.0;
+                    Speed.mc.player.motionX *= this.zeroSpeed.getValue() / 10.0;
+                    Speed.mc.player.motionZ *= this.zeroSpeed.getValue() / 10.0;
                     break;
                 }
-                if (this.vanillaCounter != 4) {
-                    break;
-                }
-                final EntityPlayerSP player3 = Speed.mc.player;
-                player3.motionX /= this.speed.getValue() / 10.0;
-                final EntityPlayerSP player4 = Speed.mc.player;
-                player4.motionZ /= this.speed.getValue() / 10.0;
+                if (this.vanillaCounter != 4) break;
+                Speed.mc.player.motionX /= this.speed.getValue() / 10.0;
+                Speed.mc.player.motionZ /= this.speed.getValue() / 10.0;
                 this.vanillaCounter = 2;
-                break;
             }
         }
     }
-    
+
     private double getJumpBoostModifier() {
         double boost = 0.0;
         if (Speed.mc.player.isPotionActive(MobEffects.JUMP_BOOST)) {
-            final int amplifier = Objects.requireNonNull(Speed.mc.player.getActivePotionEffect(MobEffects.JUMP_BOOST)).getAmplifier();
-            boost *= 1.0 + 0.2 * amplifier;
+            int amplifier = Objects.requireNonNull(Speed.mc.player.getActivePotionEffect(MobEffects.JUMP_BOOST)).getAmplifier();
+            boost *= 1.0 + 0.2 * (double)amplifier;
         }
         return boost;
     }
-    
+
     private boolean vanilla() {
         return Speed.mc.player.onGround;
     }
-    
+
     private void handleYPortSpeed() {
-        if (!MovementUtil.isMoving((EntityLivingBase)Speed.mc.player) || (Speed.mc.player.isInWater() && Speed.mc.player.isInLava()) || Speed.mc.player.collidedHorizontally) {
+        if (!MovementUtil.isMoving((EntityLivingBase)Speed.mc.player) || Speed.mc.player.isInWater() && Speed.mc.player.isInLava() || Speed.mc.player.collidedHorizontally) {
             return;
         }
         if (Speed.mc.player.onGround) {
             Speed.mc.player.jump();
             MovementUtil.setSpeed((EntityLivingBase)Speed.mc.player, MovementUtil.getBaseMoveSpeed() + this.yspeed.getValue());
-        }
-        else {
+        } else {
             Speed.mc.player.motionY = -1.0;
         }
     }
-    
+
     private void doBoost() {
         this.bounceHeight = 0.4;
         this.move = 0.26f;
@@ -190,12 +163,12 @@ public class Speed extends Module
         }
         if (EntityUtil.isEntityMoving((Entity)Speed.mc.player) && !Speed.mc.player.collidedHorizontally && !BlockUtil.isBlockAboveEntitySolid((Entity)Speed.mc.player) && BlockUtil.isBlockBelowEntitySolid((Entity)Speed.mc.player)) {
             this.oneTime = true;
-            this.antiShake = (this.noShake.getValue() && Speed.mc.player.getRidingEntity() == null);
-            final Random random = new Random();
-            final boolean rnd = random.nextBoolean();
+            this.antiShake = this.noShake.getValue() != false && Speed.mc.player.getRidingEntity() == null;
+            Random random = new Random();
+            boolean rnd = random.nextBoolean();
             if (Speed.mc.player.posY >= this.startY + this.bounceHeight) {
                 Speed.mc.player.motionY = -this.bounceHeight;
-                ++this.lowChainVal;
+                this.lowChainVal += 1.0;
                 if (this.lowChainVal == 1.0) {
                     this.move = 0.075f;
                 }
@@ -217,13 +190,13 @@ public class Speed extends Module
                 if (this.lowChainVal >= 7.0) {
                     this.move = 0.27895f;
                 }
-                if (this.useTimer.getValue()) {
+                if (this.useTimer.getValue().booleanValue()) {
                     Experium.timerManager.setTimer(1.0f);
                 }
             }
             if (Speed.mc.player.posY == this.startY) {
                 Speed.mc.player.motionY = this.bounceHeight;
-                ++this.highChainVal;
+                this.highChainVal += 1.0;
                 if (this.highChainVal == 1.0) {
                     this.move = 0.075f;
                 }
@@ -242,18 +215,16 @@ public class Speed extends Module
                 if (this.highChainVal >= 6.0) {
                     this.move = 0.43395f;
                 }
-                if (this.useTimer.getValue()) {
+                if (this.useTimer.getValue().booleanValue()) {
                     if (rnd) {
                         Experium.timerManager.setTimer(1.3f);
-                    }
-                    else {
+                    } else {
                         Experium.timerManager.setTimer(1.0f);
                     }
                 }
             }
             EntityUtil.moveEntityStrafe(this.move, (Entity)Speed.mc.player);
-        }
-        else {
+        } else {
             if (this.oneTime) {
                 Speed.mc.player.motionY = -0.1;
                 this.oneTime = false;
@@ -264,7 +235,7 @@ public class Speed extends Module
             this.speedOff();
         }
     }
-    
+
     private void doAccel() {
         this.bounceHeight = 0.4;
         this.move = 0.26f;
@@ -277,12 +248,12 @@ public class Speed extends Module
         }
         if (EntityUtil.isEntityMoving((Entity)Speed.mc.player) && !Speed.mc.player.collidedHorizontally && !BlockUtil.isBlockAboveEntitySolid((Entity)Speed.mc.player) && BlockUtil.isBlockBelowEntitySolid((Entity)Speed.mc.player)) {
             this.oneTime = true;
-            this.antiShake = (this.noShake.getValue() && Speed.mc.player.getRidingEntity() == null);
-            final Random random = new Random();
-            final boolean rnd = random.nextBoolean();
+            this.antiShake = this.noShake.getValue() != false && Speed.mc.player.getRidingEntity() == null;
+            Random random = new Random();
+            boolean rnd = random.nextBoolean();
             if (Speed.mc.player.posY >= this.startY + this.bounceHeight) {
                 Speed.mc.player.motionY = -this.bounceHeight;
-                ++this.lowChainVal;
+                this.lowChainVal += 1.0;
                 if (this.lowChainVal == 1.0) {
                     this.move = 0.075f;
                 }
@@ -334,13 +305,13 @@ public class Speed extends Module
                 if (this.lowChainVal >= 17.0) {
                     this.move = 0.545f;
                 }
-                if (this.useTimer.getValue()) {
+                if (this.useTimer.getValue().booleanValue()) {
                     Experium.timerManager.setTimer(1.0f);
                 }
             }
             if (Speed.mc.player.posY == this.startY) {
                 Speed.mc.player.motionY = this.bounceHeight;
-                ++this.highChainVal;
+                this.highChainVal += 1.0;
                 if (this.highChainVal == 1.0) {
                     this.move = 0.075f;
                 }
@@ -392,18 +363,16 @@ public class Speed extends Module
                 if (this.highChainVal >= 17.0) {
                     this.move = 1.175f;
                 }
-                if (this.useTimer.getValue()) {
+                if (this.useTimer.getValue().booleanValue()) {
                     if (rnd) {
                         Experium.timerManager.setTimer(1.3f);
-                    }
-                    else {
+                    } else {
                         Experium.timerManager.setTimer(1.0f);
                     }
                 }
             }
             EntityUtil.moveEntityStrafe(this.move, (Entity)Speed.mc.player);
-        }
-        else {
+        } else {
             if (this.oneTime) {
                 Speed.mc.player.motionY = -0.1;
                 this.oneTime = false;
@@ -414,7 +383,7 @@ public class Speed extends Module
             this.speedOff();
         }
     }
-    
+
     private void doOnground() {
         this.bounceHeight = 0.4;
         this.move = 0.26f;
@@ -427,12 +396,12 @@ public class Speed extends Module
         }
         if (EntityUtil.isEntityMoving((Entity)Speed.mc.player) && !Speed.mc.player.collidedHorizontally && !BlockUtil.isBlockAboveEntitySolid((Entity)Speed.mc.player) && BlockUtil.isBlockBelowEntitySolid((Entity)Speed.mc.player)) {
             this.oneTime = true;
-            this.antiShake = (this.noShake.getValue() && Speed.mc.player.getRidingEntity() == null);
-            final Random random = new Random();
-            final boolean rnd = random.nextBoolean();
+            this.antiShake = this.noShake.getValue() != false && Speed.mc.player.getRidingEntity() == null;
+            Random random = new Random();
+            boolean rnd = random.nextBoolean();
             if (Speed.mc.player.posY >= this.startY + this.bounceHeight) {
                 Speed.mc.player.motionY = -this.bounceHeight;
-                ++this.lowChainVal;
+                this.lowChainVal += 1.0;
                 if (this.lowChainVal == 1.0) {
                     this.move = 0.075f;
                 }
@@ -484,13 +453,13 @@ public class Speed extends Module
                 if (this.lowChainVal >= 17.0) {
                     this.move = 0.545f;
                 }
-                if (this.useTimer.getValue()) {
+                if (this.useTimer.getValue().booleanValue()) {
                     Experium.timerManager.setTimer(1.0f);
                 }
             }
             if (Speed.mc.player.posY == this.startY) {
                 Speed.mc.player.motionY = this.bounceHeight;
-                ++this.highChainVal;
+                this.highChainVal += 1.0;
                 if (this.highChainVal == 1.0) {
                     this.move = 0.075f;
                 }
@@ -542,18 +511,16 @@ public class Speed extends Module
                 if (this.highChainVal >= 17.0) {
                     this.move = 1.2f;
                 }
-                if (this.useTimer.getValue()) {
+                if (this.useTimer.getValue().booleanValue()) {
                     if (rnd) {
                         Experium.timerManager.setTimer(1.3f);
-                    }
-                    else {
+                    } else {
                         Experium.timerManager.setTimer(1.0f);
                     }
                 }
             }
             EntityUtil.moveEntityStrafe(this.move, (Entity)Speed.mc.player);
-        }
-        else {
+        } else {
             if (this.oneTime) {
                 Speed.mc.player.motionY = -0.1;
                 this.oneTime = false;
@@ -564,7 +531,7 @@ public class Speed extends Module
             this.speedOff();
         }
     }
-    
+
     @Override
     public void onDisable() {
         if (this.mode.getValue() == Mode.ONGROUND || this.mode.getValue() == Mode.BOOST) {
@@ -575,99 +542,86 @@ public class Speed extends Module
         this.highChainVal = 0.0;
         this.lowChainVal = 0.0;
         this.antiShake = false;
-        if (this.mode.getValue() == Mode.YPORT && this.motionyonoff.getValue()) {
+        if (this.mode.getValue() == Mode.YPORT && this.motionyonoff.getValue().booleanValue()) {
             Speed.mc.player.motionY = -3.0;
         }
     }
-    
+
     @SubscribeEvent
-    public void onSettingChange(final ClientEvent event) {
+    public void onSettingChange(ClientEvent event) {
         if (event.getStage() == 2 && event.getSetting().equals(this.mode) && this.mode.getPlannedValue() == Mode.INSTANT) {
             Speed.mc.player.motionY = -0.1;
         }
     }
-    
+
     @Override
     public String getDisplayInfo() {
         return this.mode.currentEnumName();
     }
-    
+
     @SubscribeEvent
-    public void onMode(final MoveEvent event) {
-        if (!this.shouldReturn() && event.getStage() == 0 && this.mode.getValue() == Mode.INSTANT && !Feature.nullCheck() && !Speed.mc.player.isSneaking() && !Speed.mc.player.isInWater() && !Speed.mc.player.isInLava() && (Speed.mc.player.movementInput.moveForward != 0.0f || Speed.mc.player.movementInput.moveStrafe != 0.0f)) {
-            if (Speed.mc.player.onGround && this.strafeJump.getValue()) {
-                event.setY(Speed.mc.player.motionY = 0.4);
+    public void onMode(MoveEvent event) {
+        if (!(this.shouldReturn() || event.getStage() != 0 || this.mode.getValue() != Mode.INSTANT || Speed.nullCheck() || Speed.mc.player.isSneaking() || Speed.mc.player.isInWater() || Speed.mc.player.isInLava() || Speed.mc.player.movementInput.moveForward == 0.0f && Speed.mc.player.movementInput.moveStrafe == 0.0f)) {
+            if (Speed.mc.player.onGround && this.strafeJump.getValue().booleanValue()) {
+                Speed.mc.player.motionY = 0.4;
+                event.setY(0.4);
             }
-            final MovementInput movementInput = Speed.mc.player.movementInput;
-            final float moveForward = movementInput.moveForward;
+            MovementInput movementInput = Speed.mc.player.movementInput;
+            float moveForward = movementInput.moveForward;
             float moveStrafe = movementInput.moveStrafe;
             float rotationYaw = Speed.mc.player.rotationYaw;
-            if (moveForward == 0.0 && moveStrafe == 0.0) {
+            if ((double)moveForward == 0.0 && (double)moveStrafe == 0.0) {
                 event.setX(0.0);
                 event.setZ(0.0);
-            }
-            else {
-                if (moveForward != 0.0) {
-                    if (moveStrafe > 0.0) {
-                        rotationYaw += ((moveForward > 0.0) ? -45 : 45);
-                    }
-                    else if (moveStrafe < 0.0) {
-                        rotationYaw += ((moveForward > 0.0) ? 45 : -45);
+            } else {
+                if ((double)moveForward != 0.0) {
+                    if ((double)moveStrafe > 0.0) {
+                        rotationYaw += (float)((double)moveForward > 0.0 ? -45 : 45);
+                    } else if ((double)moveStrafe < 0.0) {
+                        rotationYaw += (float)((double)moveForward > 0.0 ? 45 : -45);
                     }
                     moveStrafe = 0.0f;
                 }
-                moveStrafe = ((moveStrafe == 0.0f) ? moveStrafe : ((moveStrafe > 0.0) ? 1.0f : -1.0f));
-                final double cos = Math.cos(Math.toRadians(rotationYaw + 90.0f));
-                final double sin = Math.sin(Math.toRadians(rotationYaw + 90.0f));
-                event.setX(moveForward * EntityUtil.getMaxSpeed() * cos + moveStrafe * EntityUtil.getMaxSpeed() * sin);
-                event.setZ(moveForward * EntityUtil.getMaxSpeed() * sin - moveStrafe * EntityUtil.getMaxSpeed() * cos);
+                moveStrafe = moveStrafe == 0.0f ? moveStrafe : ((double)moveStrafe > 0.0 ? 1.0f : -1.0f);
+                double cos = Math.cos(Math.toRadians(rotationYaw + 90.0f));
+                double sin = Math.sin(Math.toRadians(rotationYaw + 90.0f));
+                event.setX((double)moveForward * EntityUtil.getMaxSpeed() * cos + (double)moveStrafe * EntityUtil.getMaxSpeed() * sin);
+                event.setZ((double)moveForward * EntityUtil.getMaxSpeed() * sin - (double)moveStrafe * EntityUtil.getMaxSpeed() * cos);
             }
         }
     }
-    
+
     private void speedOff() {
-        final float yaw = (float)Math.toRadians(Speed.mc.player.rotationYaw);
+        float yaw = (float)Math.toRadians(Speed.mc.player.rotationYaw);
         if (BlockUtil.isBlockAboveEntitySolid((Entity)Speed.mc.player)) {
             if (Speed.mc.gameSettings.keyBindForward.isKeyDown() && !Speed.mc.gameSettings.keyBindSneak.isKeyDown() && Speed.mc.player.onGround) {
-                final EntityPlayerSP player = Speed.mc.player;
-                player.motionX -= MathUtil.sin(yaw) * 0.15;
-                final EntityPlayerSP player2 = Speed.mc.player;
-                player2.motionZ += MathUtil.cos(yaw) * 0.15;
+                Speed.mc.player.motionX -= (double)MathUtil.sin(yaw) * 0.15;
+                Speed.mc.player.motionZ += (double)MathUtil.cos(yaw) * 0.15;
             }
-        }
-        else if (Speed.mc.player.collidedHorizontally) {
+        } else if (Speed.mc.player.collidedHorizontally) {
             if (Speed.mc.gameSettings.keyBindForward.isKeyDown() && !Speed.mc.gameSettings.keyBindSneak.isKeyDown() && Speed.mc.player.onGround) {
-                final EntityPlayerSP player3 = Speed.mc.player;
-                player3.motionX -= MathUtil.sin(yaw) * 0.03;
-                final EntityPlayerSP player4 = Speed.mc.player;
-                player4.motionZ += MathUtil.cos(yaw) * 0.03;
+                Speed.mc.player.motionX -= (double)MathUtil.sin(yaw) * 0.03;
+                Speed.mc.player.motionZ += (double)MathUtil.cos(yaw) * 0.03;
             }
-        }
-        else if (!BlockUtil.isBlockBelowEntitySolid((Entity)Speed.mc.player)) {
+        } else if (!BlockUtil.isBlockBelowEntitySolid((Entity)Speed.mc.player)) {
             if (Speed.mc.gameSettings.keyBindForward.isKeyDown() && !Speed.mc.gameSettings.keyBindSneak.isKeyDown() && Speed.mc.player.onGround) {
-                final EntityPlayerSP player5 = Speed.mc.player;
-                player5.motionX -= MathUtil.sin(yaw) * 0.03;
-                final EntityPlayerSP player6 = Speed.mc.player;
-                player6.motionZ += MathUtil.cos(yaw) * 0.03;
+                Speed.mc.player.motionX -= (double)MathUtil.sin(yaw) * 0.03;
+                Speed.mc.player.motionZ += (double)MathUtil.cos(yaw) * 0.03;
             }
-        }
-        else {
+        } else {
             Speed.mc.player.motionX = 0.0;
             Speed.mc.player.motionZ = 0.0;
         }
     }
-    
-    static {
-        Speed.INSTANCE = new Speed();
-    }
-    
-    public enum Mode
-    {
-        INSTANT, 
-        ONGROUND, 
-        ACCEL, 
-        BOOST, 
-        VANILLA, 
+
+    public static enum Mode {
+        INSTANT,
+        ONGROUND,
+        ACCEL,
+        BOOST,
+        VANILLA,
         YPORT;
+
     }
 }
+

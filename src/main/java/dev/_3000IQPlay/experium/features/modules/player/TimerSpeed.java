@@ -1,91 +1,79 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package dev._3000IQPlay.experium.features.modules.player;
 
 import dev._3000IQPlay.experium.Experium;
+import dev._3000IQPlay.experium.features.modules.Module;
 import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.util.Timer;
-import dev._3000IQPlay.experium.features.modules.Module;
 
-public class TimerSpeed extends Module
-{
-    private final Timer timer;
-    private final Timer turnOffTimer;
-    public Setting<Boolean> autoOff;
-    public Setting<Integer> timeLimit;
-    public Setting<TimerMode> mode;
-    public Setting<Float> timerSpeed;
-    public Setting<Float> fastSpeed;
-    public Setting<Integer> fastTime;
-    public Setting<Integer> slowTime;
-    public Setting<Boolean> startFast;
-    public float speed;
-    private boolean fast;
-    
+public class TimerSpeed
+extends Module {
+    private final Timer timer = new Timer();
+    private final Timer turnOffTimer = new Timer();
+    public Setting<Boolean> autoOff = this.register(new Setting<Boolean>("AutoOff", false));
+    public Setting<Integer> timeLimit = this.register(new Setting<Object>("Limit", Integer.valueOf(250), Integer.valueOf(1), Integer.valueOf(2500), v -> this.autoOff.getValue()));
+    public Setting<TimerMode> mode = this.register(new Setting<TimerMode>("Mode", TimerMode.NORMAL));
+    public Setting<Float> timerSpeed = this.register(new Setting<Float>("Speed", Float.valueOf(4.0f), Float.valueOf(0.1f), Float.valueOf(20.0f)));
+    public Setting<Float> fastSpeed = this.register(new Setting<Object>("Fast", Float.valueOf(10.0f), Float.valueOf(0.1f), Float.valueOf(100.0f), v -> this.mode.getValue() == TimerMode.SWITCH, "Fast Speed for switch."));
+    public Setting<Integer> fastTime = this.register(new Setting<Object>("FastTime", 20, 1, 500, v -> this.mode.getValue() == TimerMode.SWITCH, "How long you want to go fast.(ms * 10)"));
+    public Setting<Integer> slowTime = this.register(new Setting<Object>("SlowTime", 20, 1, 500, v -> this.mode.getValue() == TimerMode.SWITCH, "Recover from too fast.(ms * 10)"));
+    public Setting<Boolean> startFast = this.register(new Setting<Object>("StartFast", Boolean.valueOf(false), v -> this.mode.getValue() == TimerMode.SWITCH));
+    public float speed = 1.0f;
+    private boolean fast = false;
+
     public TimerSpeed() {
-        super("Timer", "Will speed up the game.", Category.PLAYER, false, false, false);
-        this.timer = new Timer();
-        this.turnOffTimer = new Timer();
-        this.autoOff = (Setting<Boolean>)this.register(new Setting("AutoOff", (T)false));
-        this.timeLimit = (Setting<Integer>)this.register(new Setting("Limit", (T)250, (T)1, (T)2500, v -> this.autoOff.getValue()));
-        this.mode = (Setting<TimerMode>)this.register(new Setting("Mode", (T)TimerMode.NORMAL));
-        this.timerSpeed = (Setting<Float>)this.register(new Setting("Speed", (T)4.0f, (T)0.1f, (T)20.0f));
-        this.fastSpeed = (Setting<Float>)this.register(new Setting("Fast", (T)10.0f, (T)0.1f, (T)100.0f, v -> this.mode.getValue() == TimerMode.SWITCH, "Fast Speed for switch."));
-        this.fastTime = (Setting<Integer>)this.register(new Setting("FastTime", (T)20, (T)1, (T)500, v -> this.mode.getValue() == TimerMode.SWITCH, "How long you want to go fast.(ms * 10)"));
-        this.slowTime = (Setting<Integer>)this.register(new Setting("SlowTime", (T)20, (T)1, (T)500, v -> this.mode.getValue() == TimerMode.SWITCH, "Recover from too fast.(ms * 10)"));
-        this.startFast = (Setting<Boolean>)this.register(new Setting("StartFast", (T)false, v -> this.mode.getValue() == TimerMode.SWITCH));
-        this.speed = 1.0f;
-        this.fast = false;
+        super("Timer", "Will speed up the game.", Module.Category.PLAYER, false, false, false);
     }
-    
+
     @Override
     public void onEnable() {
         this.turnOffTimer.reset();
-        this.speed = this.timerSpeed.getValue();
-        if (!this.startFast.getValue()) {
+        this.speed = this.timerSpeed.getValue().floatValue();
+        if (!this.startFast.getValue().booleanValue()) {
             this.timer.reset();
         }
     }
-    
+
     @Override
     public void onUpdate() {
-        if (this.autoOff.getValue() && this.turnOffTimer.passedMs(this.timeLimit.getValue())) {
+        if (this.autoOff.getValue().booleanValue() && this.turnOffTimer.passedMs(this.timeLimit.getValue().intValue())) {
             this.disable();
             return;
         }
         if (this.mode.getValue() == TimerMode.NORMAL) {
-            this.speed = this.timerSpeed.getValue();
+            this.speed = this.timerSpeed.getValue().floatValue();
             return;
         }
-        if (!this.fast && this.timer.passedDms(this.slowTime.getValue())) {
+        if (!this.fast && this.timer.passedDms(this.slowTime.getValue().intValue())) {
             this.fast = true;
-            this.speed = this.fastSpeed.getValue();
+            this.speed = this.fastSpeed.getValue().floatValue();
             this.timer.reset();
         }
-        if (this.fast && this.timer.passedDms(this.fastTime.getValue())) {
+        if (this.fast && this.timer.passedDms(this.fastTime.getValue().intValue())) {
             this.fast = false;
-            this.speed = this.timerSpeed.getValue();
+            this.speed = this.timerSpeed.getValue().floatValue();
             this.timer.reset();
         }
     }
-    
+
     @Override
     public void onDisable() {
         this.speed = 1.0f;
         Experium.timerManager.reset();
         this.fast = false;
     }
-    
+
     @Override
     public String getDisplayInfo() {
         return this.timerSpeed.getValueAsString();
     }
-    
-    public enum TimerMode
-    {
-        NORMAL, 
+
+    public static enum TimerMode {
+        NORMAL,
         SWITCH;
+
     }
 }
+

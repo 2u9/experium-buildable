@@ -1,19 +1,21 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.play.server.SPacketSetSlot
+ */
 package dev._3000IQPlay.experium.mixin.mixins.accessors;
 
-import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ SPacketSetSlot.class })
-public interface ISPacketSetSlot
-{
-    @Accessor("windowId")
-    int getId();
-    
-    @Accessor("windowId")
-    void setWindowId(final int p0);
+@Mixin(value={SPacketSetSlot.class})
+public interface ISPacketSetSlot {
+    @Accessor(value="windowId")
+    public int getId();
+
+    @Accessor(value="windowId")
+    public void setWindowId(int var1);
 }
+

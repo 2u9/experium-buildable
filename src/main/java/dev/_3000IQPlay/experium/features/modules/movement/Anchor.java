@@ -1,37 +1,38 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.init.Blocks
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.movement;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.Vec3d;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import net.minecraft.util.math.BlockPos;
-import java.util.ArrayList;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import java.util.ArrayList;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Anchor extends Module
-{
+public class Anchor
+extends Module {
     public static boolean AnchorING;
-    private final ArrayList<BlockPos> holes;
-    public Setting<Boolean> pull;
-    public Setting<Integer> pitch;
+    private final ArrayList<BlockPos> holes = new ArrayList();
+    public Setting<Boolean> pull = this.register(new Setting<Boolean>("Pull", true));
+    public Setting<Integer> pitch = this.register(new Setting<Integer>("Pitch", 60, 0, 90));
     int holeblocks;
-    private Vec3d Center;
-    
+    private Vec3d Center = Vec3d.ZERO;
+
     public Anchor() {
-        super("Anchor", "Stops all movement if player is above a hole.", Category.MOVEMENT, false, false, false);
-        this.holes = new ArrayList<BlockPos>();
-        this.pull = (Setting<Boolean>)this.register(new Setting("Pull", (T)true));
-        this.pitch = (Setting<Integer>)this.register(new Setting("Pitch", (T)60, (T)0, (T)90));
-        this.Center = Vec3d.ZERO;
+        super("Anchor", "Stops all movement if player is above a hole.", Module.Category.MOVEMENT, false, false, false);
     }
-    
-    public boolean isBlockHole(final BlockPos blockpos) {
+
+    public boolean isBlockHole(BlockPos blockpos) {
         this.holeblocks = 0;
         if (Anchor.mc.world.getBlockState(blockpos.add(0, 3, 0)).getBlock() == Blocks.AIR) {
             ++this.holeblocks;
@@ -62,16 +63,16 @@ public class Anchor extends Module
         }
         return this.holeblocks >= 9;
     }
-    
-    public Vec3d GetCenter(final double posX, final double posY, final double posZ) {
-        final double x = Math.floor(posX) + 0.5;
-        final double y = Math.floor(posY);
-        final double z = Math.floor(posZ) + 0.5;
+
+    public Vec3d GetCenter(double posX, double posY, double posZ) {
+        double x = Math.floor(posX) + 0.5;
+        double y = Math.floor(posY);
+        double z = Math.floor(posZ) + 0.5;
         return new Vec3d(x, y, z);
     }
-    
-    @SubscribeEvent
+
     @Override
+    @SubscribeEvent
     public void onUpdate() {
         if (Anchor.mc.world == null) {
             return;
@@ -79,41 +80,39 @@ public class Anchor extends Module
         if (Anchor.mc.player.posY < 0.0) {
             return;
         }
-        if (Anchor.mc.player.rotationPitch >= this.pitch.getValue()) {
+        if (Anchor.mc.player.rotationPitch >= (float)this.pitch.getValue().intValue()) {
             if (this.isBlockHole(this.getPlayerPos().down(1)) || this.isBlockHole(this.getPlayerPos().down(2)) || this.isBlockHole(this.getPlayerPos().down(3)) || this.isBlockHole(this.getPlayerPos().down(4))) {
-                Anchor.AnchorING = true;
-                if (!this.pull.getValue()) {
+                AnchorING = true;
+                if (!this.pull.getValue().booleanValue()) {
                     Anchor.mc.player.motionX = 0.0;
                     Anchor.mc.player.motionZ = 0.0;
-                }
-                else {
+                } else {
                     this.Center = this.GetCenter(Anchor.mc.player.posX, Anchor.mc.player.posY, Anchor.mc.player.posZ);
-                    final double XDiff = Math.abs(this.Center.x - Anchor.mc.player.posX);
-                    final double ZDiff = Math.abs(this.Center.z - Anchor.mc.player.posZ);
+                    double XDiff = Math.abs(this.Center.x - Anchor.mc.player.posX);
+                    double ZDiff = Math.abs(this.Center.z - Anchor.mc.player.posZ);
                     if (XDiff <= 0.1 && ZDiff <= 0.1) {
                         this.Center = Vec3d.ZERO;
-                    }
-                    else {
-                        final double MotionX = this.Center.x - Anchor.mc.player.posX;
-                        final double MotionZ = this.Center.z - Anchor.mc.player.posZ;
+                    } else {
+                        double MotionX = this.Center.x - Anchor.mc.player.posX;
+                        double MotionZ = this.Center.z - Anchor.mc.player.posZ;
                         Anchor.mc.player.motionX = MotionX / 2.0;
                         Anchor.mc.player.motionZ = MotionZ / 2.0;
                     }
                 }
-            }
-            else {
-                Anchor.AnchorING = false;
+            } else {
+                AnchorING = false;
             }
         }
     }
-    
+
     @Override
     public void onDisable() {
-        Anchor.AnchorING = false;
+        AnchorING = false;
         this.holeblocks = 0;
     }
-    
+
     public BlockPos getPlayerPos() {
         return new BlockPos(Math.floor(Anchor.mc.player.posX), Math.floor(Anchor.mc.player.posY), Math.floor(Anchor.mc.player.posZ));
     }
 }
+

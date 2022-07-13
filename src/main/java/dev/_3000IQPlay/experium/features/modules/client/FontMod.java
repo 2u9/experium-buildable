@@ -1,86 +1,77 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.client;
 
 import dev._3000IQPlay.experium.Experium;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import dev._3000IQPlay.experium.event.events.ClientEvent;
 import dev._3000IQPlay.experium.features.command.Command;
-import java.awt.GraphicsEnvironment;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import java.awt.GraphicsEnvironment;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FontMod extends Module
-{
-    private static FontMod INSTANCE;
-    public Setting<String> fontName;
-    public Setting<Integer> fontSize;
-    public Setting<Integer> fontStyle;
-    public Setting<Boolean> antiAlias;
-    public Setting<Boolean> fractionalMetrics;
-    public Setting<Boolean> shadow;
-    public Setting<Boolean> showFonts;
-    public Setting<Boolean> full;
-    private boolean reloadFont;
-    
+public class FontMod
+extends Module {
+    private static FontMod INSTANCE = new FontMod();
+    public Setting<String> fontName = this.register(new Setting<String>("FontName", "Arial", "Name of the font."));
+    public Setting<Integer> fontSize = this.register(new Setting<Integer>("FontSize", Integer.valueOf(18), "Size of the font."));
+    public Setting<Integer> fontStyle = this.register(new Setting<Integer>("FontStyle", Integer.valueOf(0), "Style of the font."));
+    public Setting<Boolean> antiAlias = this.register(new Setting<Boolean>("AntiAlias", Boolean.valueOf(true), "Smoother font."));
+    public Setting<Boolean> fractionalMetrics = this.register(new Setting<Boolean>("Metrics", Boolean.valueOf(true), "Thinner font."));
+    public Setting<Boolean> shadow = this.register(new Setting<Boolean>("Shadow", Boolean.valueOf(true), "Less shadow offset font."));
+    public Setting<Boolean> showFonts = this.register(new Setting<Boolean>("Fonts", Boolean.valueOf(false), "Shows all fonts."));
+    public Setting<Boolean> full = this.register(new Setting<Boolean>("Full", false));
+    private boolean reloadFont = false;
+
     public FontMod() {
-        super("CustomFont", "CustomFont for all of the clients text. Use the font command.", Category.CLIENT, true, false, false);
-        this.fontName = (Setting<String>)this.register(new Setting("FontName", (T)"Arial", "Name of the font."));
-        this.fontSize = (Setting<Integer>)this.register(new Setting("FontSize", (T)18, "Size of the font."));
-        this.fontStyle = (Setting<Integer>)this.register(new Setting("FontStyle", (T)0, "Style of the font."));
-        this.antiAlias = (Setting<Boolean>)this.register(new Setting("AntiAlias", (T)true, "Smoother font."));
-        this.fractionalMetrics = (Setting<Boolean>)this.register(new Setting("Metrics", (T)true, "Thinner font."));
-        this.shadow = (Setting<Boolean>)this.register(new Setting("Shadow", (T)true, "Less shadow offset font."));
-        this.showFonts = (Setting<Boolean>)this.register(new Setting("Fonts", (T)false, "Shows all fonts."));
-        this.full = (Setting<Boolean>)this.register(new Setting("Full", (T)false));
-        this.reloadFont = false;
+        super("CustomFont", "CustomFont for all of the clients text. Use the font command.", Module.Category.CLIENT, true, false, false);
         this.setInstance();
     }
-    
+
     public static FontMod getInstance() {
-        if (FontMod.INSTANCE == null) {
-            FontMod.INSTANCE = new FontMod();
+        if (INSTANCE == null) {
+            INSTANCE = new FontMod();
         }
-        return FontMod.INSTANCE;
+        return INSTANCE;
     }
-    
-    public static boolean checkFont(final String font, final boolean message) {
-        final String[] availableFontFamilyNames;
-        final String[] fonts = availableFontFamilyNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        for (final String s : availableFontFamilyNames) {
+
+    public static boolean checkFont(String font, boolean message) {
+        String[] fonts;
+        for (String s : fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
             if (!message && s.equals(font)) {
                 return true;
             }
-            if (message) {
-                Command.sendMessage(s);
-            }
+            if (!message) continue;
+            Command.sendMessage(s);
         }
         return false;
     }
-    
+
     private void setInstance() {
-        FontMod.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @SubscribeEvent
-    public void onSettingChange(final ClientEvent event) {
-        final Setting setting;
+    public void onSettingChange(ClientEvent event) {
+        Setting setting;
         if (event.getStage() == 2 && (setting = event.getSetting()) != null && setting.getFeature().equals(this)) {
-            if (setting.getName().equals("FontName") && !checkFont(setting.getPlannedValue().toString(), false)) {
-                Command.sendMessage("§cThat font doesnt exist.");
+            if (setting.getName().equals("FontName") && !FontMod.checkFont(setting.getPlannedValue().toString(), false)) {
+                Command.sendMessage("\u00a7cThat font doesnt exist.");
                 event.setCanceled(true);
                 return;
             }
             this.reloadFont = true;
         }
     }
-    
+
     @Override
     public void onTick() {
-        if (this.showFonts.getValue()) {
-            checkFont("Hello", true);
+        if (this.showFonts.getValue().booleanValue()) {
+            FontMod.checkFont("Hello", true);
             Command.sendMessage("Current Font: " + this.fontName.getValue());
             this.showFonts.setValue(false);
         }
@@ -89,8 +80,5 @@ public class FontMod extends Module
             this.reloadFont = false;
         }
     }
-    
-    static {
-        FontMod.INSTANCE = new FontMod();
-    }
 }
+

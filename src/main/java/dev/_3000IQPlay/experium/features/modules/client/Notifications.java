@@ -1,101 +1,91 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.realmsclient.gui.ChatFormatting
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.init.SoundEvents
+ *  net.minecraft.network.play.server.SPacketSpawnObject
+ *  net.minecraft.util.text.ITextComponent
+ *  net.minecraft.util.text.TextComponentString
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.client;
 
-import net.minecraft.util.text.ITextComponent;
-import dev._3000IQPlay.experium.event.events.ClientEvent;
 import com.mojang.realmsclient.gui.ChatFormatting;
+import dev._3000IQPlay.experium.Experium;
+import dev._3000IQPlay.experium.event.events.ClientEvent;
+import dev._3000IQPlay.experium.event.events.PacketEvent;
+import dev._3000IQPlay.experium.features.command.Command;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.client.ModuleTools;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.manager.FileManager;
+import dev._3000IQPlay.experium.util.Timer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.network.play.server.SPacketSpawnObject;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.network.play.server.SPacketSpawnObject;
-import dev._3000IQPlay.experium.event.events.PacketEvent;
-import dev._3000IQPlay.experium.manager.FileManager;
-import java.util.Iterator;
-import net.minecraft.init.SoundEvents;
-import dev._3000IQPlay.experium.Experium;
-import java.util.Collection;
-import dev._3000IQPlay.experium.features.command.Command;
-import java.util.ArrayList;
-import net.minecraft.entity.player.EntityPlayer;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.util.Timer;
-import java.util.List;
-import dev._3000IQPlay.experium.features.modules.Module;
 
-public class Notifications extends Module
-{
+public class Notifications
+extends Module {
     private static final String fileName = "experium/util/ModuleMessage_List.txt";
-    private static final List<String> modules;
-    private static Notifications INSTANCE;
-    private final Timer timer;
-    public Setting<Boolean> totemPops;
-    public Setting<Boolean> totemNoti;
-    public Setting<Integer> delay;
-    public Setting<Boolean> clearOnLogout;
-    public Setting<Boolean> moduleMessage;
-    private final Setting<Boolean> readfile;
-    public Setting<Boolean> list;
-    public Setting<Boolean> watermark;
-    public Setting<Boolean> visualRange;
-    public Setting<Boolean> VisualRangeSound;
-    public Setting<Boolean> coords;
-    public Setting<Boolean> leaving;
-    public Setting<Boolean> pearls;
-    public Setting<Boolean> crash;
-    public Setting<Boolean> popUp;
-    public Timer totemAnnounce;
-    private List<EntityPlayer> knownPlayers;
+    private static final List<String> modules = new ArrayList<String>();
+    private static Notifications INSTANCE = new Notifications();
+    private final Timer timer = new Timer();
+    public Setting<Boolean> totemPops = this.register(new Setting<Boolean>("TotemPops", true));
+    public Setting<Boolean> totemNoti = this.register(new Setting<Object>("TotemNoti", Boolean.FALSE, v -> this.totemPops.getValue()));
+    public Setting<Integer> delay = this.register(new Setting<Object>("Delay", 200, 0, 5000, v -> this.totemPops.getValue(), "Delays messages."));
+    public Setting<Boolean> clearOnLogout = this.register(new Setting<Boolean>("LogoutClear", false));
+    public Setting<Boolean> moduleMessage = this.register(new Setting<Boolean>("ModuleMessage", true));
+    private final Setting<Boolean> readfile = this.register(new Setting<Object>("LoadFile", Boolean.FALSE, v -> this.moduleMessage.getValue()));
+    public Setting<Boolean> list = this.register(new Setting<Object>("List", Boolean.FALSE, v -> this.moduleMessage.getValue()));
+    public Setting<Boolean> watermark = this.register(new Setting<Object>("Watermark", Boolean.TRUE, v -> this.moduleMessage.getValue()));
+    public Setting<Boolean> visualRange = this.register(new Setting<Boolean>("VisualRange", false));
+    public Setting<Boolean> VisualRangeSound = this.register(new Setting<Boolean>("VisualRangeSound", false));
+    public Setting<Boolean> coords = this.register(new Setting<Object>("Coords", Boolean.TRUE, v -> this.visualRange.getValue()));
+    public Setting<Boolean> leaving = this.register(new Setting<Object>("Leaving", Boolean.FALSE, v -> this.visualRange.getValue()));
+    public Setting<Boolean> pearls = this.register(new Setting<Boolean>("PearlNotifs", false));
+    public Setting<Boolean> crash = this.register(new Setting<Boolean>("Crash", false));
+    public Setting<Boolean> popUp = this.register(new Setting<Boolean>("PopUpVisualRange", false));
+    public Timer totemAnnounce = new Timer();
+    private List<EntityPlayer> knownPlayers = new ArrayList<EntityPlayer>();
     private boolean check;
-    
+
     public Notifications() {
-        super("Notifications", "Sends Messages.", Category.CLIENT, true, false, false);
-        this.timer = new Timer();
-        this.totemPops = (Setting<Boolean>)this.register(new Setting("TotemPops", (T)true));
-        this.totemNoti = (Setting<Boolean>)this.register(new Setting("TotemNoti", (T)Boolean.FALSE, v -> this.totemPops.getValue()));
-        this.delay = (Setting<Integer>)this.register(new Setting("Delay", (T)200, (T)0, (T)5000, v -> this.totemPops.getValue(), "Delays messages."));
-        this.clearOnLogout = (Setting<Boolean>)this.register(new Setting("LogoutClear", (T)false));
-        this.moduleMessage = (Setting<Boolean>)this.register(new Setting("ModuleMessage", (T)true));
-        this.readfile = (Setting<Boolean>)this.register(new Setting("LoadFile", (T)Boolean.FALSE, v -> this.moduleMessage.getValue()));
-        this.list = (Setting<Boolean>)this.register(new Setting("List", (T)Boolean.FALSE, v -> this.moduleMessage.getValue()));
-        this.watermark = (Setting<Boolean>)this.register(new Setting("Watermark", (T)Boolean.TRUE, v -> this.moduleMessage.getValue()));
-        this.visualRange = (Setting<Boolean>)this.register(new Setting("VisualRange", (T)false));
-        this.VisualRangeSound = (Setting<Boolean>)this.register(new Setting("VisualRangeSound", (T)false));
-        this.coords = (Setting<Boolean>)this.register(new Setting("Coords", (T)Boolean.TRUE, v -> this.visualRange.getValue()));
-        this.leaving = (Setting<Boolean>)this.register(new Setting("Leaving", (T)Boolean.FALSE, v -> this.visualRange.getValue()));
-        this.pearls = (Setting<Boolean>)this.register(new Setting("PearlNotifs", (T)false));
-        this.crash = (Setting<Boolean>)this.register(new Setting("Crash", (T)false));
-        this.popUp = (Setting<Boolean>)this.register(new Setting("PopUpVisualRange", (T)false));
-        this.totemAnnounce = new Timer();
-        this.knownPlayers = new ArrayList<EntityPlayer>();
+        super("Notifications", "Sends Messages.", Module.Category.CLIENT, true, false, false);
         this.setInstance();
     }
-    
+
     public static Notifications getInstance() {
-        if (Notifications.INSTANCE == null) {
-            Notifications.INSTANCE = new Notifications();
+        if (INSTANCE == null) {
+            INSTANCE = new Notifications();
         }
-        return Notifications.INSTANCE;
+        return INSTANCE;
     }
-    
-    public static void displayCrash(final Exception e) {
-        Command.sendMessage("§cException caught: " + e.getMessage());
+
+    public static void displayCrash(Exception e) {
+        Command.sendMessage("\u00a7cException caught: " + e.getMessage());
     }
-    
+
     private void setInstance() {
-        Notifications.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @Override
     public void onLoad() {
         this.check = true;
         this.loadFile();
         this.check = false;
     }
-    
+
     @Override
     public void onEnable() {
         this.knownPlayers = new ArrayList<EntityPlayer>();
@@ -103,10 +93,10 @@ public class Notifications extends Module
             this.loadFile();
         }
     }
-    
+
     @Override
     public void onUpdate() {
-        if (this.readfile.getValue()) {
+        if (this.readfile.getValue().booleanValue()) {
             if (!this.check) {
                 Command.sendMessage("Loading File...");
                 this.timer.reset();
@@ -118,214 +108,203 @@ public class Notifications extends Module
             this.readfile.setValue(false);
             this.check = false;
         }
-        if (this.visualRange.getValue()) {
-            final ArrayList<EntityPlayer> tickPlayerList = new ArrayList<EntityPlayer>(Notifications.mc.world.playerEntities);
+        if (this.visualRange.getValue().booleanValue()) {
+            ArrayList<EntityPlayer> tickPlayerList = new ArrayList<>(Notifications.mc.world.playerEntities);
             if (tickPlayerList.size() > 0) {
-                for (final EntityPlayer player : tickPlayerList) {
-                    if (!player.getName().equals(Notifications.mc.player.getName())) {
-                        if (this.knownPlayers.contains(player)) {
-                            continue;
-                        }
-                        this.knownPlayers.add(player);
-                        if (Experium.friendManager.isFriend(player)) {
-                            Command.sendMessage("Player §a" + player.getName() + "§r entered your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), this.popUp.getValue());
-                        }
-                        else {
-                            Command.sendMessage("Player §c" + player.getName() + "§r entered your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), this.popUp.getValue());
-                        }
-                        if (this.VisualRangeSound.getValue()) {
-                            Notifications.mc.player.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
-                        }
-                        return;
+                for (EntityPlayer player : tickPlayerList) {
+                    if (player.getName().equals(Notifications.mc.player.getName()) || this.knownPlayers.contains(player))
+                        continue;
+                    this.knownPlayers.add(player);
+                    if (Experium.friendManager.isFriend(player)) {
+                        Command.sendMessage("Player \u00a7a" + player.getName() + "\u00a7r" + " entered your visual range" + (this.coords.getValue() != false ? " at (" + (int) player.posX + ", " + (int) player.posY + ", " + (int) player.posZ + ")!" : "!"), this.popUp.getValue());
+                    } else {
+                        Command.sendMessage("Player \u00a7c" + player.getName() + "\u00a7r" + " entered your visual range" + (this.coords.getValue() != false ? " at (" + (int) player.posX + ", " + (int) player.posY + ", " + (int) player.posZ + ")!" : "!"), this.popUp.getValue());
                     }
+                    if (this.VisualRangeSound.getValue().booleanValue()) {
+                        dev._3000IQPlay.experium.features.modules.client.Notifications.mc.player.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
+                    }
+                    return;
                 }
             }
             if (this.knownPlayers.size() > 0) {
-                for (final EntityPlayer player : this.knownPlayers) {
-                    if (tickPlayerList.contains(player)) {
-                        continue;
-                    }
-                    this.knownPlayers.remove(player);
-                    if (this.leaving.getValue()) {
+                for (EntityPlayer player : this.knownPlayers) {
+                    if (tickPlayerList.contains((Object)player)) continue;
+                    this.knownPlayers.remove((Object)player);
+                    if (this.leaving.getValue().booleanValue()) {
                         if (Experium.friendManager.isFriend(player)) {
-                            Command.sendMessage("Player §a" + player.getName() + "§r left your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), this.popUp.getValue());
-                        }
-                        else {
-                            Command.sendMessage("Player §c" + player.getName() + "§r left your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), this.popUp.getValue());
+                            Command.sendMessage("Player \u00a7a" + player.getName() + "\u00a7r left your visual range" + (this.coords.getValue() != false ? " at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!" : "!"), this.popUp.getValue());
+                        } else {
+                            Command.sendMessage("Player \u00a7c" + player.getName() + "\u00a7r left your visual range" + (this.coords.getValue() != false ? " at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!" : "!"), this.popUp.getValue());
                         }
                     }
+                    return;
                 }
             }
         }
     }
-    
+
     public void loadFile() {
-        final List<String> fileInput = FileManager.readTextFileAllLines("experium/util/ModuleMessage_List.txt");
-        final Iterator<String> i = fileInput.iterator();
-        Notifications.modules.clear();
+        List<String> fileInput = FileManager.readTextFileAllLines(fileName);
+        Iterator<String> i = fileInput.iterator();
+        modules.clear();
         while (i.hasNext()) {
-            final String s = i.next();
-            if (s.replaceAll("\\s", "").isEmpty()) {
-                continue;
-            }
-            Notifications.modules.add(s);
+            String s = i.next();
+            if (s.replaceAll("\\s", "").isEmpty()) continue;
+            modules.add(s);
         }
     }
-    
+
     @SubscribeEvent
-    public void onReceivePacket(final PacketEvent.Receive event) {
-        if (event.getPacket() instanceof SPacketSpawnObject && this.pearls.getValue()) {
-            final SPacketSpawnObject packet = event.getPacket();
-            final EntityPlayer player = Notifications.mc.world.getClosestPlayer(packet.getX(), packet.getY(), packet.getZ(), 1.0, false);
+    public void onReceivePacket(PacketEvent.Receive event) {
+        if (event.getPacket() instanceof SPacketSpawnObject && this.pearls.getValue().booleanValue()) {
+            SPacketSpawnObject packet = (SPacketSpawnObject)event.getPacket();
+            EntityPlayer player = Notifications.mc.world.getClosestPlayer(packet.getX(), packet.getY(), packet.getZ(), 1.0, false);
             if (player == null) {
                 return;
             }
             if (packet.getEntityID() == 85) {
-                Command.sendMessage("§cPearl thrown by " + player.getName() + " at X:" + (int)packet.getX() + " Y:" + (int)packet.getY() + " Z:" + (int)packet.getZ());
+                Command.sendMessage("\u00a7cPearl thrown by " + player.getName() + " at X:" + (int)packet.getX() + " Y:" + (int)packet.getY() + " Z:" + (int)packet.getZ());
             }
         }
     }
-    
-    public TextComponentString getNotifierOn(final Module module) {
+
+    public TextComponentString getNotifierOn(Module module) {
         if (ModuleTools.getInstance().isEnabled()) {
             switch (ModuleTools.getInstance().notifier.getValue()) {
                 case EXPERIUM: {
-                    final TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + " " + ChatFormatting.BOLD + module.getDisplayName() + ChatFormatting.RESET + ChatFormatting.GREEN + " enabled.");
+                    TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + " " + (Object)ChatFormatting.BOLD + module.getDisplayName() + (Object)ChatFormatting.RESET + (Object)ChatFormatting.GREEN + " enabled.");
                     return text;
                 }
                 case FUTURE: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.RED + "[Future] " + ChatFormatting.GRAY + module.getDisplayName() + " toggled " + ChatFormatting.GREEN + "on" + ChatFormatting.GRAY + ".");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.RED + "[Future] " + (Object)ChatFormatting.GRAY + module.getDisplayName() + " toggled " + (Object)ChatFormatting.GREEN + "on" + (Object)ChatFormatting.GRAY + ".");
                     return text;
                 }
                 case DOTGOD: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_PURPLE + "[" + ChatFormatting.LIGHT_PURPLE + "DotGod.CC" + ChatFormatting.DARK_PURPLE + "] " + ChatFormatting.DARK_AQUA + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + " was " + ChatFormatting.GREEN + "enabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_PURPLE + "[" + (Object)ChatFormatting.LIGHT_PURPLE + "DotGod.CC" + (Object)ChatFormatting.DARK_PURPLE + "] " + (Object)ChatFormatting.DARK_AQUA + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + " was " + (Object)ChatFormatting.GREEN + "enabled.");
                     return text;
                 }
                 case SNOW: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.BLUE + "[" + ChatFormatting.AQUA + "Snow" + ChatFormatting.BLUE + "] [" + ChatFormatting.DARK_AQUA + module.getDisplayName() + ChatFormatting.BLUE + "] " + ChatFormatting.GREEN + "enabled");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.BLUE + "[" + (Object)ChatFormatting.AQUA + "Snow" + (Object)ChatFormatting.BLUE + "] [" + (Object)ChatFormatting.DARK_AQUA + module.getDisplayName() + (Object)ChatFormatting.BLUE + "] " + (Object)ChatFormatting.GREEN + "enabled");
                     return text;
                 }
                 case WEATHER: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.AQUA + "[" + ChatFormatting.AQUA + "Weather" + ChatFormatting.AQUA + "] " + ChatFormatting.DARK_AQUA + module.getDisplayName() + ChatFormatting.WHITE + " was toggled " + ChatFormatting.GREEN + "on.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.AQUA + "[" + (Object)ChatFormatting.AQUA + "Weather" + (Object)ChatFormatting.AQUA + "] " + (Object)ChatFormatting.DARK_AQUA + module.getDisplayName() + (Object)ChatFormatting.WHITE + " was toggled " + (Object)ChatFormatting.GREEN + "on.");
                     return text;
                 }
                 case CATALYST: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_GRAY + "[" + ChatFormatting.AQUA + "Catalyst" + ChatFormatting.DARK_GRAY + "] " + ChatFormatting.GRAY + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.GREEN + " ON");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_GRAY + "[" + (Object)ChatFormatting.AQUA + "Catalyst" + (Object)ChatFormatting.DARK_GRAY + "] " + (Object)ChatFormatting.GRAY + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.GREEN + " ON");
                     return text;
                 }
                 case RUSHERHACK: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.WHITE + "[" + ChatFormatting.GREEN + "rusherhack" + ChatFormatting.WHITE + "] " + ChatFormatting.WHITE + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.WHITE + " has been enabled");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.WHITE + "[" + (Object)ChatFormatting.GREEN + "rusherhack" + (Object)ChatFormatting.WHITE + "] " + (Object)ChatFormatting.WHITE + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.WHITE + " has been enabled");
                     return text;
                 }
                 case KONAS: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_GRAY + "[" + ChatFormatting.LIGHT_PURPLE + "Konas" + ChatFormatting.DARK_GRAY + "] " + ChatFormatting.WHITE + module.getDisplayName() + ChatFormatting.WHITE + " has been enabled");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_GRAY + "[" + (Object)ChatFormatting.LIGHT_PURPLE + "Konas" + (Object)ChatFormatting.DARK_GRAY + "] " + (Object)ChatFormatting.WHITE + module.getDisplayName() + (Object)ChatFormatting.WHITE + " has been enabled");
                     return text;
                 }
                 case LEGACY: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.WHITE + "[" + ChatFormatting.LIGHT_PURPLE + "Legacy" + ChatFormatting.WHITE + "] " + ChatFormatting.BOLD + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.GREEN + " enabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.WHITE + "[" + (Object)ChatFormatting.LIGHT_PURPLE + "Legacy" + (Object)ChatFormatting.WHITE + "] " + (Object)ChatFormatting.BOLD + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.GREEN + " enabled.");
                     return text;
                 }
                 case EUROPA: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.GRAY + "[" + ChatFormatting.RED + "Europa" + ChatFormatting.GRAY + "] " + ChatFormatting.RESET + ChatFormatting.WHITE + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.GREEN + ChatFormatting.BOLD + " Enabled!");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.GRAY + "[" + (Object)ChatFormatting.RED + "Europa" + (Object)ChatFormatting.GRAY + "] " + (Object)ChatFormatting.RESET + (Object)ChatFormatting.WHITE + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.GREEN + (Object)ChatFormatting.BOLD + " Enabled!");
                     return text;
                 }
                 case PYRO: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_RED + "[" + ChatFormatting.DARK_RED + "Pyro" + ChatFormatting.DARK_RED + "] " + ChatFormatting.GREEN + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.GREEN + " has been enabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_RED + "[" + (Object)ChatFormatting.DARK_RED + "Pyro" + (Object)ChatFormatting.DARK_RED + "] " + (Object)ChatFormatting.GREEN + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.GREEN + " has been enabled.");
                     return text;
                 }
                 case MUFFIN: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.LIGHT_PURPLE + "[" + ChatFormatting.DARK_PURPLE + "Muffin" + ChatFormatting.LIGHT_PURPLE + "] " + ChatFormatting.LIGHT_PURPLE + module.getDisplayName() + ChatFormatting.DARK_PURPLE + " was " + ChatFormatting.GREEN + "enabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.LIGHT_PURPLE + "[" + (Object)ChatFormatting.DARK_PURPLE + "Muffin" + (Object)ChatFormatting.LIGHT_PURPLE + "] " + (Object)ChatFormatting.LIGHT_PURPLE + module.getDisplayName() + (Object)ChatFormatting.DARK_PURPLE + " was " + (Object)ChatFormatting.GREEN + "enabled.");
                     return text;
                 }
             }
         }
-        final TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + ChatFormatting.GREEN + module.getDisplayName() + " toggled on.");
+        TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + (Object)ChatFormatting.GREEN + module.getDisplayName() + " toggled on.");
         return text;
     }
-    
-    public TextComponentString getNotifierOff(final Module module) {
+
+    public TextComponentString getNotifierOff(Module module) {
         if (ModuleTools.getInstance().isEnabled()) {
             switch (ModuleTools.getInstance().notifier.getValue()) {
                 case EXPERIUM: {
-                    final TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + " " + ChatFormatting.BOLD + module.getDisplayName() + ChatFormatting.RESET + ChatFormatting.RED + " disabled.");
+                    TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + " " + (Object)ChatFormatting.BOLD + module.getDisplayName() + (Object)ChatFormatting.RESET + (Object)ChatFormatting.RED + " disabled.");
                     return text;
                 }
                 case FUTURE: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.RED + "[Future] " + ChatFormatting.GRAY + module.getDisplayName() + " toggled " + ChatFormatting.RED + "off" + ChatFormatting.GRAY + ".");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.RED + "[Future] " + (Object)ChatFormatting.GRAY + module.getDisplayName() + " toggled " + (Object)ChatFormatting.RED + "off" + (Object)ChatFormatting.GRAY + ".");
                     return text;
                 }
                 case DOTGOD: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_PURPLE + "[" + ChatFormatting.LIGHT_PURPLE + "DotGod.CC" + ChatFormatting.DARK_PURPLE + "] " + ChatFormatting.DARK_AQUA + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + " was " + ChatFormatting.RED + "disabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_PURPLE + "[" + (Object)ChatFormatting.LIGHT_PURPLE + "DotGod.CC" + (Object)ChatFormatting.DARK_PURPLE + "] " + (Object)ChatFormatting.DARK_AQUA + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + " was " + (Object)ChatFormatting.RED + "disabled.");
                     return text;
                 }
                 case SNOW: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.BLUE + "[" + ChatFormatting.AQUA + "Snow" + ChatFormatting.BLUE + "] [" + ChatFormatting.DARK_AQUA + module.getDisplayName() + ChatFormatting.BLUE + "] " + ChatFormatting.RED + "disabled");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.BLUE + "[" + (Object)ChatFormatting.AQUA + "Snow" + (Object)ChatFormatting.BLUE + "] [" + (Object)ChatFormatting.DARK_AQUA + module.getDisplayName() + (Object)ChatFormatting.BLUE + "] " + (Object)ChatFormatting.RED + "disabled");
                     return text;
                 }
                 case WEATHER: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.AQUA + "[" + ChatFormatting.AQUA + "Weather" + ChatFormatting.AQUA + "] " + ChatFormatting.DARK_AQUA + module.getDisplayName() + ChatFormatting.WHITE + " was toggled " + ChatFormatting.RED + "off.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.AQUA + "[" + (Object)ChatFormatting.AQUA + "Weather" + (Object)ChatFormatting.AQUA + "] " + (Object)ChatFormatting.DARK_AQUA + module.getDisplayName() + (Object)ChatFormatting.WHITE + " was toggled " + (Object)ChatFormatting.RED + "off.");
                     return text;
                 }
                 case CATALYST: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_GRAY + "[" + ChatFormatting.AQUA + "Catalyst" + ChatFormatting.DARK_GRAY + "] " + ChatFormatting.GRAY + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.RED + " OFF");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_GRAY + "[" + (Object)ChatFormatting.AQUA + "Catalyst" + (Object)ChatFormatting.DARK_GRAY + "] " + (Object)ChatFormatting.GRAY + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.RED + " OFF");
                     return text;
                 }
                 case RUSHERHACK: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.WHITE + "[" + ChatFormatting.GREEN + "rusherhack" + ChatFormatting.WHITE + "] " + ChatFormatting.WHITE + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.WHITE + " has been disabled");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.WHITE + "[" + (Object)ChatFormatting.GREEN + "rusherhack" + (Object)ChatFormatting.WHITE + "] " + (Object)ChatFormatting.WHITE + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.WHITE + " has been disabled");
                     return text;
                 }
                 case LEGACY: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.WHITE + "[" + ChatFormatting.LIGHT_PURPLE + "Legacy" + ChatFormatting.WHITE + "] " + ChatFormatting.BOLD + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.RED + " disabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.WHITE + "[" + (Object)ChatFormatting.LIGHT_PURPLE + "Legacy" + (Object)ChatFormatting.WHITE + "] " + (Object)ChatFormatting.BOLD + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.RED + " disabled.");
                     return text;
                 }
                 case KONAS: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_GRAY + "[" + ChatFormatting.LIGHT_PURPLE + "Konas" + ChatFormatting.DARK_GRAY + "] " + ChatFormatting.WHITE + module.getDisplayName() + ChatFormatting.WHITE + " has been disabled");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_GRAY + "[" + (Object)ChatFormatting.LIGHT_PURPLE + "Konas" + (Object)ChatFormatting.DARK_GRAY + "] " + (Object)ChatFormatting.WHITE + module.getDisplayName() + (Object)ChatFormatting.WHITE + " has been disabled");
                     return text;
                 }
                 case EUROPA: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.GRAY + "[" + ChatFormatting.RED + "Europa" + ChatFormatting.GRAY + "] " + ChatFormatting.RESET + ChatFormatting.WHITE + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.RED + ChatFormatting.BOLD + " Disabled!");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.GRAY + "[" + (Object)ChatFormatting.RED + "Europa" + (Object)ChatFormatting.GRAY + "] " + (Object)ChatFormatting.RESET + (Object)ChatFormatting.WHITE + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.RED + (Object)ChatFormatting.BOLD + " Disabled!");
                     return text;
                 }
                 case PYRO: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.DARK_RED + "[" + ChatFormatting.DARK_RED + "Pyro" + ChatFormatting.DARK_RED + "] " + ChatFormatting.RED + module.getDisplayName() + ChatFormatting.LIGHT_PURPLE + "" + ChatFormatting.RED + " has been disabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.DARK_RED + "[" + (Object)ChatFormatting.DARK_RED + "Pyro" + (Object)ChatFormatting.DARK_RED + "] " + (Object)ChatFormatting.RED + module.getDisplayName() + (Object)ChatFormatting.LIGHT_PURPLE + "" + (Object)ChatFormatting.RED + " has been disabled.");
                     return text;
                 }
                 case MUFFIN: {
-                    final TextComponentString text = new TextComponentString(ChatFormatting.LIGHT_PURPLE + "[" + ChatFormatting.DARK_PURPLE + "Muffin" + ChatFormatting.LIGHT_PURPLE + "] " + ChatFormatting.LIGHT_PURPLE + module.getDisplayName() + ChatFormatting.DARK_PURPLE + " was " + ChatFormatting.RED + "disabled.");
+                    TextComponentString text = new TextComponentString((Object)ChatFormatting.LIGHT_PURPLE + "[" + (Object)ChatFormatting.DARK_PURPLE + "Muffin" + (Object)ChatFormatting.LIGHT_PURPLE + "] " + (Object)ChatFormatting.LIGHT_PURPLE + module.getDisplayName() + (Object)ChatFormatting.DARK_PURPLE + " was " + (Object)ChatFormatting.RED + "disabled.");
                     return text;
                 }
             }
         }
-        final TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + ChatFormatting.RED + module.getDisplayName() + " toggled off.");
+        TextComponentString text = new TextComponentString(Experium.commandManager.getClientMessage() + (Object)ChatFormatting.RED + module.getDisplayName() + " toggled off.");
         return text;
     }
-    
+
     @SubscribeEvent
-    public void onToggleModule(final ClientEvent event) {
-        if (!this.moduleMessage.getValue()) {
+    public void onToggleModule(ClientEvent event) {
+        int moduleNumber;
+        Module module;
+        if (!this.moduleMessage.getValue().booleanValue()) {
             return;
         }
-        Module module;
-        if (event.getStage() == 0 && !(module = (Module)event.getFeature()).equals(this) && (Notifications.modules.contains(module.getDisplayName()) || !this.list.getValue())) {
-            int moduleNumber = 0;
-            for (final char character : module.getDisplayName().toCharArray()) {
+        if (!(event.getStage() != 0 || (module = (Module)event.getFeature()).equals(this) || !modules.contains(module.getDisplayName()) && this.list.getValue().booleanValue())) {
+            moduleNumber = 0;
+            for (char character : module.getDisplayName().toCharArray()) {
                 moduleNumber += character;
                 moduleNumber *= 10;
             }
             Notifications.mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion((ITextComponent)this.getNotifierOff(module), moduleNumber);
         }
-        if (event.getStage() == 1 && (Notifications.modules.contains((module = (Module)event.getFeature()).getDisplayName()) || !this.list.getValue())) {
-            int moduleNumber = 0;
-            for (final char character : module.getDisplayName().toCharArray()) {
+        if (event.getStage() == 1 && (modules.contains((module = (Module)event.getFeature()).getDisplayName()) || !this.list.getValue().booleanValue())) {
+            moduleNumber = 0;
+            for (char character : module.getDisplayName().toCharArray()) {
                 moduleNumber += character;
                 moduleNumber *= 10;
             }
             Notifications.mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion((ITextComponent)this.getNotifierOn(module), moduleNumber);
         }
     }
-    
-    static {
-        modules = new ArrayList<String>();
-        Notifications.INSTANCE = new Notifications();
-    }
 }
+

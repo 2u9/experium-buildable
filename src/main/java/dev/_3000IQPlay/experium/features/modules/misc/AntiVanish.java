@@ -1,66 +1,71 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.play.server.SPacketPlayerListItem
+ *  net.minecraft.network.play.server.SPacketPlayerListItem$Action
+ *  net.minecraft.network.play.server.SPacketPlayerListItem$AddPlayerData
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.misc;
 
-import dev._3000IQPlay.experium.features.command.Command;
-import dev._3000IQPlay.experium.util.PlayerUtil;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import java.util.Iterator;
-import net.minecraft.network.play.server.SPacketPlayerListItem;
 import dev._3000IQPlay.experium.event.events.PacketEvent;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.UUID;
-import java.util.Queue;
+import dev._3000IQPlay.experium.features.command.Command;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.util.PlayerUtil;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import net.minecraft.network.play.server.SPacketPlayerListItem;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class AntiVanish extends Module
-{
-    private final Queue<UUID> toLookUp;
-    
+public class AntiVanish
+extends Module {
+    private final Queue<UUID> toLookUp = new ConcurrentLinkedQueue<UUID>();
+
     public AntiVanish() {
-        super("AntiVanish", "Notifies you when players vanish", Category.MISC, true, false, false);
-        this.toLookUp = new ConcurrentLinkedQueue<UUID>();
+        super("AntiVanish", "Notifies you when players vanish", Module.Category.MISC, true, false, false);
     }
-    
+
     @SubscribeEvent
-    public void onPacketReceive(final PacketEvent.Receive event) {
-        final SPacketPlayerListItem sPacketPlayerListItem;
-        if (event.getPacket() instanceof SPacketPlayerListItem && (sPacketPlayerListItem = event.getPacket()).getAction() == SPacketPlayerListItem.Action.UPDATE_LATENCY) {
-            for (final SPacketPlayerListItem.AddPlayerData addPlayerData : sPacketPlayerListItem.getEntries()) {
+    public void onPacketReceive(PacketEvent.Receive event) {
+        SPacketPlayerListItem sPacketPlayerListItem;
+        if (event.getPacket() instanceof SPacketPlayerListItem && (sPacketPlayerListItem = (SPacketPlayerListItem)event.getPacket()).getAction() == SPacketPlayerListItem.Action.UPDATE_LATENCY) {
+            for (SPacketPlayerListItem.AddPlayerData addPlayerData : sPacketPlayerListItem.getEntries()) {
                 try {
-                    if (AntiVanish.mc.getConnection().getPlayerInfo(addPlayerData.getProfile().getId()) != null) {
-                        continue;
-                    }
+                    if (mc.getConnection().getPlayerInfo(addPlayerData.getProfile().getId()) != null) continue;
                     this.toLookUp.add(addPlayerData.getProfile().getId());
                 }
                 catch (Exception e) {
                     e.printStackTrace();
+                    return;
                 }
             }
         }
     }
-    
+
     @Override
     public void onUpdate() {
-        final UUID lookUp;
+        UUID lookUp;
         if (PlayerUtil.timer.passedS(5.0) && (lookUp = this.toLookUp.poll()) != null) {
             try {
-                final String name = PlayerUtil.getNameFromUUID(lookUp);
+                String name = PlayerUtil.getNameFromUUID(lookUp);
                 if (name != null) {
-                    Command.sendMessage("§c" + name + " has gone into vanish.");
+                    Command.sendMessage("\u00a7c" + name + " has gone into vanish.");
                 }
             }
-            catch (Exception ex) {}
+            catch (Exception exception) {
+                // empty catch block
+            }
             PlayerUtil.timer.reset();
         }
     }
-    
+
     @Override
     public void onLogout() {
         this.toLookUp.clear();
     }
 }
+

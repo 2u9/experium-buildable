@@ -1,33 +1,47 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.authlib.GameProfile
+ *  net.minecraft.client.entity.EntityOtherPlayerMP
+ *  net.minecraft.client.model.ModelBase
+ *  net.minecraft.client.model.ModelPlayer
+ *  net.minecraft.client.renderer.GlStateManager
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.EntityLivingBase
+ *  net.minecraft.network.play.server.SPacketEntityStatus
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.world.World
+ *  net.minecraftforge.client.event.RenderWorldLastEvent
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ *  org.lwjgl.opengl.GL11
+ */
 package dev._3000IQPlay.experium.features.modules.render;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.entity.EntityLivingBase;
+import com.mojang.authlib.GameProfile;
+import dev._3000IQPlay.experium.event.events.PacketEvent;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.util.NordTessellator;
-import net.minecraft.util.math.MathHelper;
+import dev._3000IQPlay.experium.util.TotemPopChams;
 import java.awt.Color;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.network.play.server.SPacketEntityStatus;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import dev._3000IQPlay.experium.util.TotemPopChams;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.world.World;
-import net.minecraft.network.play.server.SPacketEntityStatus;
-import dev._3000IQPlay.experium.event.events.PacketEvent;
-import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
+import org.lwjgl.opengl.GL11;
 
-public class PopChams extends Module
-{
+public class PopChams
+extends Module {
     public static Setting<Boolean> self;
     public static Setting<Boolean> elevator;
     public static Setting<Integer> rL;
@@ -47,31 +61,32 @@ public class PopChams extends Module
     Long startTime;
     double alphaFill;
     double alphaLine;
-    
+
     public PopChams() {
-        super("PopChams", "Renders a Glowing fakeplayer in the exact location where your enemy popped", Category.RENDER, true, false, false);
-        PopChams.self = (Setting<Boolean>)this.register(new Setting("Render Own Pops", (T)true));
-        PopChams.elevator = (Setting<Boolean>)this.register(new Setting("Travel", (T)true));
-        PopChams.elevatorMode = (Setting<ElevatorMode>)this.register(new Setting("Elevator", (T)ElevatorMode.UP, v -> PopChams.elevator.getValue()));
-        PopChams.rL = (Setting<Integer>)this.register(new Setting("Outline Red", (T)135, (T)0, (T)255));
-        PopChams.bL = (Setting<Integer>)this.register(new Setting("Outline Green", (T)0, (T)0, (T)255));
-        PopChams.gL = (Setting<Integer>)this.register(new Setting("Outline Blue", (T)255, (T)0, (T)255));
-        PopChams.aL = (Setting<Integer>)this.register(new Setting("Outline Alpha", (T)255, (T)0, (T)255));
-        PopChams.rF = (Setting<Integer>)this.register(new Setting("Fill Red", (T)135, (T)0, (T)255));
-        PopChams.bF = (Setting<Integer>)this.register(new Setting("Fill Green", (T)0, (T)0, (T)255));
-        PopChams.gF = (Setting<Integer>)this.register(new Setting("Fill Blue", (T)255, (T)0, (T)255));
-        PopChams.aF = (Setting<Integer>)this.register(new Setting("Fill Alpha", (T)140, (T)0, (T)255));
-        PopChams.fadestart = (Setting<Integer>)this.register(new Setting("Fade Start", (T)0, (T)0, (T)255));
-        PopChams.fadetime = (Setting<Float>)this.register(new Setting("Fade Time", (T)0.5f, (T)0.0f, (T)2.0f));
-        PopChams.onlyOneEsp = (Setting<Boolean>)this.register(new Setting("Only Render One", (T)true));
+        super("PopChams", "Renders a Glowing fakeplayer in the exact location where your enemy popped", Module.Category.RENDER, true, false, false);
+        self = this.register(new Setting<Boolean>("Render Own Pops", true));
+        elevator = this.register(new Setting<Boolean>("Travel", true));
+        elevatorMode = this.register(new Setting<ElevatorMode>("Elevator", ElevatorMode.UP, v -> elevator.getValue()));
+        rL = this.register(new Setting<Integer>("Outline Red", 135, 0, 255));
+        bL = this.register(new Setting<Integer>("Outline Green", 0, 0, 255));
+        gL = this.register(new Setting<Integer>("Outline Blue", 255, 0, 255));
+        aL = this.register(new Setting<Integer>("Outline Alpha", 255, 0, 255));
+        rF = this.register(new Setting<Integer>("Fill Red", 135, 0, 255));
+        bF = this.register(new Setting<Integer>("Fill Green", 0, 0, 255));
+        gF = this.register(new Setting<Integer>("Fill Blue", 255, 0, 255));
+        aF = this.register(new Setting<Integer>("Fill Alpha", 140, 0, 255));
+        fadestart = this.register(new Setting<Integer>("Fade Start", 0, 0, 255));
+        fadetime = this.register(new Setting<Float>("Fade Time", Float.valueOf(0.5f), Float.valueOf(0.0f), Float.valueOf(2.0f)));
+        onlyOneEsp = this.register(new Setting<Boolean>("Only Render One", true));
     }
-    
+
     @SubscribeEvent
-    public void onUpdate(final PacketEvent.Receive event) {
-        final SPacketEntityStatus packet;
-        if (event.getPacket() instanceof SPacketEntityStatus && (packet = event.getPacket()).getOpCode() == 35 && packet.getEntity((World)PopChams.mc.world) != null && (PopChams.self.getValue() || packet.getEntity((World)PopChams.mc.world).getEntityId() != PopChams.mc.player.getEntityId())) {
-            final GameProfile profile = new GameProfile(PopChams.mc.player.getUniqueID(), "");
-            (this.player = new EntityOtherPlayerMP((World)PopChams.mc.world, profile)).copyLocationAndAnglesFrom(packet.getEntity((World)PopChams.mc.world));
+    public void onUpdate(PacketEvent.Receive event) {
+        SPacketEntityStatus packet;
+        if (event.getPacket() instanceof SPacketEntityStatus && (packet = (SPacketEntityStatus)event.getPacket()).getOpCode() == 35 && packet.getEntity((World)PopChams.mc.world) != null && (self.getValue().booleanValue() || packet.getEntity((World)PopChams.mc.world).getEntityId() != PopChams.mc.player.getEntityId())) {
+            GameProfile profile = new GameProfile(PopChams.mc.player.getUniqueID(), "");
+            this.player = new EntityOtherPlayerMP((World)PopChams.mc.world, profile);
+            this.player.copyLocationAndAnglesFrom(packet.getEntity((World)PopChams.mc.world));
             this.playerModel = new ModelPlayer(0.0f, false);
             this.startTime = System.currentTimeMillis();
             this.playerModel.bipedHead.showModel = false;
@@ -80,149 +95,148 @@ public class PopChams extends Module
             this.playerModel.bipedLeftLegwear.showModel = false;
             this.playerModel.bipedRightArmwear.showModel = false;
             this.playerModel.bipedRightLegwear.showModel = false;
-            this.alphaFill = PopChams.aF.getValue();
-            this.alphaLine = PopChams.aL.getValue();
-            if (!PopChams.onlyOneEsp.getValue()) {
-                final TotemPopChams totemPopChams = new TotemPopChams(this.player, this.playerModel, this.startTime, this.alphaFill, this.alphaLine);
+            this.alphaFill = aF.getValue().intValue();
+            this.alphaLine = aL.getValue().intValue();
+            if (!onlyOneEsp.getValue().booleanValue()) {
+                TotemPopChams totemPopChams = new TotemPopChams(this.player, this.playerModel, this.startTime, this.alphaFill, this.alphaLine);
             }
         }
     }
-    
+
     @SubscribeEvent
-    public void onRenderWorld(final RenderWorldLastEvent event) {
-        if (PopChams.onlyOneEsp.getValue()) {
+    public void onRenderWorld(RenderWorldLastEvent event) {
+        if (onlyOneEsp.getValue().booleanValue()) {
             if (this.player == null || PopChams.mc.world == null || PopChams.mc.player == null) {
                 return;
             }
-            if (PopChams.elevator.getValue()) {
-                if (PopChams.elevatorMode.getValue() == ElevatorMode.UP) {
-                    final EntityOtherPlayerMP player = this.player;
-                    player.posY += 0.05f * event.getPartialTicks();
-                }
-                else if (PopChams.elevatorMode.getValue() == ElevatorMode.DOWN) {
-                    final EntityOtherPlayerMP player2 = this.player;
-                    player2.posY -= 0.05f * event.getPartialTicks();
+            if (elevator.getValue().booleanValue()) {
+                if (elevatorMode.getValue() == ElevatorMode.UP) {
+                    this.player.posY += (double)(0.05f * event.getPartialTicks());
+                } else if (elevatorMode.getValue() == ElevatorMode.DOWN) {
+                    this.player.posY -= (double)(0.05f * event.getPartialTicks());
                 }
             }
-            GL11.glLineWidth(1.0f);
-            final Color lineColorS = new Color(PopChams.rL.getValue(), PopChams.bL.getValue(), PopChams.gL.getValue(), PopChams.aL.getValue());
-            final Color fillColorS = new Color(PopChams.rF.getValue(), PopChams.bF.getValue(), PopChams.gF.getValue(), PopChams.aF.getValue());
+            GL11.glLineWidth((float)1.0f);
+            Color lineColorS = new Color(rL.getValue(), bL.getValue(), gL.getValue(), aL.getValue());
+            Color fillColorS = new Color(rF.getValue(), bF.getValue(), gF.getValue(), aF.getValue());
             int lineA = lineColorS.getAlpha();
             int fillA = fillColorS.getAlpha();
-            final long time = System.currentTimeMillis() - this.startTime - PopChams.fadestart.getValue().longValue();
-            if (System.currentTimeMillis() - this.startTime > PopChams.fadestart.getValue().longValue()) {
-                double normal = this.normalize((double)time, 0.0, PopChams.fadetime.getValue().doubleValue());
-                normal = MathHelper.clamp(normal, 0.0, 1.0);
+            long time = System.currentTimeMillis() - this.startTime - ((Number)fadestart.getValue()).longValue();
+            if (System.currentTimeMillis() - this.startTime > ((Number)fadestart.getValue()).longValue()) {
+                double normal = this.normalize(time, 0.0, ((Number)fadetime.getValue()).doubleValue());
+                normal = MathHelper.clamp((double)normal, (double)0.0, (double)1.0);
                 normal = -normal + 1.0;
                 lineA *= (int)normal;
                 fillA *= (int)normal;
             }
-            final Color lineColor = newAlpha(lineColorS, lineA);
-            final Color fillColor = newAlpha(fillColorS, fillA);
+            Color lineColor = PopChams.newAlpha(lineColorS, lineA);
+            Color fillColor = PopChams.newAlpha(fillColorS, fillA);
             if (this.player != null && this.playerModel != null) {
                 NordTessellator.prepareGL();
-                GL11.glPushAttrib(1048575);
-                GL11.glEnable(2881);
-                GL11.glEnable(2848);
+                GL11.glPushAttrib((int)1048575);
+                GL11.glEnable((int)2881);
+                GL11.glEnable((int)2848);
                 if (this.alphaFill > 1.0) {
-                    this.alphaFill -= PopChams.fadetime.getValue();
+                    this.alphaFill -= (double)fadetime.getValue().floatValue();
                 }
-                final Color fillFinal = new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), (int)this.alphaFill);
+                Color fillFinal = new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), (int)this.alphaFill);
                 if (this.alphaLine > 1.0) {
-                    this.alphaLine -= PopChams.fadetime.getValue();
+                    this.alphaLine -= (double)fadetime.getValue().floatValue();
                 }
-                final Color outlineFinal = new Color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), (int)this.alphaLine);
-                glColor(fillFinal);
-                GL11.glPolygonMode(1032, 6914);
-                renderEntity((EntityLivingBase)this.player, (ModelBase)this.playerModel, this.player.limbSwing, this.player.limbSwingAmount, (float)this.player.ticksExisted, this.player.rotationYawHead, this.player.rotationPitch, 1);
-                glColor(outlineFinal);
-                GL11.glPolygonMode(1032, 6913);
-                renderEntity((EntityLivingBase)this.player, (ModelBase)this.playerModel, this.player.limbSwing, this.player.limbSwingAmount, (float)this.player.ticksExisted, this.player.rotationYawHead, this.player.rotationPitch, 1);
-                GL11.glPolygonMode(1032, 6914);
+                Color outlineFinal = new Color(lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue(), (int)this.alphaLine);
+                PopChams.glColor(fillFinal);
+                GL11.glPolygonMode((int)1032, (int)6914);
+                PopChams.renderEntity((EntityLivingBase)this.player, (ModelBase)this.playerModel, this.player.limbSwing, this.player.limbSwingAmount, this.player.ticksExisted, this.player.rotationYawHead, this.player.rotationPitch, 1);
+                PopChams.glColor(outlineFinal);
+                GL11.glPolygonMode((int)1032, (int)6913);
+                PopChams.renderEntity((EntityLivingBase)this.player, (ModelBase)this.playerModel, this.player.limbSwing, this.player.limbSwingAmount, this.player.ticksExisted, this.player.rotationYawHead, this.player.rotationPitch, 1);
+                GL11.glPolygonMode((int)1032, (int)6914);
                 GL11.glPopAttrib();
                 NordTessellator.releaseGL();
             }
         }
     }
-    
-    double normalize(final double value, final double min, final double max) {
+
+    double normalize(double value, double min, double max) {
         return (value - min) / (max - min);
     }
-    
-    public static void renderEntity(final EntityLivingBase entity, final ModelBase modelBase, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final int scale) {
-        if (PopChams.mc.getRenderManager() == null) {
+
+    public static void renderEntity(EntityLivingBase entity, ModelBase modelBase, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, int scale) {
+        if (mc.getRenderManager() == null) {
             return;
         }
-        final float partialTicks = PopChams.mc.getRenderPartialTicks();
-        final double x = entity.posX - PopChams.mc.getRenderManager().viewerPosX;
+        float partialTicks = mc.getRenderPartialTicks();
+        double x = entity.posX - PopChams.mc.getRenderManager().viewerPosX;
         double y = entity.posY - PopChams.mc.getRenderManager().viewerPosY;
-        final double z = entity.posZ - PopChams.mc.getRenderManager().viewerPosZ;
+        double z = entity.posZ - PopChams.mc.getRenderManager().viewerPosZ;
         GlStateManager.pushMatrix();
         if (entity.isSneaking()) {
             y -= 0.125;
         }
-        final float interpolateRotation = interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
-        final float interpolateRotation2 = interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
-        final float rotationInterp = interpolateRotation2 - interpolateRotation;
-        final float renderPitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-        renderLivingAt(x, y, z);
-        final float f8 = handleRotationFloat(entity, partialTicks);
-        prepareRotations(entity);
-        final float f9 = prepareScale(entity, (float)scale);
+        float interpolateRotation = PopChams.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
+        float interpolateRotation2 = PopChams.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
+        float rotationInterp = interpolateRotation2 - interpolateRotation;
+        float renderPitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+        PopChams.renderLivingAt(x, y, z);
+        float f8 = PopChams.handleRotationFloat(entity, partialTicks);
+        PopChams.prepareRotations(entity);
+        float f9 = PopChams.prepareScale(entity, scale);
         GlStateManager.enableAlpha();
         modelBase.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTicks);
         modelBase.setRotationAngles(limbSwing, limbSwingAmount, f8, entity.rotationYaw, entity.rotationPitch, f9, (Entity)entity);
         modelBase.render((Entity)entity, limbSwing, limbSwingAmount, f8, entity.rotationYaw, entity.rotationPitch, f9);
         GlStateManager.popMatrix();
     }
-    
-    public static void prepareTranslate(final EntityLivingBase entityIn, final double x, final double y, final double z) {
-        renderLivingAt(x - PopChams.mc.getRenderManager().viewerPosX, y - PopChams.mc.getRenderManager().viewerPosY, z - PopChams.mc.getRenderManager().viewerPosZ);
+
+    public static void prepareTranslate(EntityLivingBase entityIn, double x, double y, double z) {
+        PopChams.renderLivingAt(x - PopChams.mc.getRenderManager().viewerPosX, y - PopChams.mc.getRenderManager().viewerPosY, z - PopChams.mc.getRenderManager().viewerPosZ);
     }
-    
-    public static void renderLivingAt(final double x, final double y, final double z) {
-        GlStateManager.translate((float)x, (float)y, (float)z);
+
+    public static void renderLivingAt(double x, double y, double z) {
+        GlStateManager.translate((float)((float)x), (float)((float)y), (float)((float)z));
     }
-    
-    public static float prepareScale(final EntityLivingBase entity, final float scale) {
+
+    public static float prepareScale(EntityLivingBase entity, float scale) {
         GlStateManager.enableRescaleNormal();
-        GlStateManager.scale(-1.0f, -1.0f, 1.0f);
-        final double widthX = entity.getRenderBoundingBox().maxX - entity.getRenderBoundingBox().minX;
-        final double widthZ = entity.getRenderBoundingBox().maxZ - entity.getRenderBoundingBox().minZ;
-        GlStateManager.scale(scale + widthX, (double)(scale * entity.height), scale + widthZ);
-        final float f = 0.0625f;
-        GlStateManager.translate(0.0f, -1.501f, 0.0f);
+        GlStateManager.scale((float)-1.0f, (float)-1.0f, (float)1.0f);
+        double widthX = entity.getRenderBoundingBox().maxX - entity.getRenderBoundingBox().minX;
+        double widthZ = entity.getRenderBoundingBox().maxZ - entity.getRenderBoundingBox().minZ;
+        GlStateManager.scale((double)((double)scale + widthX), (double)(scale * entity.height), (double)((double)scale + widthZ));
+        float f = 0.0625f;
+        GlStateManager.translate((float)0.0f, (float)-1.501f, (float)0.0f);
         return 0.0625f;
     }
-    
-    public static void prepareRotations(final EntityLivingBase entityLivingBase) {
-        GlStateManager.rotate(180.0f - entityLivingBase.rotationYaw, 0.0f, 1.0f, 0.0f);
+
+    public static void prepareRotations(EntityLivingBase entityLivingBase) {
+        GlStateManager.rotate((float)(180.0f - entityLivingBase.rotationYaw), (float)0.0f, (float)1.0f, (float)0.0f);
     }
-    
-    public static float interpolateRotation(final float prevYawOffset, final float yawOffset, final float partialTicks) {
+
+    public static float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
         float f;
-        for (f = yawOffset - prevYawOffset; f < -180.0f; f += 360.0f) {}
+        for (f = yawOffset - prevYawOffset; f < -180.0f; f += 360.0f) {
+        }
         while (f >= 180.0f) {
             f -= 360.0f;
         }
         return prevYawOffset + partialTicks * f;
     }
-    
-    public static Color newAlpha(final Color color, final int alpha) {
+
+    public static Color newAlpha(Color color, int alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
     }
-    
-    public static void glColor(final Color color) {
-        GL11.glColor4f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
+
+    public static void glColor(Color color) {
+        GL11.glColor4f((float)((float)color.getRed() / 255.0f), (float)((float)color.getGreen() / 255.0f), (float)((float)color.getBlue() / 255.0f), (float)((float)color.getAlpha() / 255.0f));
     }
-    
-    public static float handleRotationFloat(final EntityLivingBase livingBase, final float partialTicks) {
+
+    public static float handleRotationFloat(EntityLivingBase livingBase, float partialTicks) {
         return 0.0f;
     }
-    
-    public enum ElevatorMode
-    {
-        UP, 
+
+    public static enum ElevatorMode {
+        UP,
         DOWN;
+
     }
 }
+

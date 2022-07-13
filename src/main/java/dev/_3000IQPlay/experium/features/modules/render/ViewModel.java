@@ -1,86 +1,65 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.render;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import dev._3000IQPlay.experium.event.events.RenderItemEvent;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class ViewModel extends Module
-{
-    private static ViewModel INSTANCE;
-    public Setting<Settings> settings;
-    public Setting<Boolean> noEatAnimation;
-    public Setting<Double> eatX;
-    public Setting<Double> eatY;
-    public Setting<Boolean> doBob;
-    public Setting<Double> mainX;
-    public Setting<Double> mainY;
-    public Setting<Double> mainZ;
-    public Setting<Double> offX;
-    public Setting<Double> offY;
-    public Setting<Double> offZ;
-    public Setting<Integer> mainRotX;
-    public Setting<Integer> mainRotY;
-    public Setting<Integer> mainRotZ;
-    public Setting<Integer> offRotX;
-    public Setting<Integer> offRotY;
-    public Setting<Integer> offRotZ;
-    public Setting<Double> mainScaleX;
-    public Setting<Double> mainScaleY;
-    public Setting<Double> mainScaleZ;
-    public Setting<Double> offScaleX;
-    public Setting<Double> offScaleY;
-    public Setting<Double> offScaleZ;
-    
+public class ViewModel
+extends Module {
+    private static ViewModel INSTANCE = new ViewModel();
+    public Setting<Settings> settings = this.register(new Setting<Settings>("Settings", Settings.TRANSLATE));
+    public Setting<Boolean> noEatAnimation = this.register(new Setting<Boolean>("NoEatAnimation", Boolean.valueOf(false), v -> this.settings.getValue() == Settings.TWEAKS));
+    public Setting<Double> eatX = this.register(new Setting<Double>("EatX", Double.valueOf(1.0), Double.valueOf(-2.0), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.TWEAKS && this.noEatAnimation.getValue() == false));
+    public Setting<Double> eatY = this.register(new Setting<Double>("EatY", Double.valueOf(1.0), Double.valueOf(-2.0), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.TWEAKS && this.noEatAnimation.getValue() == false));
+    public Setting<Boolean> doBob = this.register(new Setting<Boolean>("ItemBob", Boolean.valueOf(true), v -> this.settings.getValue() == Settings.TWEAKS));
+    public Setting<Double> mainX = this.register(new Setting<Double>("MainX", Double.valueOf(0.0), Double.valueOf(-2.0), Double.valueOf(4.0), v -> this.settings.getValue() == Settings.TRANSLATE));
+    public Setting<Double> mainY = this.register(new Setting<Double>("MainY", Double.valueOf(-0.0), Double.valueOf(-3.0), Double.valueOf(3.0), v -> this.settings.getValue() == Settings.TRANSLATE));
+    public Setting<Double> mainZ = this.register(new Setting<Double>("MainZ", Double.valueOf(-0.0), Double.valueOf(-5.0), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.TRANSLATE));
+    public Setting<Double> offX = this.register(new Setting<Double>("OffX", Double.valueOf(0.0), Double.valueOf(-2.0), Double.valueOf(4.0), v -> this.settings.getValue() == Settings.TRANSLATE));
+    public Setting<Double> offY = this.register(new Setting<Double>("OffY", Double.valueOf(-0.0), Double.valueOf(-3.0), Double.valueOf(3.0), v -> this.settings.getValue() == Settings.TRANSLATE));
+    public Setting<Double> offZ = this.register(new Setting<Double>("OffZ", Double.valueOf(-0.0), Double.valueOf(-5.0), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.TRANSLATE));
+    public Setting<Integer> mainRotX = this.register(new Setting<Integer>("MainRotationX", Integer.valueOf(0), Integer.valueOf(-36), Integer.valueOf(36), v -> this.settings.getValue() == Settings.ROTATE));
+    public Setting<Integer> mainRotY = this.register(new Setting<Integer>("MainRotationY", Integer.valueOf(0), Integer.valueOf(-36), Integer.valueOf(36), v -> this.settings.getValue() == Settings.ROTATE));
+    public Setting<Integer> mainRotZ = this.register(new Setting<Integer>("MainRotationZ", Integer.valueOf(0), Integer.valueOf(-36), Integer.valueOf(36), v -> this.settings.getValue() == Settings.ROTATE));
+    public Setting<Integer> offRotX = this.register(new Setting<Integer>("OffRotationX", Integer.valueOf(0), Integer.valueOf(-36), Integer.valueOf(36), v -> this.settings.getValue() == Settings.ROTATE));
+    public Setting<Integer> offRotY = this.register(new Setting<Integer>("OffRotationY", Integer.valueOf(0), Integer.valueOf(-36), Integer.valueOf(36), v -> this.settings.getValue() == Settings.ROTATE));
+    public Setting<Integer> offRotZ = this.register(new Setting<Integer>("OffRotationZ", Integer.valueOf(0), Integer.valueOf(-36), Integer.valueOf(36), v -> this.settings.getValue() == Settings.ROTATE));
+    public Setting<Double> mainScaleX = this.register(new Setting<Double>("MainScaleX", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.SCALE));
+    public Setting<Double> mainScaleY = this.register(new Setting<Double>("MainScaleY", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.SCALE));
+    public Setting<Double> mainScaleZ = this.register(new Setting<Double>("MainScaleZ", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.SCALE));
+    public Setting<Double> offScaleX = this.register(new Setting<Double>("OffScaleX", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.SCALE));
+    public Setting<Double> offScaleY = this.register(new Setting<Double>("OffScaleY", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.SCALE));
+    public Setting<Double> offScaleZ = this.register(new Setting<Double>("OffScaleZ", Double.valueOf(1.0), Double.valueOf(0.1), Double.valueOf(5.0), v -> this.settings.getValue() == Settings.SCALE));
+
     public ViewModel() {
-        super("ViewModel", "Cool", Category.RENDER, true, false, false);
-        this.settings = (Setting<Settings>)this.register(new Setting("Settings", (T)Settings.TRANSLATE));
-        this.noEatAnimation = (Setting<Boolean>)this.register(new Setting("NoEatAnimation", (T)false, v -> this.settings.getValue() == Settings.TWEAKS));
-        this.eatX = (Setting<Double>)this.register(new Setting("EatX", (T)1.0, (T)(-2.0), (T)5.0, v -> this.settings.getValue() == Settings.TWEAKS && !this.noEatAnimation.getValue()));
-        this.eatY = (Setting<Double>)this.register(new Setting("EatY", (T)1.0, (T)(-2.0), (T)5.0, v -> this.settings.getValue() == Settings.TWEAKS && !this.noEatAnimation.getValue()));
-        this.doBob = (Setting<Boolean>)this.register(new Setting("ItemBob", (T)true, v -> this.settings.getValue() == Settings.TWEAKS));
-        this.mainX = (Setting<Double>)this.register(new Setting("MainX", (T)0.0, (T)(-2.0), (T)4.0, v -> this.settings.getValue() == Settings.TRANSLATE));
-        this.mainY = (Setting<Double>)this.register(new Setting("MainY", (T)-0.0, (T)(-3.0), (T)3.0, v -> this.settings.getValue() == Settings.TRANSLATE));
-        this.mainZ = (Setting<Double>)this.register(new Setting("MainZ", (T)-0.0, (T)(-5.0), (T)5.0, v -> this.settings.getValue() == Settings.TRANSLATE));
-        this.offX = (Setting<Double>)this.register(new Setting("OffX", (T)0.0, (T)(-2.0), (T)4.0, v -> this.settings.getValue() == Settings.TRANSLATE));
-        this.offY = (Setting<Double>)this.register(new Setting("OffY", (T)-0.0, (T)(-3.0), (T)3.0, v -> this.settings.getValue() == Settings.TRANSLATE));
-        this.offZ = (Setting<Double>)this.register(new Setting("OffZ", (T)-0.0, (T)(-5.0), (T)5.0, v -> this.settings.getValue() == Settings.TRANSLATE));
-        this.mainRotX = (Setting<Integer>)this.register(new Setting("MainRotationX", (T)0, (T)(-36), (T)36, v -> this.settings.getValue() == Settings.ROTATE));
-        this.mainRotY = (Setting<Integer>)this.register(new Setting("MainRotationY", (T)0, (T)(-36), (T)36, v -> this.settings.getValue() == Settings.ROTATE));
-        this.mainRotZ = (Setting<Integer>)this.register(new Setting("MainRotationZ", (T)0, (T)(-36), (T)36, v -> this.settings.getValue() == Settings.ROTATE));
-        this.offRotX = (Setting<Integer>)this.register(new Setting("OffRotationX", (T)0, (T)(-36), (T)36, v -> this.settings.getValue() == Settings.ROTATE));
-        this.offRotY = (Setting<Integer>)this.register(new Setting("OffRotationY", (T)0, (T)(-36), (T)36, v -> this.settings.getValue() == Settings.ROTATE));
-        this.offRotZ = (Setting<Integer>)this.register(new Setting("OffRotationZ", (T)0, (T)(-36), (T)36, v -> this.settings.getValue() == Settings.ROTATE));
-        this.mainScaleX = (Setting<Double>)this.register(new Setting("MainScaleX", (T)1.0, (T)0.1, (T)5.0, v -> this.settings.getValue() == Settings.SCALE));
-        this.mainScaleY = (Setting<Double>)this.register(new Setting("MainScaleY", (T)1.0, (T)0.1, (T)5.0, v -> this.settings.getValue() == Settings.SCALE));
-        this.mainScaleZ = (Setting<Double>)this.register(new Setting("MainScaleZ", (T)1.0, (T)0.1, (T)5.0, v -> this.settings.getValue() == Settings.SCALE));
-        this.offScaleX = (Setting<Double>)this.register(new Setting("OffScaleX", (T)1.0, (T)0.1, (T)5.0, v -> this.settings.getValue() == Settings.SCALE));
-        this.offScaleY = (Setting<Double>)this.register(new Setting("OffScaleY", (T)1.0, (T)0.1, (T)5.0, v -> this.settings.getValue() == Settings.SCALE));
-        this.offScaleZ = (Setting<Double>)this.register(new Setting("OffScaleZ", (T)1.0, (T)0.1, (T)5.0, v -> this.settings.getValue() == Settings.SCALE));
+        super("ViewModel", "Cool", Module.Category.RENDER, true, false, false);
         this.setInstance();
     }
-    
+
     public static ViewModel getInstance() {
-        if (ViewModel.INSTANCE == null) {
-            ViewModel.INSTANCE = new ViewModel();
+        if (INSTANCE == null) {
+            INSTANCE = new ViewModel();
         }
-        return ViewModel.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        ViewModel.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @SubscribeEvent
-    public void onItemRender(final RenderItemEvent event) {
+    public void onItemRender(RenderItemEvent event) {
         event.setMainX(this.mainX.getValue());
         event.setMainY(this.mainY.getValue());
         event.setMainZ(this.mainZ.getValue());
-        event.setOffX(-this.offX.getValue());
+        event.setOffX(-this.offX.getValue().doubleValue());
         event.setOffY(this.offY.getValue());
         event.setOffZ(this.offZ.getValue());
         event.setMainRotX(this.mainRotX.getValue() * 5);
@@ -96,16 +75,13 @@ public class ViewModel extends Module
         event.setMainHandScaleY(this.mainScaleY.getValue());
         event.setMainHandScaleZ(this.mainScaleZ.getValue());
     }
-    
-    static {
-        ViewModel.INSTANCE = new ViewModel();
-    }
-    
-    private enum Settings
-    {
-        TRANSLATE, 
-        ROTATE, 
-        SCALE, 
+
+    private static enum Settings {
+        TRANSLATE,
+        ROTATE,
+        SCALE,
         TWEAKS;
+
     }
 }
+

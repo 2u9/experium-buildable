@@ -1,38 +1,43 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.util.math.AxisAlignedBB
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraftforge.fml.common.eventhandler.Cancelable
+ */
 package dev._3000IQPlay.experium.event.events;
 
+import dev._3000IQPlay.experium.event.EventStage;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import dev._3000IQPlay.experium.event.EventStage;
 
 @Cancelable
-public class JesusEvent extends EventStage
-{
+public class JesusEvent
+extends EventStage {
     private BlockPos pos;
     private AxisAlignedBB boundingBox;
-    
-    public JesusEvent(final int stage, final BlockPos pos) {
+
+    public JesusEvent(int stage, BlockPos pos) {
         super(stage);
         this.pos = pos;
     }
-    
+
     public BlockPos getPos() {
         return this.pos;
     }
-    
-    public void setPos(final BlockPos pos) {
+
+    public void setPos(BlockPos pos) {
         this.pos = pos;
     }
-    
+
     public AxisAlignedBB getBoundingBox() {
         return this.boundingBox;
     }
-    
-    public void setBoundingBox(final AxisAlignedBB boundingBox) {
+
+    public void setBoundingBox(AxisAlignedBB boundingBox) {
         this.boundingBox = boundingBox;
     }
 }
+

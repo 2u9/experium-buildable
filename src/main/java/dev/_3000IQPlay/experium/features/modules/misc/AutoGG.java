@@ -1,65 +1,63 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketChatMessage
+ *  net.minecraft.network.play.client.CPacketUseEntity
+ *  net.minecraft.network.play.client.CPacketUseEntity$Action
+ *  net.minecraft.world.World
+ *  net.minecraftforge.event.entity.player.AttackEntityEvent
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.misc;
 
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketChatMessage;
-import dev._3000IQPlay.experium.util.MathUtil;
-import java.util.Random;
-import dev._3000IQPlay.experium.manager.FileManager;
-import net.minecraft.world.World;
-import net.minecraft.network.play.client.CPacketUseEntity;
-import dev._3000IQPlay.experium.event.events.PacketEvent;
 import dev._3000IQPlay.experium.Experium;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import dev._3000IQPlay.experium.event.events.DeathEvent;
-import java.util.Iterator;
-import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
+import dev._3000IQPlay.experium.event.events.PacketEvent;
 import dev._3000IQPlay.experium.features.command.Command;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.manager.FileManager;
+import dev._3000IQPlay.experium.util.MathUtil;
+import dev._3000IQPlay.experium.util.Timer;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
-import net.minecraft.entity.player.EntityPlayer;
 import java.util.Map;
-import dev._3000IQPlay.experium.util.Timer;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketChatMessage;
+import net.minecraft.network.play.client.CPacketUseEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class AutoGG extends Module
-{
+public class AutoGG
+extends Module {
     private static final String path = "experium/autogg.txt";
-    private final Setting<Boolean> onOwnDeath;
-    private final Setting<Boolean> greentext;
-    private final Setting<Boolean> loadFiles;
-    private final Setting<Integer> targetResetTimer;
-    private final Setting<Integer> delay;
-    private final Setting<Boolean> test;
-    private final Timer timer;
-    private final Timer cooldownTimer;
-    public Map<EntityPlayer, Integer> targets;
-    public List<String> messages;
+    private final Setting<Boolean> onOwnDeath = this.register(new Setting<Boolean>("OwnDeath", false));
+    private final Setting<Boolean> greentext = this.register(new Setting<Boolean>("Greentext", false));
+    private final Setting<Boolean> loadFiles = this.register(new Setting<Boolean>("LoadFiles", false));
+    private final Setting<Integer> targetResetTimer = this.register(new Setting<Integer>("Reset", 30, 0, 90));
+    private final Setting<Integer> delay = this.register(new Setting<Integer>("Delay", 5, 0, 30));
+    private final Setting<Boolean> test = this.register(new Setting<Boolean>("Test", false));
+    private final Timer timer = new Timer();
+    private final Timer cooldownTimer = new Timer();
+    public Map<EntityPlayer, Integer> targets = new ConcurrentHashMap<EntityPlayer, Integer>();
+    public List<String> messages = new ArrayList<String>();
     public EntityPlayer cauraTarget;
     private boolean cooldown;
-    
+
     public AutoGG() {
-        super("AutoGG", "Automatically GGs", Category.MISC, true, false, false);
-        this.onOwnDeath = (Setting<Boolean>)this.register(new Setting("OwnDeath", (T)false));
-        this.greentext = (Setting<Boolean>)this.register(new Setting("Greentext", (T)false));
-        this.loadFiles = (Setting<Boolean>)this.register(new Setting("LoadFiles", (T)false));
-        this.targetResetTimer = (Setting<Integer>)this.register(new Setting("Reset", (T)30, (T)0, (T)90));
-        this.delay = (Setting<Integer>)this.register(new Setting("Delay", (T)5, (T)0, (T)30));
-        this.test = (Setting<Boolean>)this.register(new Setting("Test", (T)false));
-        this.timer = new Timer();
-        this.cooldownTimer = new Timer();
-        this.targets = new ConcurrentHashMap<EntityPlayer, Integer>();
-        this.messages = new ArrayList<String>();
-        final File file = new File("experium/autogg.txt");
+        super("AutoGG", "Automatically GGs", Module.Category.MISC, true, false, false);
+        File file = new File(path);
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -69,17 +67,17 @@ public class AutoGG extends Module
             }
         }
     }
-    
+
     @Override
     public void onEnable() {
         this.loadMessages();
         this.timer.reset();
         this.cooldownTimer.reset();
     }
-    
+
     @Override
     public void onTick() {
-        if (this.loadFiles.getValue()) {
+        if (this.loadFiles.getValue().booleanValue()) {
             this.loadMessages();
             Command.sendMessage("<AutoGG> Loaded messages.");
             this.loadFiles.setValue(false);
@@ -87,69 +85,67 @@ public class AutoGG extends Module
         if (AutoCrystal.target != null && this.cauraTarget != AutoCrystal.target) {
             this.cauraTarget = AutoCrystal.target;
         }
-        if (this.test.getValue()) {
+        if (this.test.getValue().booleanValue()) {
             this.announceDeath((EntityPlayer)AutoGG.mc.player);
             this.test.setValue(false);
         }
         if (!this.cooldown) {
             this.cooldownTimer.reset();
         }
-        if (this.cooldownTimer.passedS(this.delay.getValue()) && this.cooldown) {
+        if (this.cooldownTimer.passedS(this.delay.getValue().intValue()) && this.cooldown) {
             this.cooldown = false;
             this.cooldownTimer.reset();
         }
         if (AutoCrystal.target != null) {
             this.targets.put(AutoCrystal.target, (int)(this.timer.getPassedTimeMs() / 1000L));
         }
-        this.targets.replaceAll((p, v) -> Integer.valueOf((int)(this.timer.getPassedTimeMs() / 1000L)));
-        for (final EntityPlayer player : this.targets.keySet()) {
-            if (this.targets.get(player) <= this.targetResetTimer.getValue()) {
-                continue;
-            }
-            this.targets.remove(player);
+        this.targets.replaceAll((p, v) -> (int)(this.timer.getPassedTimeMs() / 1000L));
+        for (EntityPlayer player : this.targets.keySet()) {
+            if (this.targets.get((Object)player) <= this.targetResetTimer.getValue()) continue;
+            this.targets.remove((Object)player);
             this.timer.reset();
         }
     }
-    
+
     @SubscribeEvent
-    public void onEntityDeath(final DeathEvent event) {
-        if (this.targets.containsKey(event.player) && !this.cooldown) {
+    public void onEntityDeath(DeathEvent event) {
+        if (this.targets.containsKey((Object)event.player) && !this.cooldown) {
             this.announceDeath(event.player);
             this.cooldown = true;
-            this.targets.remove(event.player);
+            this.targets.remove((Object)event.player);
         }
         if (event.player == this.cauraTarget && !this.cooldown) {
             this.announceDeath(event.player);
             this.cooldown = true;
         }
-        if (event.player == AutoGG.mc.player && this.onOwnDeath.getValue()) {
+        if (event.player == AutoGG.mc.player && this.onOwnDeath.getValue().booleanValue()) {
             this.announceDeath(event.player);
             this.cooldown = true;
         }
     }
-    
+
     @SubscribeEvent
-    public void onAttackEntity(final AttackEntityEvent event) {
+    public void onAttackEntity(AttackEntityEvent event) {
         if (event.getTarget() instanceof EntityPlayer && !Experium.friendManager.isFriend(event.getEntityPlayer())) {
             this.targets.put((EntityPlayer)event.getTarget(), 0);
         }
     }
-    
+
     @SubscribeEvent
-    public void onSendAttackPacket(final PacketEvent.Send event) {
-        final CPacketUseEntity packet;
-        if (event.getPacket() instanceof CPacketUseEntity && (packet = event.getPacket()).getAction() == CPacketUseEntity.Action.ATTACK && packet.getEntityFromWorld((World)AutoGG.mc.world) instanceof EntityPlayer && !Experium.friendManager.isFriend((EntityPlayer)packet.getEntityFromWorld((World)AutoGG.mc.world))) {
+    public void onSendAttackPacket(PacketEvent.Send event) {
+        CPacketUseEntity packet;
+        if (event.getPacket() instanceof CPacketUseEntity && (packet = (CPacketUseEntity)event.getPacket()).getAction() == CPacketUseEntity.Action.ATTACK && packet.getEntityFromWorld((World)AutoGG.mc.world) instanceof EntityPlayer && !Experium.friendManager.isFriend((EntityPlayer)packet.getEntityFromWorld((World)AutoGG.mc.world))) {
             this.targets.put((EntityPlayer)packet.getEntityFromWorld((World)AutoGG.mc.world), 0);
         }
     }
-    
+
     public void loadMessages() {
-        this.messages = FileManager.readTextFileAllLines("experium/autogg.txt");
+        this.messages = FileManager.readTextFileAllLines(path);
     }
-    
+
     public String getRandomMessage() {
         this.loadMessages();
-        final Random rand = new Random();
+        Random rand = new Random();
         if (this.messages.size() == 0) {
             return "GG <player>, Experium On Top";
         }
@@ -158,8 +154,9 @@ public class AutoGG extends Module
         }
         return this.messages.get(MathUtil.clamp(rand.nextInt(this.messages.size()), 0, this.messages.size() - 1));
     }
-    
-    public void announceDeath(final EntityPlayer target) {
-        AutoGG.mc.player.connection.sendPacket((Packet)new CPacketChatMessage((this.greentext.getValue() ? ">" : "") + this.getRandomMessage().replaceAll("<player>", target.getDisplayNameString())));
+
+    public void announceDeath(EntityPlayer target) {
+        AutoGG.mc.player.connection.sendPacket((Packet)new CPacketChatMessage((this.greentext.getValue() != false ? ">" : "") + this.getRandomMessage().replaceAll("<player>", target.getDisplayNameString())));
     }
 }
+

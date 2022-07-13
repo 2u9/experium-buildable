@@ -1,164 +1,169 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.state.IBlockState
+ *  net.minecraft.client.gui.BossInfoClient
+ *  net.minecraft.client.gui.GuiBossOverlay
+ *  net.minecraft.client.gui.ScaledResolution
+ *  net.minecraft.client.renderer.GlStateManager
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.item.EntityItem
+ *  net.minecraft.entity.passive.EntityBat
+ *  net.minecraft.init.Blocks
+ *  net.minecraft.init.SoundEvents
+ *  net.minecraft.item.Item
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.network.play.server.SPacketTimeUpdate
+ *  net.minecraft.util.EnumParticleTypes
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.BlockPos$MutableBlockPos
+ *  net.minecraft.world.BossInfo
+ *  net.minecraft.world.GameType
+ *  net.minecraft.world.World
+ *  net.minecraftforge.client.event.RenderGameOverlayEvent$ElementType
+ *  net.minecraftforge.client.event.RenderGameOverlayEvent$Post
+ *  net.minecraftforge.client.event.RenderGameOverlayEvent$Pre
+ *  net.minecraftforge.client.event.RenderLivingEvent$Pre
+ *  net.minecraftforge.event.entity.PlaySoundAtEntityEvent
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ *  org.lwjgl.opengl.GL11
+ */
 package dev._3000IQPlay.experium.features.modules.render;
 
-import net.minecraft.init.SoundEvents;
-import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
-import net.minecraft.entity.passive.EntityBat;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import java.util.Iterator;
-import java.util.HashMap;
-import net.minecraft.world.BossInfo;
-import net.minecraft.client.gui.GuiBossOverlay;
-import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.opengl.GL11;
-import net.minecraft.client.gui.BossInfoClient;
-import java.util.UUID;
-import java.util.Map;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.World;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.item.Item;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.GameType;
-import java.util.Random;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.network.play.server.SPacketTimeUpdate;
 import dev._3000IQPlay.experium.event.events.PacketEvent;
-import java.util.function.Consumer;
-import net.minecraft.entity.Entity;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import net.minecraft.entity.item.EntityItem;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
-public class NoRender extends Module
-{
-    private static NoRender INSTANCE;
-    public Setting<Boolean> fire;
-    public Setting<Boolean> portal;
-    public Setting<Boolean> pumpkin;
-    public Setting<Boolean> totemPops;
-    public Setting<Boolean> items;
-    public Setting<Boolean> nausea;
-    public Setting<Boolean> hurtcam;
-    public Setting<Fog> fog;
-    public Setting<Boolean> noWeather;
-    public Setting<Boss> boss;
-    public Setting<Float> scale;
-    public Setting<Boolean> bats;
-    public Setting<NoArmor> noArmor;
-    public Setting<Boolean> glint;
-    public Setting<Skylight> skylight;
-    public Setting<Boolean> barriers;
-    public Setting<Boolean> blocks;
-    public Setting<Boolean> advancements;
-    public Setting<Boolean> pigmen;
-    public Setting<Boolean> timeChange;
-    public Setting<Integer> time;
-    
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.gui.BossInfoClient;
+import net.minecraft.client.gui.GuiBossOverlay;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.passive.EntityBat;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketTimeUpdate;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BossInfo;
+import net.minecraft.world.GameType;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.opengl.GL11;
+
+public class NoRender
+extends Module {
+    private static NoRender INSTANCE = new NoRender();
+    public Setting<Boolean> fire = this.register(new Setting<Boolean>("Fire", Boolean.valueOf(false), "Removes the portal overlay."));
+    public Setting<Boolean> portal = this.register(new Setting<Boolean>("Portal", Boolean.valueOf(false), "Removes the portal overlay."));
+    public Setting<Boolean> pumpkin = this.register(new Setting<Boolean>("Pumpkin", Boolean.valueOf(false), "Removes the pumpkin overlay."));
+    public Setting<Boolean> totemPops = this.register(new Setting<Boolean>("TotemPop", Boolean.valueOf(false), "Removes the Totem overlay."));
+    public Setting<Boolean> items = this.register(new Setting<Boolean>("Items", Boolean.valueOf(false), "Removes items on the ground."));
+    public Setting<Boolean> nausea = this.register(new Setting<Boolean>("Nausea", Boolean.valueOf(false), "Removes Portal Nausea."));
+    public Setting<Boolean> hurtcam = this.register(new Setting<Boolean>("HurtCam", Boolean.valueOf(false), "Removes shaking after taking damage."));
+    public Setting<Fog> fog = this.register(new Setting<Fog>("Fog", Fog.NONE, "Removes Fog."));
+    public Setting<Boolean> noWeather = this.register(new Setting<Boolean>("Weather", Boolean.valueOf(false), "AntiWeather"));
+    public Setting<Boss> boss = this.register(new Setting<Boss>("BossBars", Boss.NONE, "Modifies the bossbars."));
+    public Setting<Float> scale = this.register(new Setting<Object>("Scale", Float.valueOf(0.0f), Float.valueOf(0.5f), Float.valueOf(1.0f), v -> this.boss.getValue() == Boss.MINIMIZE || this.boss.getValue() != Boss.STACK, "Scale of the bars."));
+    public Setting<Boolean> bats = this.register(new Setting<Boolean>("Bats", Boolean.valueOf(false), "Removes bats."));
+    public Setting<NoArmor> noArmor = this.register(new Setting<NoArmor>("NoArmor", NoArmor.NONE, "Doesnt Render Armor on players."));
+    public Setting<Boolean> glint = this.register(new Setting<Object>("Glint", Boolean.valueOf(false), v -> this.noArmor.getValue() != NoArmor.NONE));
+    public Setting<Skylight> skylight = this.register(new Setting<Skylight>("Skylight", Skylight.NONE));
+    public Setting<Boolean> barriers = this.register(new Setting<Boolean>("Barriers", Boolean.valueOf(false), "Barriers"));
+    public Setting<Boolean> blocks = this.register(new Setting<Boolean>("Blocks", Boolean.valueOf(false), "Blocks"));
+    public Setting<Boolean> advancements = this.register(new Setting<Boolean>("Advancements", false));
+    public Setting<Boolean> pigmen = this.register(new Setting<Boolean>("Pigmen", false));
+    public Setting<Boolean> timeChange = this.register(new Setting<Boolean>("TimeChange", false));
+    public Setting<Integer> time = this.register(new Setting<Object>("Time", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(23000), v -> this.timeChange.getValue()));
+
     public NoRender() {
-        super("NoRender", "Allows you to stop rendering stuff", Category.RENDER, true, false, false);
-        this.fire = (Setting<Boolean>)this.register(new Setting("Fire", (T)false, "Removes the portal overlay."));
-        this.portal = (Setting<Boolean>)this.register(new Setting("Portal", (T)false, "Removes the portal overlay."));
-        this.pumpkin = (Setting<Boolean>)this.register(new Setting("Pumpkin", (T)false, "Removes the pumpkin overlay."));
-        this.totemPops = (Setting<Boolean>)this.register(new Setting("TotemPop", (T)false, "Removes the Totem overlay."));
-        this.items = (Setting<Boolean>)this.register(new Setting("Items", (T)false, "Removes items on the ground."));
-        this.nausea = (Setting<Boolean>)this.register(new Setting("Nausea", (T)false, "Removes Portal Nausea."));
-        this.hurtcam = (Setting<Boolean>)this.register(new Setting("HurtCam", (T)false, "Removes shaking after taking damage."));
-        this.fog = (Setting<Fog>)this.register(new Setting("Fog", (T)Fog.NONE, "Removes Fog."));
-        this.noWeather = (Setting<Boolean>)this.register(new Setting("Weather", (T)false, "AntiWeather"));
-        this.boss = (Setting<Boss>)this.register(new Setting("BossBars", (T)Boss.NONE, "Modifies the bossbars."));
-        this.scale = (Setting<Float>)this.register(new Setting("Scale", (T)0.0f, (T)0.5f, (T)1.0f, v -> this.boss.getValue() == Boss.MINIMIZE || this.boss.getValue() != Boss.STACK, "Scale of the bars."));
-        this.bats = (Setting<Boolean>)this.register(new Setting("Bats", (T)false, "Removes bats."));
-        this.noArmor = (Setting<NoArmor>)this.register(new Setting("NoArmor", (T)NoArmor.NONE, "Doesnt Render Armor on players."));
-        this.glint = (Setting<Boolean>)this.register(new Setting("Glint", (T)false, v -> this.noArmor.getValue() != NoArmor.NONE));
-        this.skylight = (Setting<Skylight>)this.register(new Setting("Skylight", (T)Skylight.NONE));
-        this.barriers = (Setting<Boolean>)this.register(new Setting("Barriers", (T)false, "Barriers"));
-        this.blocks = (Setting<Boolean>)this.register(new Setting("Blocks", (T)false, "Blocks"));
-        this.advancements = (Setting<Boolean>)this.register(new Setting("Advancements", (T)false));
-        this.pigmen = (Setting<Boolean>)this.register(new Setting("Pigmen", (T)false));
-        this.timeChange = (Setting<Boolean>)this.register(new Setting("TimeChange", (T)false));
-        this.time = (Setting<Integer>)this.register(new Setting("Time", (T)0, (T)0, (T)23000, v -> this.timeChange.getValue()));
+        super("NoRender", "Allows you to stop rendering stuff", Module.Category.RENDER, true, false, false);
         this.setInstance();
     }
-    
+
     public static NoRender getInstance() {
-        if (NoRender.INSTANCE == null) {
-            NoRender.INSTANCE = new NoRender();
+        if (INSTANCE == null) {
+            INSTANCE = new NoRender();
         }
-        return NoRender.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        NoRender.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @Override
     public void onUpdate() {
-        if (this.items.getValue()) {
+        if (this.items.getValue().booleanValue()) {
             NoRender.mc.world.loadedEntityList.stream().filter(EntityItem.class::isInstance).map(EntityItem.class::cast).forEach(Entity::setDead);
         }
-        if (this.noWeather.getValue() && NoRender.mc.world.isRaining()) {
+        if (this.noWeather.getValue().booleanValue() && NoRender.mc.world.isRaining()) {
             NoRender.mc.world.setRainStrength(0.0f);
         }
-        if (this.timeChange.getValue()) {
-            NoRender.mc.world.setWorldTime((long)this.time.getValue());
+        if (this.timeChange.getValue().booleanValue()) {
+            NoRender.mc.world.setWorldTime((long)this.time.getValue().intValue());
         }
     }
-    
+
     @SubscribeEvent
-    public void onPacketReceive(final PacketEvent.Receive event) {
+    public void onPacketReceive(PacketEvent.Receive event) {
         if (event.getPacket() instanceof SPacketTimeUpdate & this.timeChange.getValue()) {
             event.setCanceled(true);
         }
     }
-    
-    public void doVoidFogParticles(final int posX, final int posY, final int posZ) {
-        final int i = 32;
-        final Random random = new Random();
-        final ItemStack itemstack = NoRender.mc.player.getHeldItemMainhand();
-        final boolean flag = !this.barriers.getValue() || (NoRender.mc.playerController.getCurrentGameType() == GameType.CREATIVE && !itemstack.isEmpty() && itemstack.getItem() == Item.getItemFromBlock(Blocks.BARRIER));
-        final BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+
+    public void doVoidFogParticles(int posX, int posY, int posZ) {
+        int i = 32;
+        Random random = new Random();
+        ItemStack itemstack = NoRender.mc.player.getHeldItemMainhand();
+        boolean flag = this.barriers.getValue() == false || NoRender.mc.playerController.getCurrentGameType() == GameType.CREATIVE && !itemstack.isEmpty() && itemstack.getItem() == Item.getItemFromBlock((Block)Blocks.BARRIER);
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
         for (int j = 0; j < 667; ++j) {
             this.showBarrierParticles(posX, posY, posZ, 16, random, flag, blockpos$mutableblockpos);
             this.showBarrierParticles(posX, posY, posZ, 32, random, flag, blockpos$mutableblockpos);
         }
     }
-    
-    public void showBarrierParticles(final int x, final int y, final int z, final int offset, final Random random, final boolean holdingBarrier, final BlockPos.MutableBlockPos pos) {
-        final int i = x + NoRender.mc.world.rand.nextInt(offset) - NoRender.mc.world.rand.nextInt(offset);
-        final int j = y + NoRender.mc.world.rand.nextInt(offset) - NoRender.mc.world.rand.nextInt(offset);
-        final int k = z + NoRender.mc.world.rand.nextInt(offset) - NoRender.mc.world.rand.nextInt(offset);
+
+    public void showBarrierParticles(int x, int y, int z, int offset, Random random, boolean holdingBarrier, BlockPos.MutableBlockPos pos) {
+        int i = x + NoRender.mc.world.rand.nextInt(offset) - NoRender.mc.world.rand.nextInt(offset);
+        int j = y + NoRender.mc.world.rand.nextInt(offset) - NoRender.mc.world.rand.nextInt(offset);
+        int k = z + NoRender.mc.world.rand.nextInt(offset) - NoRender.mc.world.rand.nextInt(offset);
         pos.setPos(i, j, k);
-        final IBlockState iblockstate = NoRender.mc.world.getBlockState((BlockPos)pos);
+        IBlockState iblockstate = NoRender.mc.world.getBlockState((BlockPos)pos);
         iblockstate.getBlock().randomDisplayTick(iblockstate, (World)NoRender.mc.world, (BlockPos)pos, random);
         if (!holdingBarrier && iblockstate.getBlock() == Blocks.BARRIER) {
-            NoRender.mc.world.spawnParticle(EnumParticleTypes.BARRIER, (double)(i + 0.5f), (double)(j + 0.5f), (double)(k + 0.5f), 0.0, 0.0, 0.0, new int[0]);
+            NoRender.mc.world.spawnParticle(EnumParticleTypes.BARRIER, (double)((float)i + 0.5f), (double)((float)j + 0.5f), (double)((float)k + 0.5f), 0.0, 0.0, 0.0, new int[0]);
         }
     }
-    
+
     @SubscribeEvent
-    public void onRenderPre(final RenderGameOverlayEvent.Pre event) {
+    public void onRenderPre(RenderGameOverlayEvent.Pre event) {
         if (event.getType() == RenderGameOverlayEvent.ElementType.BOSSINFO && this.boss.getValue() != Boss.NONE) {
             event.setCanceled(true);
         }
     }
-    
+
     @SubscribeEvent
     public void onRenderPost(final RenderGameOverlayEvent.Post event) {
         if (event.getType() == RenderGameOverlayEvent.ElementType.BOSSINFO && this.boss.getValue() != Boss.NONE) {
             if (this.boss.getValue() == Boss.MINIMIZE) {
-                final Map<UUID, BossInfoClient> map = (Map<UUID, BossInfoClient>)NoRender.mc.ingameGUI.getBossOverlay().mapBossInfos;
+                final Map<UUID, BossInfoClient> map = NoRender.mc.ingameGUI.getBossOverlay().mapBossInfos;
                 if (map == null) {
                     return;
                 }
@@ -168,20 +173,19 @@ public class NoRender extends Module
                 for (final Map.Entry<UUID, BossInfoClient> entry : map.entrySet()) {
                     final BossInfoClient info = entry.getValue();
                     final String text = info.getName().getFormattedText();
-                    final int k = (int)(i / this.scale.getValue() / 2.0f - 91.0f);
-                    GL11.glScaled((double)this.scale.getValue(), (double)this.scale.getValue(), 1.0);
+                    final int k = (int) (i / this.scale.getValue() / 2.0f - 91.0f);
+                    GL11.glScaled((double) this.scale.getValue(), (double) this.scale.getValue(), 1.0);
                     if (!event.isCanceled()) {
                         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
                         NoRender.mc.getTextureManager().bindTexture(GuiBossOverlay.GUI_BARS_TEXTURES);
-                        NoRender.mc.ingameGUI.getBossOverlay().render(k, j, (BossInfo)info);
-                        NoRender.mc.fontRenderer.drawStringWithShadow(text, i / this.scale.getValue() / 2.0f - NoRender.mc.fontRenderer.getStringWidth(text) / 2, (float)(j - 9), 16777215);
+                        NoRender.mc.ingameGUI.getBossOverlay().render(k, j, info);
+                        NoRender.mc.fontRenderer.drawStringWithShadow(text, i / this.scale.getValue() / 2.0f - NoRender.mc.fontRenderer.getStringWidth(text) / 2, (float) (j - 9), 16777215);
                     }
                     GL11.glScaled(1.0 / this.scale.getValue(), 1.0 / this.scale.getValue(), 1.0);
                     j += 10 + NoRender.mc.fontRenderer.FONT_HEIGHT;
                 }
-            }
-            else if (this.boss.getValue() == Boss.STACK) {
-                final Map<UUID, BossInfoClient> map = (Map<UUID, BossInfoClient>)NoRender.mc.ingameGUI.getBossOverlay().mapBossInfos;
+            } else if (this.boss.getValue() == Boss.STACK) {
+                final Map<UUID, BossInfoClient> map = NoRender.mc.ingameGUI.getBossOverlay().mapBossInfos;
                 final HashMap<String, Pair<BossInfoClient, Integer>> to = new HashMap<String, Pair<BossInfoClient, Integer>>();
                 for (final Map.Entry<UUID, BossInfoClient> entry2 : map.entrySet()) {
                     final String s = entry2.getValue().getName().getFormattedText();
@@ -189,8 +193,7 @@ public class NoRender extends Module
                         Pair<BossInfoClient, Integer> p = to.get(s);
                         p = new Pair<BossInfoClient, Integer>(p.getKey(), p.getValue() + 1);
                         to.put(s, p);
-                    }
-                    else {
+                    } else {
                         final Pair<BossInfoClient, Integer> p = new Pair<BossInfoClient, Integer>(entry2.getValue(), 1);
                         to.put(s, p);
                     }
@@ -203,13 +206,13 @@ public class NoRender extends Module
                     final BossInfoClient info2 = entry3.getValue().getKey();
                     final int a = entry3.getValue().getValue();
                     text = text + " x" + a;
-                    final int k2 = (int)(l / this.scale.getValue() / 2.0f - 91.0f);
-                    GL11.glScaled((double)this.scale.getValue(), (double)this.scale.getValue(), 1.0);
+                    final int k2 = (int) (l / this.scale.getValue() / 2.0f - 91.0f);
+                    GL11.glScaled((double) this.scale.getValue(), (double) this.scale.getValue(), 1.0);
                     if (!event.isCanceled()) {
                         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
                         NoRender.mc.getTextureManager().bindTexture(GuiBossOverlay.GUI_BARS_TEXTURES);
-                        NoRender.mc.ingameGUI.getBossOverlay().render(k2, m, (BossInfo)info2);
-                        NoRender.mc.fontRenderer.drawStringWithShadow(text, l / this.scale.getValue() / 2.0f - NoRender.mc.fontRenderer.getStringWidth(text) / 2, (float)(m - 9), 16777215);
+                        NoRender.mc.ingameGUI.getBossOverlay().render(k2, m, info2);
+                        NoRender.mc.fontRenderer.drawStringWithShadow(text, l / this.scale.getValue() / 2.0f - NoRender.mc.fontRenderer.getStringWidth(text) / 2, (float) (m - 9), 16777215);
                     }
                     GL11.glScaled(1.0 / this.scale.getValue(), 1.0 / this.scale.getValue(), 1.0);
                     m += 10 + NoRender.mc.fontRenderer.FONT_HEIGHT;
@@ -217,82 +220,81 @@ public class NoRender extends Module
             }
         }
     }
-    
+
     @SubscribeEvent
-    public void onRenderLiving(final RenderLivingEvent.Pre<?> event) {
-        if (this.bats.getValue() && event.getEntity() instanceof EntityBat) {
+    public void onRenderLiving(RenderLivingEvent.Pre<?> event) {
+        if (this.bats.getValue().booleanValue() && event.getEntity() instanceof EntityBat) {
             event.setCanceled(true);
         }
     }
-    
+
     @SubscribeEvent
-    public void onPlaySound(final PlaySoundAtEntityEvent event) {
-        if ((this.bats.getValue() && event.getSound().equals(SoundEvents.ENTITY_BAT_AMBIENT)) || event.getSound().equals(SoundEvents.ENTITY_BAT_DEATH) || event.getSound().equals(SoundEvents.ENTITY_BAT_HURT) || event.getSound().equals(SoundEvents.ENTITY_BAT_LOOP) || event.getSound().equals(SoundEvents.ENTITY_BAT_TAKEOFF)) {
+    public void onPlaySound(PlaySoundAtEntityEvent event) {
+        if (this.bats.getValue().booleanValue() && event.getSound().equals((Object)SoundEvents.ENTITY_BAT_AMBIENT) || event.getSound().equals((Object)SoundEvents.ENTITY_BAT_DEATH) || event.getSound().equals((Object)SoundEvents.ENTITY_BAT_HURT) || event.getSound().equals((Object)SoundEvents.ENTITY_BAT_LOOP) || event.getSound().equals((Object)SoundEvents.ENTITY_BAT_TAKEOFF)) {
             event.setVolume(0.0f);
             event.setPitch(0.0f);
             event.setCanceled(true);
         }
     }
-    
+
     static {
-        NoRender.INSTANCE = new NoRender();
-        NoRender.INSTANCE = new NoRender();
+        INSTANCE = new NoRender();
     }
-    
-    public enum Skylight
-    {
-        NONE, 
-        WORLD, 
-        ENTITY, 
-        ALL;
-    }
-    
-    public enum Fog
-    {
-        NONE, 
-        AIR, 
-        NOFOG;
-    }
-    
-    public enum Boss
-    {
-        NONE, 
-        REMOVE, 
-        STACK, 
-        MINIMIZE;
-    }
-    
-    public enum NoArmor
-    {
-        NONE, 
-        ALL, 
-        HELMET;
-    }
-    
-    public static class Pair<T, S>
-    {
+
+    public static class Pair<T, S> {
         private T key;
         private S value;
-        
-        public Pair(final T key, final S value) {
+
+        public Pair(T key, S value) {
             this.key = key;
             this.value = value;
         }
-        
+
         public T getKey() {
             return this.key;
         }
-        
-        public void setKey(final T key) {
+
+        public void setKey(T key) {
             this.key = key;
         }
-        
+
         public S getValue() {
             return this.value;
         }
-        
-        public void setValue(final S value) {
+
+        public void setValue(S value) {
             this.value = value;
         }
     }
+
+    public static enum NoArmor {
+        NONE,
+        ALL,
+        HELMET;
+
+    }
+
+    public static enum Boss {
+        NONE,
+        REMOVE,
+        STACK,
+        MINIMIZE;
+
+    }
+
+    public static enum Fog {
+        NONE,
+        AIR,
+        NOFOG;
+
+    }
+
+    public static enum Skylight {
+        NONE,
+        WORLD,
+        ENTITY,
+        ALL;
+
+    }
 }
+

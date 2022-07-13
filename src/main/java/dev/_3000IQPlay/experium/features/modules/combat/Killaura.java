@@ -1,144 +1,128 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.EntityLivingBase
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.init.Items
+ *  net.minecraft.inventory.ClickType
+ *  net.minecraft.item.ItemSword
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketEntityAction
+ *  net.minecraft.network.play.client.CPacketEntityAction$Action
+ *  net.minecraft.util.EnumHand
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.combat;
 
-import java.util.Iterator;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketEntityAction;
-import net.minecraft.inventory.ClickType;
-import dev._3000IQPlay.experium.util.InventoryUtil;
-import net.minecraft.item.ItemSword;
-import dev._3000IQPlay.experium.util.MathUtil;
-import net.minecraft.util.EnumHand;
-import net.minecraft.init.Items;
-import dev._3000IQPlay.experium.util.DamageUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import dev._3000IQPlay.experium.util.EntityUtil;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import dev._3000IQPlay.experium.Experium;
 import dev._3000IQPlay.experium.event.events.UpdateWalkingPlayerEvent;
+import dev._3000IQPlay.experium.features.modules.Module;
 import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.DamageUtil;
+import dev._3000IQPlay.experium.util.EntityUtil;
+import dev._3000IQPlay.experium.util.InventoryUtil;
+import dev._3000IQPlay.experium.util.MathUtil;
 import dev._3000IQPlay.experium.util.Timer;
 import net.minecraft.entity.Entity;
-import dev._3000IQPlay.experium.features.modules.Module;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.ClickType;
+import net.minecraft.item.ItemSword;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketEntityAction;
+import net.minecraft.util.EnumHand;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Killaura extends Module
-{
+public class Killaura
+extends Module {
     public static Entity target;
-    private final Timer timer;
-    private final Setting<TargetMode> targetMode;
-    public Setting<Float> range;
-    public Setting<Boolean> autoSwitch;
-    public Setting<Boolean> oneDotEight;
-    public Setting<Boolean> rotate;
-    public Setting<Boolean> stay;
-    public Setting<Boolean> armorBreak;
-    public Setting<Boolean> eating;
-    public Setting<Boolean> onlySharp;
-    public Setting<Boolean> teleport;
-    public Setting<Float> raytrace;
-    public Setting<Float> teleportRange;
-    public Setting<Boolean> lagBack;
-    public Setting<Boolean> players;
-    public Setting<Boolean> mobs;
-    public Setting<Boolean> animals;
-    public Setting<Boolean> vehicles;
-    public Setting<Boolean> projectiles;
-    public Setting<Boolean> tps;
-    public Setting<Boolean> packet;
-    public Setting<Boolean> swing;
-    public Setting<Boolean> sneak;
-    public Setting<Float> health;
-    
+    private final Timer timer = new Timer();
+    private final Setting<TargetMode> targetMode = this.register(new Setting<TargetMode>("Target", TargetMode.CLOSEST));
+    public Setting<Float> range = this.register(new Setting<Float>("Range", Float.valueOf(6.0f), Float.valueOf(0.1f), Float.valueOf(7.0f)));
+    public Setting<Boolean> autoSwitch = this.register(new Setting<Boolean>("AutoSwitch", false));
+    public Setting<Boolean> oneDotEight = this.register(new Setting<Boolean>("1.8", false));
+    public Setting<Boolean> rotate = this.register(new Setting<Boolean>("Rotate", false));
+    public Setting<Boolean> stay = this.register(new Setting<Object>("Stay", Boolean.valueOf(true), v -> this.rotate.getValue()));
+    public Setting<Boolean> armorBreak = this.register(new Setting<Boolean>("ArmorBreak", false));
+    public Setting<Boolean> eating = this.register(new Setting<Boolean>("Eating", true));
+    public Setting<Boolean> onlySharp = this.register(new Setting<Boolean>("Axe/Sword", true));
+    public Setting<Boolean> teleport = this.register(new Setting<Boolean>("Teleport", false));
+    public Setting<Float> raytrace = this.register(new Setting<Object>("Raytrace", Float.valueOf(6.0f), Float.valueOf(0.1f), Float.valueOf(7.0f), v -> this.teleport.getValue() == false, "Wall Range."));
+    public Setting<Float> teleportRange = this.register(new Setting<Object>("TpRange", Float.valueOf(15.0f), Float.valueOf(0.1f), Float.valueOf(50.0f), v -> this.teleport.getValue(), "Teleport Range."));
+    public Setting<Boolean> lagBack = this.register(new Setting<Object>("LagBack", Boolean.valueOf(true), v -> this.teleport.getValue()));
+    public Setting<Boolean> players = this.register(new Setting<Boolean>("Players", true));
+    public Setting<Boolean> mobs = this.register(new Setting<Boolean>("Mobs", false));
+    public Setting<Boolean> animals = this.register(new Setting<Boolean>("Animals", false));
+    public Setting<Boolean> vehicles = this.register(new Setting<Boolean>("Entities", false));
+    public Setting<Boolean> projectiles = this.register(new Setting<Boolean>("Projectiles", false));
+    public Setting<Boolean> tps = this.register(new Setting<Boolean>("TpsSync", true));
+    public Setting<Boolean> packet = this.register(new Setting<Boolean>("Packet", false));
+    public Setting<Boolean> swing = this.register(new Setting<Boolean>("Swing", true));
+    public Setting<Boolean> sneak = this.register(new Setting<Boolean>("State", false));
+    public Setting<Float> health = this.register(new Setting<Object>("Health", Float.valueOf(6.0f), Float.valueOf(0.1f), Float.valueOf(36.0f), v -> this.targetMode.getValue() == TargetMode.SMART));
+
     public Killaura() {
-        super("Killaura", "Kills aura.", Category.COMBAT, true, false, false);
-        this.timer = new Timer();
-        this.targetMode = (Setting<TargetMode>)this.register(new Setting("Target", (T)TargetMode.CLOSEST));
-        this.range = (Setting<Float>)this.register(new Setting("Range", (T)6.0f, (T)0.1f, (T)7.0f));
-        this.autoSwitch = (Setting<Boolean>)this.register(new Setting("AutoSwitch", (T)false));
-        this.oneDotEight = (Setting<Boolean>)this.register(new Setting("1.8", (T)false));
-        this.rotate = (Setting<Boolean>)this.register(new Setting("Rotate", (T)false));
-        this.stay = (Setting<Boolean>)this.register(new Setting("Stay", (T)true, v -> this.rotate.getValue()));
-        this.armorBreak = (Setting<Boolean>)this.register(new Setting("ArmorBreak", (T)false));
-        this.eating = (Setting<Boolean>)this.register(new Setting("Eating", (T)true));
-        this.onlySharp = (Setting<Boolean>)this.register(new Setting("Axe/Sword", (T)true));
-        this.teleport = (Setting<Boolean>)this.register(new Setting("Teleport", (T)false));
-        this.raytrace = (Setting<Float>)this.register(new Setting("Raytrace", (T)6.0f, (T)0.1f, (T)7.0f, v -> !this.teleport.getValue(), "Wall Range."));
-        this.teleportRange = (Setting<Float>)this.register(new Setting("TpRange", (T)15.0f, (T)0.1f, (T)50.0f, v -> this.teleport.getValue(), "Teleport Range."));
-        this.lagBack = (Setting<Boolean>)this.register(new Setting("LagBack", (T)true, v -> this.teleport.getValue()));
-        this.players = (Setting<Boolean>)this.register(new Setting("Players", (T)true));
-        this.mobs = (Setting<Boolean>)this.register(new Setting("Mobs", (T)false));
-        this.animals = (Setting<Boolean>)this.register(new Setting("Animals", (T)false));
-        this.vehicles = (Setting<Boolean>)this.register(new Setting("Entities", (T)false));
-        this.projectiles = (Setting<Boolean>)this.register(new Setting("Projectiles", (T)false));
-        this.tps = (Setting<Boolean>)this.register(new Setting("TpsSync", (T)true));
-        this.packet = (Setting<Boolean>)this.register(new Setting("Packet", (T)false));
-        this.swing = (Setting<Boolean>)this.register(new Setting("Swing", (T)true));
-        this.sneak = (Setting<Boolean>)this.register(new Setting("State", (T)false));
-        this.health = (Setting<Float>)this.register(new Setting("Health", (T)6.0f, (T)0.1f, (T)36.0f, v -> this.targetMode.getValue() == TargetMode.SMART));
+        super("Killaura", "Kills aura.", Module.Category.COMBAT, true, false, false);
     }
-    
+
     @Override
     public void onTick() {
-        if (!this.rotate.getValue()) {
+        if (!this.rotate.getValue().booleanValue()) {
             this.doKillaura();
         }
     }
-    
+
     @SubscribeEvent
-    public void onUpdateWalkingPlayerEvent(final UpdateWalkingPlayerEvent event) {
-        if (event.getStage() == 0 && this.rotate.getValue()) {
-            if (this.stay.getValue() && Killaura.target != null) {
-                Experium.rotationManager.lookAtEntity(Killaura.target);
+    public void onUpdateWalkingPlayerEvent(UpdateWalkingPlayerEvent event) {
+        if (event.getStage() == 0 && this.rotate.getValue().booleanValue()) {
+            if (this.stay.getValue().booleanValue() && target != null) {
+                Experium.rotationManager.lookAtEntity(target);
             }
             this.doKillaura();
         }
     }
-    
+
     private void doKillaura() {
-        if (this.onlySharp.getValue() && !EntityUtil.holdingWeapon((EntityPlayer)Killaura.mc.player)) {
-            Killaura.target = null;
+        int sword;
+        int wait;
+        if (this.onlySharp.getValue().booleanValue() && !EntityUtil.holdingWeapon((EntityPlayer)Killaura.mc.player)) {
+            target = null;
             return;
         }
-        int n = 0;
-        if (!this.oneDotEight.getValue()) {
-            n = (int)(DamageUtil.getCooldownByWeapon((EntityPlayer)Killaura.mc.player) * (this.tps.getValue() ? Experium.serverManager.getTpsFactor() : 1.0f));
-        }
-        final int wait = n;
-        if (!this.timer.passedMs(wait) || (!this.eating.getValue() && Killaura.mc.player.isHandActive() && (!Killaura.mc.player.getHeldItemOffhand().getItem().equals(Items.SHIELD) || Killaura.mc.player.getActiveHand() != EnumHand.OFF_HAND))) {
+
+        int n = this.oneDotEight.getValue() != false ? 0 : (wait = (wait = (int)((float)DamageUtil.getCooldownByWeapon((EntityPlayer)Killaura.mc.player) * (this.tps.getValue() != false ? Experium.serverManager.getTpsFactor() : 1.0f))));
+        if (!this.timer.passedMs(n) || !this.eating.getValue().booleanValue() && Killaura.mc.player.isHandActive() && (!Killaura.mc.player.getHeldItemOffhand().getItem().equals((Object)Items.SHIELD) || Killaura.mc.player.getActiveHand() != EnumHand.OFF_HAND)) {
             return;
         }
-        if (this.targetMode.getValue() != TargetMode.FOCUS || Killaura.target == null || (Killaura.mc.player.getDistanceSq(Killaura.target) >= MathUtil.square(this.range.getValue()) && (!this.teleport.getValue() || Killaura.mc.player.getDistanceSq(Killaura.target) >= MathUtil.square(this.teleportRange.getValue()))) || (!Killaura.mc.player.canEntityBeSeen(Killaura.target) && !EntityUtil.canEntityFeetBeSeen(Killaura.target) && Killaura.mc.player.getDistanceSq(Killaura.target) >= MathUtil.square(this.raytrace.getValue()) && !this.teleport.getValue())) {
-            Killaura.target = this.getTarget();
+        if (!(this.targetMode.getValue() == TargetMode.FOCUS && target != null && (Killaura.mc.player.getDistanceSq(target) < MathUtil.square(this.range.getValue().floatValue()) || this.teleport.getValue().booleanValue() && Killaura.mc.player.getDistanceSq(target) < MathUtil.square(this.teleportRange.getValue().floatValue())) && (Killaura.mc.player.canEntityBeSeen(target) || EntityUtil.canEntityFeetBeSeen(target) || Killaura.mc.player.getDistanceSq(target) < MathUtil.square(this.raytrace.getValue().floatValue()) || this.teleport.getValue().booleanValue()))) {
+            target = this.getTarget();
         }
-        if (Killaura.target == null) {
+        if (target == null) {
             return;
         }
-        final int sword;
-        if (this.autoSwitch.getValue() && (sword = InventoryUtil.findHotbarBlock(ItemSword.class)) != -1) {
+        if (this.autoSwitch.getValue().booleanValue() && (sword = InventoryUtil.findHotbarBlock(ItemSword.class)) != -1) {
             InventoryUtil.switchToHotbarSlot(sword, false);
         }
-        if (this.rotate.getValue()) {
-            Experium.rotationManager.lookAtEntity(Killaura.target);
+        if (this.rotate.getValue().booleanValue()) {
+            Experium.rotationManager.lookAtEntity(target);
         }
-        if (this.teleport.getValue()) {
-            Experium.positionManager.setPositionPacket(Killaura.target.posX, EntityUtil.canEntityFeetBeSeen(Killaura.target) ? Killaura.target.posY : (Killaura.target.posY + Killaura.target.getEyeHeight()), Killaura.target.posZ, true, true, !this.lagBack.getValue());
+        if (this.teleport.getValue().booleanValue()) {
+            Experium.positionManager.setPositionPacket(Killaura.target.posX, EntityUtil.canEntityFeetBeSeen(target) ? Killaura.target.posY : Killaura.target.posY + (double)target.getEyeHeight(), Killaura.target.posZ, true, true, this.lagBack.getValue() == false);
         }
-        if (this.armorBreak.getValue()) {
+        if (this.armorBreak.getValue().booleanValue()) {
             Killaura.mc.playerController.windowClick(Killaura.mc.player.inventoryContainer.windowId, 9, Killaura.mc.player.inventory.currentItem, ClickType.SWAP, (EntityPlayer)Killaura.mc.player);
-            EntityUtil.attackEntity(Killaura.target, this.packet.getValue(), this.swing.getValue());
+            EntityUtil.attackEntity(target, this.packet.getValue(), this.swing.getValue());
             Killaura.mc.playerController.windowClick(Killaura.mc.player.inventoryContainer.windowId, 9, Killaura.mc.player.inventory.currentItem, ClickType.SWAP, (EntityPlayer)Killaura.mc.player);
-            EntityUtil.attackEntity(Killaura.target, this.packet.getValue(), this.swing.getValue());
-        }
-        else {
-            final boolean sneaking = Killaura.mc.player.isSneaking();
-            final boolean sprint = Killaura.mc.player.isSprinting();
-            if (this.sneak.getValue()) {
+            EntityUtil.attackEntity(target, this.packet.getValue(), this.swing.getValue());
+        } else {
+            boolean sneaking = Killaura.mc.player.isSneaking();
+            boolean sprint = Killaura.mc.player.isSprinting();
+            if (this.sneak.getValue().booleanValue()) {
                 if (sneaking) {
                     Killaura.mc.player.connection.sendPacket((Packet)new CPacketEntityAction((Entity)Killaura.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
                 }
@@ -146,8 +130,8 @@ public class Killaura extends Module
                     Killaura.mc.player.connection.sendPacket((Packet)new CPacketEntityAction((Entity)Killaura.mc.player, CPacketEntityAction.Action.STOP_SPRINTING));
                 }
             }
-            EntityUtil.attackEntity(Killaura.target, this.packet.getValue(), this.swing.getValue());
-            if (this.sneak.getValue()) {
+            EntityUtil.attackEntity(target, this.packet.getValue(), this.swing.getValue());
+            if (this.sneak.getValue().booleanValue()) {
                 if (sprint) {
                     Killaura.mc.player.connection.sendPacket((Packet)new CPacketEntityAction((Entity)Killaura.mc.player, CPacketEntityAction.Action.START_SPRINTING));
                 }
@@ -158,11 +142,10 @@ public class Killaura extends Module
         }
         this.timer.reset();
     }
-    
-    private void startEntityAttackThread(final Entity entity, final int time) {
-        final Timer timer;
+
+    private void startEntityAttackThread(Entity entity, int time) {
         new Thread(() -> {
-            timer = new Timer();
+            Timer timer = new Timer();
             timer.reset();
             try {
                 Thread.sleep(time);
@@ -173,55 +156,46 @@ public class Killaura extends Module
             EntityUtil.attackEntity(entity, true, this.swing.getValue());
         }).start();
     }
-    
+
     private Entity getTarget() {
         Entity target = null;
-        double distance = (double)(this.teleport.getValue() ? this.teleportRange.getValue() : ((double)(float)this.range.getValue()));
+        double distance = this.teleport.getValue() != false ? (double)this.teleportRange.getValue().floatValue() : (double)this.range.getValue().floatValue();
         double maxHealth = 36.0;
-        for (final Entity entity : Killaura.mc.world.loadedEntityList) {
-            if (((this.players.getValue() && entity instanceof EntityPlayer) || (this.animals.getValue() && EntityUtil.isPassive(entity)) || (this.mobs.getValue() && EntityUtil.isMobAggressive(entity)) || (this.vehicles.getValue() && EntityUtil.isVehicle(entity)) || (this.projectiles.getValue() && EntityUtil.isProjectile(entity))) && (!(entity instanceof EntityLivingBase) || !EntityUtil.isntValid(entity, distance))) {
-                if (!this.teleport.getValue() && !Killaura.mc.player.canEntityBeSeen(entity) && !EntityUtil.canEntityFeetBeSeen(entity) && Killaura.mc.player.getDistanceSq(entity) > MathUtil.square(this.raytrace.getValue())) {
-                    continue;
-                }
-                if (target == null) {
-                    target = entity;
-                    distance = Killaura.mc.player.getDistanceSq(entity);
-                    maxHealth = EntityUtil.getHealth(entity);
-                }
-                else {
-                    if (entity instanceof EntityPlayer && DamageUtil.isArmorLow((EntityPlayer)entity, 18)) {
-                        target = entity;
-                        break;
-                    }
-                    if (this.targetMode.getValue() == TargetMode.SMART && EntityUtil.getHealth(entity) < this.health.getValue()) {
-                        target = entity;
-                        break;
-                    }
-                    if (this.targetMode.getValue() != TargetMode.HEALTH && Killaura.mc.player.getDistanceSq(entity) < distance) {
-                        target = entity;
-                        distance = Killaura.mc.player.getDistanceSq(entity);
-                        maxHealth = EntityUtil.getHealth(entity);
-                    }
-                    if (this.targetMode.getValue() != TargetMode.HEALTH) {
-                        continue;
-                    }
-                    if (EntityUtil.getHealth(entity) >= maxHealth) {
-                        continue;
-                    }
-                    target = entity;
-                    distance = Killaura.mc.player.getDistanceSq(entity);
-                    maxHealth = EntityUtil.getHealth(entity);
-                }
+        for (Entity entity : Killaura.mc.world.loadedEntityList) {
+            if (!(this.players.getValue() != false && entity instanceof EntityPlayer || this.animals.getValue() != false && EntityUtil.isPassive(entity) || this.mobs.getValue() != false && EntityUtil.isMobAggressive(entity) || this.vehicles.getValue() != false && EntityUtil.isVehicle(entity)) && (!this.projectiles.getValue().booleanValue() || !EntityUtil.isProjectile(entity)) || entity instanceof EntityLivingBase && EntityUtil.isntValid(entity, distance) || !this.teleport.getValue().booleanValue() && !Killaura.mc.player.canEntityBeSeen(entity) && !EntityUtil.canEntityFeetBeSeen(entity) && Killaura.mc.player.getDistanceSq(entity) > MathUtil.square(this.raytrace.getValue().floatValue())) continue;
+            if (target == null) {
+                target = entity;
+                distance = Killaura.mc.player.getDistanceSq(entity);
+                maxHealth = EntityUtil.getHealth(entity);
+                continue;
             }
+            if (entity instanceof EntityPlayer && DamageUtil.isArmorLow((EntityPlayer)entity, 18)) {
+                target = entity;
+                break;
+            }
+            if (this.targetMode.getValue() == TargetMode.SMART && EntityUtil.getHealth(entity) < this.health.getValue().floatValue()) {
+                target = entity;
+                break;
+            }
+            if (this.targetMode.getValue() != TargetMode.HEALTH && Killaura.mc.player.getDistanceSq(entity) < distance) {
+                target = entity;
+                distance = Killaura.mc.player.getDistanceSq(entity);
+                maxHealth = EntityUtil.getHealth(entity);
+            }
+            if (this.targetMode.getValue() != TargetMode.HEALTH || !((double)EntityUtil.getHealth(entity) < maxHealth)) continue;
+            target = entity;
+            distance = Killaura.mc.player.getDistanceSq(entity);
+            maxHealth = EntityUtil.getHealth(entity);
         }
         return target;
     }
-    
-    public enum TargetMode
-    {
-        FOCUS, 
-        CLOSEST, 
-        HEALTH, 
+
+    public static enum TargetMode {
+        FOCUS,
+        CLOSEST,
+        HEALTH,
         SMART;
+
     }
 }
+

@@ -1,16 +1,18 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.renderer.EntityRenderer
+ */
 package dev._3000IQPlay.experium.mixin.mixins.accessors;
 
-import org.spongepowered.asm.mixin.gen.Invoker;
 import net.minecraft.client.renderer.EntityRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin({ EntityRenderer.class })
-public interface IEntityRenderer
-{
-    @Invoker("setupCameraTransform")
-    void setupCameraTransformInvoker(final float p0, final int p1);
+@Mixin(value={EntityRenderer.class})
+public interface IEntityRenderer {
+    @Invoker(value="setupCameraTransform")
+    public void setupCameraTransformInvoker(float var1, int var2);
 }
+

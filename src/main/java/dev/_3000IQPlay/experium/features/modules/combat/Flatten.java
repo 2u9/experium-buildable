@@ -1,73 +1,72 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockObsidian
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.item.EntityItem
+ *  net.minecraft.entity.item.EntityXPOrb
+ *  net.minecraft.entity.player.EntityPlayer
+ *  net.minecraft.util.EnumHand
+ *  net.minecraft.util.math.AxisAlignedBB
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3d
+ */
 package dev._3000IQPlay.experium.features.modules.combat;
 
 import dev._3000IQPlay.experium.Experium;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.util.BlockUtil;
-import net.minecraft.util.EnumHand;
-import java.util.Iterator;
-import java.util.List;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.item.EntityItem;
+import dev._3000IQPlay.experium.util.InventoryUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ArrayList;
-import dev._3000IQPlay.experium.util.InventoryUtil;
-import net.minecraft.block.BlockObsidian;
 import net.minecraft.util.math.Vec3d;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
 
-public class Flatten extends Module
-{
-    private final Setting<Float> placerange;
-    private final Setting<Integer> blocksPerTick;
-    private final Setting<Boolean> rotate;
-    private final Setting<Boolean> packet;
-    private final Setting<Boolean> autoDisable;
-    private final Vec3d[] offsetsDefault;
-    private int offsetStep;
-    private int oldSlot;
-    
+public class Flatten
+extends Module {
+    private final Setting<Float> placerange = this.register(new Setting<Float>("PlaceRange", Float.valueOf(6.0f), Float.valueOf(1.0f), Float.valueOf(10.0f)));
+    private final Setting<Integer> blocksPerTick = this.register(new Setting<Integer>("Block/Place", 12, 1, 20));
+    private final Setting<Boolean> rotate = this.register(new Setting<Boolean>("Rotate", false));
+    private final Setting<Boolean> packet = this.register(new Setting<Boolean>("PacketPlace", false));
+    private final Setting<Boolean> autoDisable = this.register(new Setting<Boolean>("AutoDisable", false));
+    private final Vec3d[] offsetsDefault = new Vec3d[]{new Vec3d(0.0, 0.0, -1.0), new Vec3d(0.0, 0.0, 1.0), new Vec3d(1.0, 0.0, 0.0), new Vec3d(-1.0, 0.0, 0.0)};
+    private int offsetStep = 0;
+    private int oldSlot = -1;
+
     public Flatten() {
-        super("Flatten", "Flatter then zprestiges 9 yr gf.", Category.COMBAT, true, false, false);
-        this.placerange = (Setting<Float>)this.register(new Setting("PlaceRange", (T)6.0f, (T)1.0f, (T)10.0f));
-        this.blocksPerTick = (Setting<Integer>)this.register(new Setting("Block/Place", (T)12, (T)1, (T)20));
-        this.rotate = (Setting<Boolean>)this.register(new Setting("Rotate", (T)false));
-        this.packet = (Setting<Boolean>)this.register(new Setting("PacketPlace", (T)false));
-        this.autoDisable = (Setting<Boolean>)this.register(new Setting("AutoDisable", (T)false));
-        this.offsetsDefault = new Vec3d[] { new Vec3d(0.0, 0.0, -1.0), new Vec3d(0.0, 0.0, 1.0), new Vec3d(1.0, 0.0, 0.0), new Vec3d(-1.0, 0.0, 0.0) };
-        this.offsetStep = 0;
-        this.oldSlot = -1;
+        super("Flatten", "Flatter then zprestiges 9 yr gf.", Module.Category.COMBAT, true, false, false);
     }
-    
+
     @Override
     public void onEnable() {
         this.oldSlot = Flatten.mc.player.inventory.currentItem;
     }
-    
+
     @Override
     public void onDisable() {
         this.oldSlot = -1;
     }
-    
+
     @Override
     public void onUpdate() {
-        final EntityPlayer closest_target = this.findClosestTarget();
-        final int obbySlot = InventoryUtil.findHotbarBlock(BlockObsidian.class);
+        EntityPlayer closest_target = this.findClosestTarget();
+        int obbySlot = InventoryUtil.findHotbarBlock(BlockObsidian.class);
         if (closest_target == null) {
             this.disable();
             return;
         }
-        final List<Vec3d> place_targets = new ArrayList<Vec3d>();
+        ArrayList place_targets = new ArrayList();
         Collections.addAll(place_targets, this.offsetsDefault);
         int blocks_placed = 0;
         while (blocks_placed < this.blocksPerTick.getValue()) {
@@ -75,14 +74,13 @@ public class Flatten extends Module
                 this.offsetStep = 0;
                 break;
             }
-            final BlockPos offset_pos = new BlockPos((Vec3d)place_targets.get(this.offsetStep));
-            final BlockPos target_pos = new BlockPos(closest_target.getPositionVector()).down().add(offset_pos.getX(), offset_pos.getY(), offset_pos.getZ());
+            BlockPos offset_pos = new BlockPos((Vec3d)place_targets.get(this.offsetStep));
+            BlockPos target_pos = new BlockPos(closest_target.getPositionVector()).down().add(offset_pos.getX(), offset_pos.getY(), offset_pos.getZ());
             boolean should_try_place = Flatten.mc.world.getBlockState(target_pos).getMaterial().isReplaceable();
-            for (final Entity entity : Flatten.mc.world.getEntitiesWithinAABBExcludingEntity((Entity)null, new AxisAlignedBB(target_pos))) {
-                if (!(entity instanceof EntityItem) && !(entity instanceof EntityXPOrb)) {
-                    should_try_place = false;
-                    break;
-                }
+            for (Entity entity : Flatten.mc.world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(target_pos))) {
+                if (entity instanceof EntityItem || entity instanceof EntityXPOrb) continue;
+                should_try_place = false;
+                break;
             }
             if (should_try_place) {
                 this.place(target_pos, obbySlot, this.oldSlot);
@@ -90,44 +88,29 @@ public class Flatten extends Module
             }
             ++this.offsetStep;
         }
-        if (this.autoDisable.getValue()) {
+        if (this.autoDisable.getValue().booleanValue()) {
             this.disable();
         }
     }
-    
-    private void place(final BlockPos pos, final int slot, final int oldSlot) {
+
+    private void place(BlockPos pos, int slot, int oldSlot) {
         Flatten.mc.player.inventory.currentItem = slot;
         Flatten.mc.playerController.updateController();
         BlockUtil.placeBlock(pos, EnumHand.MAIN_HAND, this.rotate.getValue(), this.packet.getValue(), Flatten.mc.player.isSneaking());
         Flatten.mc.player.inventory.currentItem = oldSlot;
         Flatten.mc.playerController.updateController();
     }
-    
+
     private EntityPlayer findClosestTarget() {
         if (Flatten.mc.world.playerEntities.isEmpty()) {
             return null;
         }
         EntityPlayer closestTarget = null;
-        for (final EntityPlayer target : Flatten.mc.world.playerEntities) {
-            if (target != Flatten.mc.player) {
-                if (!target.isEntityAlive()) {
-                    continue;
-                }
-                if (Experium.friendManager.isFriend(target.getName())) {
-                    continue;
-                }
-                if (target.getHealth() <= 0.0f) {
-                    continue;
-                }
-                if (Flatten.mc.player.getDistance((Entity)target) > this.placerange.getValue()) {
-                    continue;
-                }
-                if (closestTarget != null && Flatten.mc.player.getDistance((Entity)target) > Flatten.mc.player.getDistance((Entity)closestTarget)) {
-                    continue;
-                }
-                closestTarget = target;
-            }
+        for (EntityPlayer target : Flatten.mc.world.playerEntities) {
+            if (target == Flatten.mc.player || !target.isEntityAlive() || Experium.friendManager.isFriend(target.getName()) || target.getHealth() <= 0.0f || Flatten.mc.player.getDistance((Entity)target) > this.placerange.getValue().floatValue() || closestTarget != null && Flatten.mc.player.getDistance((Entity)target) > Flatten.mc.player.getDistance((Entity)closestTarget)) continue;
+            closestTarget = target;
         }
         return closestTarget;
     }
 }
+

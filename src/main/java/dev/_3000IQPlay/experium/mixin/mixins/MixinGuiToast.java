@@ -1,24 +1,27 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.gui.ScaledResolution
+ *  net.minecraft.client.gui.toasts.GuiToast
+ */
 package dev._3000IQPlay.experium.mixin.mixins;
 
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import dev._3000IQPlay.experium.features.modules.render.NoRender;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.toasts.GuiToast;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({ GuiToast.class })
-public class MixinGuiToast
-{
-    @Inject(method = { "drawToast" }, at = { @At("HEAD") }, cancellable = true)
-    public void drawToastHook(final ScaledResolution resolution, final CallbackInfo info) {
-        if (NoRender.getInstance().isOn() && NoRender.getInstance().advancements.getValue()) {
+@Mixin(value={GuiToast.class})
+public class MixinGuiToast {
+    @Inject(method={"drawToast"}, at={@At(value="HEAD")}, cancellable=true)
+    public void drawToastHook(ScaledResolution resolution, CallbackInfo info) {
+        if (NoRender.getInstance().isOn() && NoRender.getInstance().advancements.getValue().booleanValue()) {
             info.cancel();
         }
     }
 }
+

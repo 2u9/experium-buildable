@@ -1,39 +1,41 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.Minecraft
+ *  net.minecraft.client.gui.ScaledResolution
+ */
 package dev._3000IQPlay.experium.features.notifications;
 
-import dev._3000IQPlay.experium.util.RenderUtil;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.Minecraft;
 import dev._3000IQPlay.experium.Experium;
 import dev._3000IQPlay.experium.features.modules.client.HUD;
+import dev._3000IQPlay.experium.util.RenderUtil;
 import dev._3000IQPlay.experium.util.Timer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 
-public class Notifications
-{
+public class Notifications {
     private final String text;
     private final long disableTime;
     private final float width;
-    private final Timer timer;
-    
-    public Notifications(final String text, final long disableTime) {
-        this.timer = new Timer();
+    private final Timer timer = new Timer();
+
+    public Notifications(String text, long disableTime) {
         this.text = text;
         this.disableTime = disableTime;
-        this.width = (float)Experium.moduleManager.getModuleByClass(HUD.class).renderer.getStringWidth(text);
+        this.width = Experium.moduleManager.getModuleByClass(HUD.class).renderer.getStringWidth(text);
         this.timer.reset();
     }
-    
-    public void onDraw(final int y) {
-        final ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+
+    public void onDraw(int y) {
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         if (this.timer.passedMs(this.disableTime)) {
             Experium.notificationManager.getNotifications().remove(this);
         }
-        RenderUtil.drawRect(scaledResolution.getScaledWidth() - 4 - this.width, (float)y, (float)(scaledResolution.getScaledWidth() - 2), (float)(y + Experium.moduleManager.getModuleByClass(HUD.class).renderer.getFontHeight() + 3), 1962934272);
-        Experium.moduleManager.getModuleByClass(HUD.class).renderer.drawString(this.text, scaledResolution.getScaledWidth() - this.width - 3.0f, (float)(y + 2), -1, true);
+        RenderUtil.drawRect((float)(scaledResolution.getScaledWidth() - 4) - this.width, y, scaledResolution.getScaledWidth() - 2, y + Experium.moduleManager.getModuleByClass(HUD.class).renderer.getFontHeight() + 3, 0x75000000);
+        Experium.moduleManager.getModuleByClass(HUD.class).renderer.drawString(this.text, (float)scaledResolution.getScaledWidth() - this.width - 3.0f, y + 2, -1, true);
     }
 }
+

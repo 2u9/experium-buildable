@@ -1,56 +1,56 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketPlayer$Position
+ *  net.minecraft.util.math.RayTraceResult
+ *  net.minecraft.util.math.RayTraceResult$Type
+ *  net.minecraft.util.math.Vec3d
+ */
 package dev._3000IQPlay.experium.features.modules.movement;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import dev._3000IQPlay.experium.Experium;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import dev._3000IQPlay.experium.Experium;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
 
-public class AntiVoid extends Module
-{
-    Setting<Mode> mode;
-    Setting<Integer> distance;
-    Setting<Integer> height;
-    Setting<Float> speed;
-    Setting<Float> timer;
-    
+public class AntiVoid
+extends Module {
+    Setting<Mode> mode = this.register(new Setting<Mode>("Mode", Mode.MotionStop));
+    Setting<Integer> distance = this.register(new Setting<Integer>("Distance", 10, 1, 256));
+    Setting<Integer> height = this.register(new Setting<Object>("Height", Integer.valueOf(4), Integer.valueOf(0), Integer.valueOf(10), v -> this.mode.getValue() == Mode.Packet));
+    Setting<Float> speed = this.register(new Setting<Object>("Speed", Float.valueOf(5.0f), Float.valueOf(0.1f), Float.valueOf(10.0f), v -> this.mode.getValue() == Mode.Motion || this.mode.getValue() == Mode.Glide));
+    Setting<Float> timer = this.register(new Setting<Object>("Timer", Float.valueOf(8.0f), Float.valueOf(0.1f), Float.valueOf(10.0f), v -> this.mode.getValue() == Mode.Timer));
+
     public AntiVoid() {
-        super("AntiVoid", "Prevents u from falling in the void", Category.MOVEMENT, true, false, false);
-        this.mode = (Setting<Mode>)this.register(new Setting("Mode", (T)Mode.MotionStop));
-        this.distance = (Setting<Integer>)this.register(new Setting("Distance", (T)10, (T)1, (T)256));
-        this.height = (Setting<Integer>)this.register(new Setting("Height", (T)4, (T)0, (T)10, v -> this.mode.getValue() == Mode.Packet));
-        this.speed = (Setting<Float>)this.register(new Setting("Speed", (T)5.0f, (T)0.1f, (T)10.0f, v -> this.mode.getValue() == Mode.Motion || this.mode.getValue() == Mode.Glide));
-        this.timer = (Setting<Float>)this.register(new Setting("Timer", (T)8.0f, (T)0.1f, (T)10.0f, v -> this.mode.getValue() == Mode.Timer));
+        super("AntiVoid", "Prevents u from falling in the void", Module.Category.MOVEMENT, true, false, false);
     }
-    
+
     @Override
     public void onToggle() {
-        if (fullNullCheck()) {
+        if (AntiVoid.fullNullCheck()) {
             return;
         }
         if (this.mode.getValue() == Mode.Timer) {
             Experium.timerManager.reset();
         }
     }
-    
+
     @Override
     public void onUpdate() {
-        if (fullNullCheck()) {
+        if (AntiVoid.fullNullCheck()) {
             return;
         }
-        if (AntiVoid.mc.player.noClip || AntiVoid.mc.player.posY > this.distance.getValue() || AntiVoid.mc.player.isRiding()) {
+        if (AntiVoid.mc.player.noClip || AntiVoid.mc.player.posY > (double)this.distance.getValue().intValue() || AntiVoid.mc.player.isRiding()) {
             return;
         }
-        final RayTraceResult trace = AntiVoid.mc.world.rayTraceBlocks(AntiVoid.mc.player.getPositionVector(), new Vec3d(AntiVoid.mc.player.posX, 0.0, AntiVoid.mc.player.posZ), false, false, false);
+        RayTraceResult trace = AntiVoid.mc.world.rayTraceBlocks(AntiVoid.mc.player.getPositionVector(), new Vec3d(AntiVoid.mc.player.posX, 0.0, AntiVoid.mc.player.posZ), false, false, false);
         if (trace == null || trace.typeOfHit != RayTraceResult.Type.BLOCK) {
             switch (this.mode.getValue()) {
                 case MotionStop: {
@@ -59,32 +59,31 @@ public class AntiVoid extends Module
                     break;
                 }
                 case Motion: {
-                    AntiVoid.mc.player.motionY = this.speed.getValue();
+                    AntiVoid.mc.player.motionY = this.speed.getValue().floatValue();
                     break;
                 }
                 case Timer: {
-                    Experium.timerManager.setTimer(this.timer.getValue());
+                    Experium.timerManager.setTimer(this.timer.getValue().floatValue());
                     break;
                 }
                 case Glide: {
-                    final EntityPlayerSP player = AntiVoid.mc.player;
-                    player.motionY *= this.speed.getValue();
+                    AntiVoid.mc.player.motionY *= (double)this.speed.getValue().floatValue();
                     break;
                 }
                 case Packet: {
-                    AntiVoid.mc.getConnection().sendPacket((Packet)new CPacketPlayer.Position(AntiVoid.mc.player.posX, (double)this.height.getValue(), AntiVoid.mc.player.posZ, AntiVoid.mc.player.onGround));
-                    break;
+                    mc.getConnection().sendPacket((Packet)new CPacketPlayer.Position(AntiVoid.mc.player.posX, (double)this.height.getValue().intValue(), AntiVoid.mc.player.posZ, AntiVoid.mc.player.onGround));
                 }
             }
         }
     }
-    
-    enum Mode
-    {
-        MotionStop, 
-        Motion, 
-        Timer, 
-        Glide, 
+
+    static enum Mode {
+        MotionStop,
+        Motion,
+        Timer,
+        Glide,
         Packet;
+
     }
 }
+

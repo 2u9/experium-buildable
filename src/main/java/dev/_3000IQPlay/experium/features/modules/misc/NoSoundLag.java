@@ -1,85 +1,87 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Sets
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.item.EntityEnderCrystal
+ *  net.minecraft.init.SoundEvents
+ *  net.minecraft.network.play.server.SPacketSoundEffect
+ *  net.minecraft.util.SoundCategory
+ *  net.minecraft.util.SoundEvent
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.misc;
 
 import com.google.common.collect.Sets;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.SoundCategory;
 import dev._3000IQPlay.experium.event.events.PacketEvent;
-import java.util.Iterator;
-import dev._3000IQPlay.experium.util.MathUtil;
-import net.minecraft.entity.item.EntityEnderCrystal;
-import net.minecraft.entity.Entity;
-import java.util.ArrayList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.network.play.server.SPacketSoundEffect;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import net.minecraft.util.SoundEvent;
-import java.util.Set;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.combat.AutoCrystal;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.MathUtil;
+import java.util.ArrayList;
+import java.util.Set;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityEnderCrystal;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class NoSoundLag extends Module
-{
+public class NoSoundLag
+extends Module {
     private static final Set<SoundEvent> BLACKLIST;
     private static NoSoundLag instance;
-    public Setting<Boolean> crystals;
-    public Setting<Boolean> armor;
-    public Setting<Float> soundRange;
-    
+    static {
+        BLACKLIST = Sets.newHashSet(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundEvents.ITEM_ARMOR_EQIIP_ELYTRA, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, SoundEvents.ITEM_ARMOR_EQUIP_IRON, SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundEvents.ITEM_ARMOR_EQUIP_CHAIN, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER);
+    }
+    public Setting<Boolean> crystals = this.register(new Setting<Boolean>("Crystals", true));
+    public Setting<Boolean> armor = this.register(new Setting<Boolean>("Armor", true));
+    public Setting<Float> soundRange = this.register(new Setting<Float>("SoundRange", Float.valueOf(12.0f), Float.valueOf(0.0f), Float.valueOf(12.0f)));
+
     public NoSoundLag() {
-        super("NoSoundLag", "Prevents Lag through sound spam.", Category.MISC, true, false, false);
-        this.crystals = (Setting<Boolean>)this.register(new Setting("Crystals", (T)true));
-        this.armor = (Setting<Boolean>)this.register(new Setting("Armor", (T)true));
-        this.soundRange = (Setting<Float>)this.register(new Setting("SoundRange", (T)12.0f, (T)0.0f, (T)12.0f));
-        NoSoundLag.instance = this;
+        super("NoSoundLag", "Prevents Lag through sound spam.", Module.Category.MISC, true, false, false);
+        instance = this;
     }
-    
+
     public static NoSoundLag getInstance() {
-        if (NoSoundLag.instance == null) {
-            NoSoundLag.instance = new NoSoundLag();
+        if (instance == null) {
+            instance = new NoSoundLag();
         }
-        return NoSoundLag.instance;
+        return instance;
     }
-    
-    public static void removeEntities(final SPacketSoundEffect packet, final float range) {
-        final BlockPos pos = new BlockPos(packet.getX(), packet.getY(), packet.getZ());
-        final ArrayList<Entity> toRemove = new ArrayList<Entity>();
-        if (fullNullCheck()) {
+
+    public static void removeEntities(SPacketSoundEffect packet, float range) {
+        BlockPos pos = new BlockPos(packet.getX(), packet.getY(), packet.getZ());
+        ArrayList<Entity> toRemove = new ArrayList<Entity>();
+        if (NoSoundLag.fullNullCheck()) {
             return;
         }
-        for (final Entity entity : NoSoundLag.mc.world.loadedEntityList) {
-            if (entity instanceof EntityEnderCrystal) {
-                if (entity.getDistanceSq(pos) > MathUtil.square(range)) {
-                    continue;
-                }
-                toRemove.add(entity);
-            }
+        for (Entity entity : NoSoundLag.mc.world.loadedEntityList) {
+            if (!(entity instanceof EntityEnderCrystal) || !(entity.getDistanceSq(pos) <= MathUtil.square(range))) continue;
+            toRemove.add(entity);
         }
-        for (final Entity entity : toRemove) {
+        for (Entity entity : toRemove) {
             entity.setDead();
         }
     }
-    
+
     @SubscribeEvent
-    public void onPacketReceived(final PacketEvent.Receive event) {
+    public void onPacketReceived(PacketEvent.Receive event) {
         if (event != null && event.getPacket() != null && NoSoundLag.mc.player != null && NoSoundLag.mc.world != null && event.getPacket() instanceof SPacketSoundEffect) {
-            final SPacketSoundEffect packet = event.getPacket();
-            if (this.crystals.getValue() && packet.getCategory() == SoundCategory.BLOCKS && packet.getSound() == SoundEvents.ENTITY_GENERIC_EXPLODE && (AutoCrystal.getInstance().isOff() || (!AutoCrystal.getInstance().sound.getValue() && AutoCrystal.getInstance().threadMode.getValue() != AutoCrystal.ThreadMode.SOUND))) {
-                removeEntities(packet, this.soundRange.getValue());
+            SPacketSoundEffect packet = (SPacketSoundEffect)event.getPacket();
+            if (this.crystals.getValue().booleanValue() && packet.getCategory() == SoundCategory.BLOCKS && packet.getSound() == SoundEvents.ENTITY_GENERIC_EXPLODE && (AutoCrystal.getInstance().isOff() || !AutoCrystal.getInstance().sound.getValue().booleanValue() && AutoCrystal.getInstance().threadMode.getValue() != AutoCrystal.ThreadMode.SOUND)) {
+                NoSoundLag.removeEntities(packet, this.soundRange.getValue().floatValue());
             }
-            if (NoSoundLag.BLACKLIST.contains(packet.getSound()) && this.armor.getValue()) {
+            if (BLACKLIST.contains((Object)packet.getSound()) && this.armor.getValue().booleanValue()) {
                 event.setCanceled(true);
             }
         }
     }
-    
-    static {
-        BLACKLIST = Sets.newHashSet((Object[])new SoundEvent[] { SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundEvents.ITEM_ARMOR_EQIIP_ELYTRA, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, SoundEvents.ITEM_ARMOR_EQUIP_IRON, SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundEvents.ITEM_ARMOR_EQUIP_CHAIN, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER });
-    }
 }
+

@@ -1,40 +1,42 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.play.client.CPacketPlayer
+ */
 package dev._3000IQPlay.experium.mixin.mixins.accessors;
 
-import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.network.play.client.CPacketPlayer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({ CPacketPlayer.class })
-public interface ICPacketPlayer
-{
-    @Accessor("yaw")
-    float getYaw();
-    
-    @Accessor("yaw")
-    void setYaw(final float p0);
-    
-    @Accessor("pitch")
-    float getPitch();
-    
-    @Accessor("pitch")
-    void setPitch(final float p0);
-    
-    @Accessor("y")
-    void setY(final double p0);
-    
-    @Accessor("y")
-    double getY();
-    
-    @Accessor("onGround")
-    void setOnGround(final boolean p0);
-    
-    @Accessor("rotating")
-    boolean isRotating();
-    
-    @Accessor("moving")
-    boolean isMoving();
+@Mixin(value={CPacketPlayer.class})
+public interface ICPacketPlayer {
+    @Accessor(value="yaw")
+    public float getYaw();
+
+    @Accessor(value="yaw")
+    public void setYaw(float var1);
+
+    @Accessor(value="pitch")
+    public float getPitch();
+
+    @Accessor(value="pitch")
+    public void setPitch(float var1);
+
+    @Accessor(value="y")
+    public void setY(double var1);
+
+    @Accessor(value="y")
+    public double getY();
+
+    @Accessor(value="onGround")
+    public void setOnGround(boolean var1);
+
+    @Accessor(value="rotating")
+    public boolean isRotating();
+
+    @Accessor(value="moving")
+    public boolean isMoving();
 }
+

@@ -1,72 +1,73 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package dev._3000IQPlay.experium.features.gui.components.items;
 
 import dev._3000IQPlay.experium.features.Feature;
 
-public class Item extends Feature
-{
+public class Item
+extends Feature {
     protected float x;
     protected float y;
     protected int width;
     protected int height;
     private boolean hidden;
-    
-    public Item(final String name) {
+
+    public Item(String name) {
         super(name);
     }
-    
-    public void setLocation(final float x, final float y) {
+
+    public void setLocation(float x, float y) {
         this.x = x;
         this.y = y;
     }
-    
-    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
+
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     }
-    
-    public void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) {
+
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
     }
-    
-    public void mouseReleased(final int mouseX, final int mouseY, final int releaseButton) {
+
+    public void mouseReleased(int mouseX, int mouseY, int releaseButton) {
     }
-    
+
     public void update() {
     }
-    
-    public void onKeyTyped(final char typedChar, final int keyCode) {
+
+    public void onKeyTyped(char typedChar, int keyCode) {
     }
-    
+
     public float getX() {
         return this.x;
     }
-    
+
     public float getY() {
         return this.y;
     }
-    
+
     public int getWidth() {
         return this.width;
     }
-    
-    public void setWidth(final int width) {
+
+    public void setWidth(int width) {
         this.width = width;
     }
-    
+
     public int getHeight() {
         return this.height;
     }
-    
-    public void setHeight(final int height) {
+
+    public void setHeight(int height) {
         this.height = height;
     }
-    
+
     public boolean isHidden() {
         return this.hidden;
     }
-    
-    public boolean setHidden(final boolean hidden) {
-        return this.hidden = hidden;
+
+    public boolean setHidden(boolean hidden) {
+        this.hidden = hidden;
+        return this.hidden;
     }
 }
+

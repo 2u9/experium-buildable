@@ -1,95 +1,102 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.Minecraft
+ *  net.minecraft.client.entity.AbstractClientPlayer
+ *  net.minecraft.client.renderer.GlStateManager
+ *  net.minecraft.client.renderer.ItemRenderer
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.util.EnumHand
+ *  net.minecraft.util.EnumHandSide
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraftforge.common.MinecraftForge
+ *  net.minecraftforge.fml.common.eventhandler.Event
+ */
 package dev._3000IQPlay.experium.mixin.mixins;
 
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.client.Minecraft;
-import dev._3000IQPlay.experium.features.modules.render.NoRender;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import dev._3000IQPlay.experium.util.RenderUtil;
-import net.minecraft.client.renderer.GlStateManager;
-import dev._3000IQPlay.experium.features.modules.render.ViewModel;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.common.MinecraftForge;
 import dev._3000IQPlay.experium.event.events.RenderItemEvent;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.util.EnumHandSide;
-import org.spongepowered.asm.mixin.Shadow;
+import dev._3000IQPlay.experium.features.modules.render.NoRender;
+import dev._3000IQPlay.experium.features.modules.render.ViewModel;
+import dev._3000IQPlay.experium.util.RenderUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({ ItemRenderer.class })
-public abstract class MixinItemRenderer
-{
-    private boolean injection;
-    
-    public MixinItemRenderer() {
-        this.injection = true;
-    }
-    
+@Mixin(value={ItemRenderer.class})
+public abstract class MixinItemRenderer {
+    private boolean injection = true;
+
     @Shadow
-    public abstract void renderItemInFirstPerson(final AbstractClientPlayer p0, final float p1, final float p2, final EnumHand p3, final float p4, final ItemStack p5, final float p6);
-    
-    @Inject(method = { "transformSideFirstPerson" }, at = { @At("HEAD") }, cancellable = true)
-    public void transformSideFirstPerson(final EnumHandSide hand, final float p_187459_2_, final CallbackInfo cancel) {
-        final RenderItemEvent event = new RenderItemEvent(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+    public abstract void renderItemInFirstPerson(AbstractClientPlayer var1, float var2, float var3, EnumHand var4, float var5, ItemStack var6, float var7);
+
+    @Inject(method={"transformSideFirstPerson"}, at={@At(value="HEAD")}, cancellable=true)
+    public void transformSideFirstPerson(EnumHandSide hand, float p_187459_2_, CallbackInfo cancel) {
+        RenderItemEvent event = new RenderItemEvent(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
         MinecraftForge.EVENT_BUS.post((Event)event);
         if (ViewModel.getInstance().isEnabled()) {
-            final boolean bob = ViewModel.getInstance().isDisabled() || ViewModel.getInstance().doBob.getValue();
-            final int i = (hand == EnumHandSide.RIGHT) ? 1 : -1;
-            GlStateManager.translate(i * 0.56f, -0.52f + (bob ? p_187459_2_ : 0.0f) * -0.6f, -0.72f);
+            boolean bob = ViewModel.getInstance().isDisabled() || ViewModel.getInstance().doBob.getValue() != false;
+            int i = hand == EnumHandSide.RIGHT ? 1 : -1;
+            GlStateManager.translate((float)((float)i * 0.56f), (float)(-0.52f + (bob ? p_187459_2_ : 0.0f) * -0.6f), (float)-0.72f);
             if (hand == EnumHandSide.RIGHT) {
-                GlStateManager.translate(event.getMainX(), event.getMainY(), event.getMainZ());
+                GlStateManager.translate((double)event.getMainX(), (double)event.getMainY(), (double)event.getMainZ());
                 RenderUtil.rotationHelper((float)event.getMainRotX(), (float)event.getMainRotY(), (float)event.getMainRotZ());
-            }
-            else {
-                GlStateManager.translate(event.getOffX(), event.getOffY(), event.getOffZ());
+            } else {
+                GlStateManager.translate((double)event.getOffX(), (double)event.getOffY(), (double)event.getOffZ());
                 RenderUtil.rotationHelper((float)event.getOffRotX(), (float)event.getOffRotY(), (float)event.getOffRotZ());
             }
             cancel.cancel();
         }
     }
-    
-    @Inject(method = { "renderFireInFirstPerson" }, at = { @At("HEAD") }, cancellable = true)
-    public void renderFireInFirstPersonHook(final CallbackInfo info) {
-        if (NoRender.getInstance().isOn() && NoRender.getInstance().fire.getValue()) {
+
+    @Inject(method={"renderFireInFirstPerson"}, at={@At(value="HEAD")}, cancellable=true)
+    public void renderFireInFirstPersonHook(CallbackInfo info) {
+        if (NoRender.getInstance().isOn() && NoRender.getInstance().fire.getValue().booleanValue()) {
             info.cancel();
         }
     }
-    
-    @Inject(method = { "transformEatFirstPerson" }, at = { @At("HEAD") }, cancellable = true)
-    private void transformEatFirstPerson(final float p_187454_1_, final EnumHandSide hand, final ItemStack stack, final CallbackInfo cancel) {
+
+    @Inject(method={"transformEatFirstPerson"}, at={@At(value="HEAD")}, cancellable=true)
+    private void transformEatFirstPerson(float p_187454_1_, EnumHandSide hand, ItemStack stack, CallbackInfo cancel) {
         if (ViewModel.getInstance().isEnabled()) {
-            if (!ViewModel.getInstance().noEatAnimation.getValue()) {
-                final float f = Minecraft.getMinecraft().player.getItemInUseCount() - p_187454_1_ + 1.0f;
-                final float f2 = f / stack.getMaxItemUseDuration();
-                if (f2 < 0.8f) {
-                    final float f3 = MathHelper.abs(MathHelper.cos(f / 4.0f * 3.1415927f) * 0.1f);
-                    GlStateManager.translate(0.0f, f3, 0.0f);
+            if (!ViewModel.getInstance().noEatAnimation.getValue().booleanValue()) {
+                float f3;
+                float f = (float)Minecraft.getMinecraft().player.getItemInUseCount() - p_187454_1_ + 1.0f;
+                float f1 = f / (float)stack.getMaxItemUseDuration();
+                if (f1 < 0.8f) {
+                    f3 = MathHelper.abs((float)(MathHelper.cos((float)(f / 4.0f * (float)Math.PI)) * 0.1f));
+                    GlStateManager.translate((float)0.0f, (float)f3, (float)0.0f);
                 }
-                final float f3 = 1.0f - (float)Math.pow(f2, 27.0);
-                final int i = (hand == EnumHandSide.RIGHT) ? 1 : -1;
-                GlStateManager.translate(f3 * 0.6f * i * ViewModel.getInstance().eatX.getValue(), f3 * 0.5f * -ViewModel.getInstance().eatY.getValue(), 0.0);
-                GlStateManager.rotate(i * f3 * 90.0f, 0.0f, 1.0f, 0.0f);
-                GlStateManager.rotate(f3 * 10.0f, 1.0f, 0.0f, 0.0f);
-                GlStateManager.rotate(i * f3 * 30.0f, 0.0f, 0.0f, 1.0f);
+                f3 = 1.0f - (float)Math.pow(f1, 27.0);
+                int i = hand == EnumHandSide.RIGHT ? 1 : -1;
+                GlStateManager.translate((double)((double)(f3 * 0.6f * (float)i) * ViewModel.getInstance().eatX.getValue()), (double)((double)(f3 * 0.5f) * -ViewModel.getInstance().eatY.getValue().doubleValue()), (double)0.0);
+                GlStateManager.rotate((float)((float)i * f3 * 90.0f), (float)0.0f, (float)1.0f, (float)0.0f);
+                GlStateManager.rotate((float)(f3 * 10.0f), (float)1.0f, (float)0.0f, (float)0.0f);
+                GlStateManager.rotate((float)((float)i * f3 * 30.0f), (float)0.0f, (float)0.0f, (float)1.0f);
             }
             cancel.cancel();
         }
     }
-    
-    @Inject(method = { "renderSuffocationOverlay" }, at = { @At("HEAD") }, cancellable = true)
-    public void renderSuffocationOverlay(final CallbackInfo ci) {
-        if (NoRender.getInstance().isOn() && NoRender.getInstance().blocks.getValue()) {
+
+    @Inject(method={"renderSuffocationOverlay"}, at={@At(value="HEAD")}, cancellable=true)
+    public void renderSuffocationOverlay(CallbackInfo ci) {
+        if (NoRender.getInstance().isOn() && NoRender.getInstance().blocks.getValue().booleanValue()) {
             ci.cancel();
         }
     }
 }
+

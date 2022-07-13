@@ -1,152 +1,118 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.realmsclient.gui.ChatFormatting
+ *  net.minecraft.client.Minecraft
+ *  net.minecraft.client.gui.GuiChat
+ *  net.minecraft.client.gui.ScaledResolution
+ *  net.minecraft.client.renderer.GlStateManager
+ *  net.minecraft.init.Items
+ *  net.minecraft.init.MobEffects
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.potion.Potion
+ *  net.minecraft.potion.PotionEffect
+ *  net.minecraft.util.ResourceLocation
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.client;
 
-import net.minecraft.client.gui.ScaledResolution;
-import dev._3000IQPlay.experium.util.RenderUtil;
-import java.util.function.ToIntFunction;
-import net.minecraft.init.Items;
-import dev._3000IQPlay.experium.util.EntityUtil;
-import dev._3000IQPlay.experium.manager.TextManager;
-import net.minecraft.client.Minecraft;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import net.minecraft.potion.PotionEffect;
-import dev._3000IQPlay.experium.util.MathUtil;
-import net.minecraft.client.gui.GuiChat;
-import dev._3000IQPlay.experium.features.modules.misc.ToolTips;
 import com.mojang.realmsclient.gui.ChatFormatting;
-import dev._3000IQPlay.experium.util.ColorUtil;
-import net.minecraft.client.renderer.GlStateManager;
-import dev._3000IQPlay.experium.features.Feature;
-import dev._3000IQPlay.experium.event.events.Render2DEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import dev._3000IQPlay.experium.event.events.ClientEvent;
-import java.util.Iterator;
 import dev._3000IQPlay.experium.Experium;
-import net.minecraft.init.MobEffects;
-import java.util.HashMap;
-import java.awt.Color;
-import net.minecraft.potion.Potion;
-import java.util.Map;
-import dev._3000IQPlay.experium.util.Timer;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.item.ItemStack;
+import dev._3000IQPlay.experium.event.events.ClientEvent;
+import dev._3000IQPlay.experium.event.events.Render2DEvent;
+import dev._3000IQPlay.experium.features.Feature;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.client.Colors;
+import dev._3000IQPlay.experium.features.modules.client.Managers;
+import dev._3000IQPlay.experium.features.modules.client.PingBypass;
+import dev._3000IQPlay.experium.features.modules.misc.ToolTips;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.manager.TextManager;
+import dev._3000IQPlay.experium.util.ColorUtil;
+import dev._3000IQPlay.experium.util.EntityUtil;
+import dev._3000IQPlay.experium.util.MathUtil;
+import dev._3000IQPlay.experium.util.RenderUtil;
+import dev._3000IQPlay.experium.util.Timer;
+import java.awt.Color;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class HUD extends Module
-{
-    private static final ItemStack totem;
-    private static final ResourceLocation codHitmarker;
-    private static final ResourceLocation csgoHitmarker;
-    private static HUD INSTANCE;
-    private final Setting<Boolean> renderingUp;
-    private final Setting<WaterMark> watermark;
-    private final Setting<Boolean> modeVer;
-    private final Setting<Boolean> arrayList;
-    private final Setting<Boolean> moduleColors;
-    private final Setting<Boolean> alphabeticalSorting;
-    private final Setting<Boolean> serverBrand;
-    private final Setting<Boolean> ping;
-    private final Setting<Boolean> tps;
-    private final Setting<Boolean> fps;
-    private final Setting<Boolean> coords;
-    private final Setting<Boolean> direction;
-    private final Setting<Boolean> speed;
-    private final Setting<Boolean> potions;
-    private final Setting<Boolean> altPotionsColors;
-    private final Setting<Boolean> armor;
-    private final Setting<Boolean> durability;
-    private final Setting<Boolean> percent;
-    private final Setting<Boolean> totems;
-    private final Setting<Greeter> greeter;
-    private final Setting<String> spoofGreeter;
-    private final Setting<LagNotify> lag;
-    private final Setting<Boolean> hitMarkers;
-    private final Setting<Boolean> grayNess;
-    private final Timer timer;
-    private final Timer moduleTimer;
-    private final Map<Potion, Color> potionColorMap;
-    public Setting<Boolean> colorSync;
-    public Setting<Boolean> rainbow;
-    public Setting<Integer> factor;
-    public Setting<Boolean> rolling;
-    public Setting<Integer> rainbowSpeed;
-    public Setting<Integer> rainbowSaturation;
-    public Setting<Integer> rainbowBrightness;
-    public Setting<Boolean> potionIcons;
-    public Setting<Boolean> shadow;
-    public Setting<Integer> animationHorizontalTime;
-    public Setting<Integer> animationVerticalTime;
-    public Setting<Boolean> textRadar;
-    public Setting<Boolean> time;
-    public Setting<Integer> hudRed;
-    public Setting<Integer> hudGreen;
-    public Setting<Integer> hudBlue;
-    public Setting<Boolean> potions1;
-    public Setting<Boolean> MS;
-    public Map<Module, Float> moduleProgressMap;
-    public Map<Integer, Integer> colorMap;
-    private Map<String, Integer> players;
+public class HUD
+extends Module {
+    private static final ItemStack totem = new ItemStack(Items.TOTEM_OF_UNDYING);
+    private static final ResourceLocation codHitmarker = new ResourceLocation("experiumsounds", "cod_hitmarker");
+    private static final ResourceLocation csgoHitmarker = new ResourceLocation("experiumsounds", "csgo_hitmarker");
+    private static HUD INSTANCE = new HUD();
+    private final Setting<Boolean> renderingUp = this.register(new Setting<Boolean>("RenderingUp", Boolean.valueOf(false), "Orientation of the HUD-Elements."));
+    private final Setting<WaterMark> watermark = this.register(new Setting<WaterMark>("Logo", WaterMark.NONE, "WaterMark"));
+    private final Setting<Boolean> modeVer = this.register(new Setting<Object>("Version", Boolean.valueOf(false), v -> this.watermark.getValue() != WaterMark.NONE));
+    private final Setting<Boolean> arrayList = this.register(new Setting<Boolean>("ActiveModules", Boolean.valueOf(false), "Lists the active modules."));
+    private final Setting<Boolean> moduleColors = this.register(new Setting<Object>("ModuleColors", Boolean.valueOf(false), v -> this.arrayList.getValue()));
+    private final Setting<Boolean> alphabeticalSorting = this.register(new Setting<Object>("AlphabeticalSorting", Boolean.valueOf(false), v -> this.arrayList.getValue()));
+    private final Setting<Boolean> serverBrand = this.register(new Setting<Boolean>("ServerBrand", Boolean.valueOf(false), "Brand of the server you are on."));
+    private final Setting<Boolean> ping = this.register(new Setting<Boolean>("Ping", Boolean.valueOf(false), "Your response time to the server."));
+    private final Setting<Boolean> tps = this.register(new Setting<Boolean>("TPS", Boolean.valueOf(false), "Ticks per second of the server."));
+    private final Setting<Boolean> fps = this.register(new Setting<Boolean>("FPS", Boolean.valueOf(false), "Your frames per second."));
+    private final Setting<Boolean> coords = this.register(new Setting<Boolean>("Coords", Boolean.valueOf(false), "Your current coordinates"));
+    private final Setting<Boolean> direction = this.register(new Setting<Boolean>("Direction", Boolean.valueOf(false), "The Direction you are facing."));
+    private final Setting<Boolean> speed = this.register(new Setting<Boolean>("Speed", Boolean.valueOf(false), "Your Speed"));
+    private final Setting<Boolean> potions = this.register(new Setting<Boolean>("Potions", Boolean.valueOf(false), "Active potion effects"));
+    private final Setting<Boolean> altPotionsColors = this.register(new Setting<Object>("AltPotionColors", Boolean.valueOf(false), v -> this.potions.getValue()));
+    private final Setting<Boolean> armor = this.register(new Setting<Boolean>("Armor", Boolean.valueOf(false), "ArmorHUD"));
+    private final Setting<Boolean> durability = this.register(new Setting<Boolean>("Durability", Boolean.valueOf(false), "Durability"));
+    private final Setting<Boolean> percent = this.register(new Setting<Object>("Percent", Boolean.valueOf(true), v -> this.armor.getValue()));
+    private final Setting<Boolean> totems = this.register(new Setting<Boolean>("Totems", Boolean.valueOf(false), "TotemHUD"));
+    private final Setting<Greeter> greeter = this.register(new Setting<Greeter>("Greeter", Greeter.NONE, "Greets you."));
+    private final Setting<String> spoofGreeter = this.register(new Setting<Object>("GreeterName", "Experium", v -> this.greeter.getValue() == Greeter.CUSTOM));
+    private final Setting<LagNotify> lag = this.register(new Setting<LagNotify>("Lag", LagNotify.GRAY, "Lag Notifier"));
+    private final Setting<Boolean> hitMarkers = this.register(new Setting<Boolean>("HitMarkers", false));
+    private final Setting<Boolean> grayNess = this.register(new Setting<Boolean>("FutureColour", false));
+    private final Timer timer = new Timer();
+    private final Timer moduleTimer = new Timer();
+    private final Map<Potion, Color> potionColorMap = new HashMap<Potion, Color>();
+    public Setting<Boolean> colorSync = this.register(new Setting<Boolean>("Sync", Boolean.valueOf(false), "Universal colors for hud."));
+    public Setting<Boolean> rainbow = this.register(new Setting<Boolean>("Rainbow", Boolean.valueOf(false), "Rainbow hud."));
+    public Setting<Integer> factor = this.register(new Setting<Object>("Factor", Integer.valueOf(1), Integer.valueOf(0), Integer.valueOf(20), v -> this.rainbow.getValue()));
+    public Setting<Boolean> rolling = this.register(new Setting<Object>("Rolling", Boolean.valueOf(false), v -> this.rainbow.getValue()));
+    public Setting<Integer> rainbowSpeed = this.register(new Setting<Object>("RSpeed", Integer.valueOf(20), Integer.valueOf(0), Integer.valueOf(100), v -> this.rainbow.getValue()));
+    public Setting<Integer> rainbowSaturation = this.register(new Setting<Object>("Saturation", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255), v -> this.rainbow.getValue()));
+    public Setting<Integer> rainbowBrightness = this.register(new Setting<Object>("Brightness", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255), v -> this.rainbow.getValue()));
+    public Setting<Boolean> potionIcons = this.register(new Setting<Boolean>("PotionIcons", Boolean.valueOf(true), "Draws Potion Icons."));
+    public Setting<Boolean> shadow = this.register(new Setting<Boolean>("Shadow", Boolean.valueOf(false), "Draws the text with a shadow."));
+    public Setting<Integer> animationHorizontalTime = this.register(new Setting<Object>("AnimationHTime", Integer.valueOf(500), Integer.valueOf(1), Integer.valueOf(1000), v -> this.arrayList.getValue()));
+    public Setting<Integer> animationVerticalTime = this.register(new Setting<Object>("AnimationVTime", Integer.valueOf(50), Integer.valueOf(1), Integer.valueOf(500), v -> this.arrayList.getValue()));
+    public Setting<Boolean> textRadar = this.register(new Setting<Boolean>("TextRadar", Boolean.valueOf(false), "A TextRadar"));
+    public Setting<Boolean> time = this.register(new Setting<Boolean>("Time", Boolean.valueOf(false), "The time"));
+    public Setting<Integer> hudRed = this.register(new Setting<Object>("Red", Integer.valueOf(135), Integer.valueOf(0), Integer.valueOf(255), v -> this.rainbow.getValue() == false));
+    public Setting<Integer> hudGreen = this.register(new Setting<Object>("Green", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(255), v -> this.rainbow.getValue() == false));
+    public Setting<Integer> hudBlue = this.register(new Setting<Object>("Blue", Integer.valueOf(255), Integer.valueOf(0), Integer.valueOf(255), v -> this.rainbow.getValue() == false));
+    public Setting<Boolean> potions1 = this.register(new Setting<Object>("LevelPotions", Boolean.valueOf(false), v -> this.potions.getValue()));
+    public Setting<Boolean> MS = this.register(new Setting<Object>("ms", Boolean.valueOf(false), v -> this.ping.getValue()));
+    public Map<Module, Float> moduleProgressMap = new HashMap<Module, Float>();
+    public Map<Integer, Integer> colorMap = new HashMap<Integer, Integer>();
+    private Map<String, Integer> players = new HashMap<String, Integer>();
     private int color;
     private boolean shouldIncrement;
     private int hitMarkerTimer;
-    
+
     public HUD() {
-        super("HUD", "HUD Elements rendered on your screen", Category.CLIENT, true, false, false);
-        this.renderingUp = (Setting<Boolean>)this.register(new Setting("RenderingUp", (T)false, "Orientation of the HUD-Elements."));
-        this.watermark = (Setting<WaterMark>)this.register(new Setting("Logo", (T)WaterMark.NONE, "WaterMark"));
-        this.modeVer = (Setting<Boolean>)this.register(new Setting("Version", (T)false, v -> this.watermark.getValue() != WaterMark.NONE));
-        this.arrayList = (Setting<Boolean>)this.register(new Setting("ActiveModules", (T)false, "Lists the active modules."));
-        this.moduleColors = (Setting<Boolean>)this.register(new Setting("ModuleColors", (T)false, v -> this.arrayList.getValue()));
-        this.alphabeticalSorting = (Setting<Boolean>)this.register(new Setting("AlphabeticalSorting", (T)false, v -> this.arrayList.getValue()));
-        this.serverBrand = (Setting<Boolean>)this.register(new Setting("ServerBrand", (T)false, "Brand of the server you are on."));
-        this.ping = (Setting<Boolean>)this.register(new Setting("Ping", (T)false, "Your response time to the server."));
-        this.tps = (Setting<Boolean>)this.register(new Setting("TPS", (T)false, "Ticks per second of the server."));
-        this.fps = (Setting<Boolean>)this.register(new Setting("FPS", (T)false, "Your frames per second."));
-        this.coords = (Setting<Boolean>)this.register(new Setting("Coords", (T)false, "Your current coordinates"));
-        this.direction = (Setting<Boolean>)this.register(new Setting("Direction", (T)false, "The Direction you are facing."));
-        this.speed = (Setting<Boolean>)this.register(new Setting("Speed", (T)false, "Your Speed"));
-        this.potions = (Setting<Boolean>)this.register(new Setting("Potions", (T)false, "Active potion effects"));
-        this.altPotionsColors = (Setting<Boolean>)this.register(new Setting("AltPotionColors", (T)false, v -> this.potions.getValue()));
-        this.armor = (Setting<Boolean>)this.register(new Setting("Armor", (T)false, "ArmorHUD"));
-        this.durability = (Setting<Boolean>)this.register(new Setting("Durability", (T)false, "Durability"));
-        this.percent = (Setting<Boolean>)this.register(new Setting("Percent", (T)true, v -> this.armor.getValue()));
-        this.totems = (Setting<Boolean>)this.register(new Setting("Totems", (T)false, "TotemHUD"));
-        this.greeter = (Setting<Greeter>)this.register(new Setting("Greeter", (T)Greeter.NONE, "Greets you."));
-        this.spoofGreeter = (Setting<String>)this.register(new Setting("GreeterName", (T)"Experium", v -> this.greeter.getValue() == Greeter.CUSTOM));
-        this.lag = (Setting<LagNotify>)this.register(new Setting("Lag", (T)LagNotify.GRAY, "Lag Notifier"));
-        this.hitMarkers = (Setting<Boolean>)this.register(new Setting("HitMarkers", (T)false));
-        this.grayNess = (Setting<Boolean>)this.register(new Setting("FutureColour", (T)false));
-        this.timer = new Timer();
-        this.moduleTimer = new Timer();
-        this.potionColorMap = new HashMap<Potion, Color>();
-        this.colorSync = (Setting<Boolean>)this.register(new Setting("Sync", (T)false, "Universal colors for hud."));
-        this.rainbow = (Setting<Boolean>)this.register(new Setting("Rainbow", (T)false, "Rainbow hud."));
-        this.factor = (Setting<Integer>)this.register(new Setting("Factor", (T)1, (T)0, (T)20, v -> this.rainbow.getValue()));
-        this.rolling = (Setting<Boolean>)this.register(new Setting("Rolling", (T)false, v -> this.rainbow.getValue()));
-        this.rainbowSpeed = (Setting<Integer>)this.register(new Setting("RSpeed", (T)20, (T)0, (T)100, v -> this.rainbow.getValue()));
-        this.rainbowSaturation = (Setting<Integer>)this.register(new Setting("Saturation", (T)255, (T)0, (T)255, v -> this.rainbow.getValue()));
-        this.rainbowBrightness = (Setting<Integer>)this.register(new Setting("Brightness", (T)255, (T)0, (T)255, v -> this.rainbow.getValue()));
-        this.potionIcons = (Setting<Boolean>)this.register(new Setting("PotionIcons", (T)true, "Draws Potion Icons."));
-        this.shadow = (Setting<Boolean>)this.register(new Setting("Shadow", (T)false, "Draws the text with a shadow."));
-        this.animationHorizontalTime = (Setting<Integer>)this.register(new Setting("AnimationHTime", (T)500, (T)1, (T)1000, v -> this.arrayList.getValue()));
-        this.animationVerticalTime = (Setting<Integer>)this.register(new Setting("AnimationVTime", (T)50, (T)1, (T)500, v -> this.arrayList.getValue()));
-        this.textRadar = (Setting<Boolean>)this.register(new Setting("TextRadar", (T)false, "A TextRadar"));
-        this.time = (Setting<Boolean>)this.register(new Setting("Time", (T)false, "The time"));
-        this.hudRed = (Setting<Integer>)this.register(new Setting("Red", (T)135, (T)0, (T)255, v -> !this.rainbow.getValue()));
-        this.hudGreen = (Setting<Integer>)this.register(new Setting("Green", (T)0, (T)0, (T)255, v -> !this.rainbow.getValue()));
-        this.hudBlue = (Setting<Integer>)this.register(new Setting("Blue", (T)255, (T)0, (T)255, v -> !this.rainbow.getValue()));
-        this.potions1 = (Setting<Boolean>)this.register(new Setting("LevelPotions", (T)false, v -> this.potions.getValue()));
-        this.MS = (Setting<Boolean>)this.register(new Setting("ms", (T)false, v -> this.ping.getValue()));
-        this.moduleProgressMap = new HashMap<Module, Float>();
-        this.colorMap = new HashMap<Integer, Integer>();
-        this.players = new HashMap<String, Integer>();
+        super("HUD", "HUD Elements rendered on your screen", Module.Category.CLIENT, true, false, false);
         this.setInstance();
         this.potionColorMap.put(MobEffects.SPEED, new Color(124, 175, 198));
         this.potionColorMap.put(MobEffects.SLOWNESS, new Color(90, 108, 129));
@@ -176,26 +142,25 @@ public class HUD extends Module
         this.potionColorMap.put(MobEffects.LUCK, new Color(51, 153, 0));
         this.potionColorMap.put(MobEffects.UNLUCK, new Color(192, 164, 77));
     }
-    
+
     public static HUD getInstance() {
-        if (HUD.INSTANCE == null) {
-            HUD.INSTANCE = new HUD();
+        if (INSTANCE == null) {
+            INSTANCE = new HUD();
         }
-        return HUD.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        HUD.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @Override
     public void onUpdate() {
-        for (final Module module : Experium.moduleManager.sortedModules) {
-            if (module.isDisabled() && module.arrayListOffset == 0.0f) {
-                module.sliding = true;
-            }
+        for (Module module : Experium.moduleManager.sortedModules) {
+            if (!module.isDisabled() || module.arrayListOffset != 0.0f) continue;
+            module.sliding = true;
         }
-        if (this.timer.passedMs(Managers.getInstance().textRadarUpdates.getValue())) {
+        if (this.timer.passedMs(Managers.getInstance().textRadarUpdates.getValue().intValue())) {
             this.players = this.getTextRadarPlayers();
             this.timer.reset();
         }
@@ -207,276 +172,260 @@ public class HUD extends Module
             this.shouldIncrement = false;
         }
     }
-    
+
     @SubscribeEvent
-    public void onModuleToggle(final ClientEvent event) {
-        if (event.getFeature() instanceof Module) {
-            if (event.getStage() == 0) {
-                for (float i = 0.0f; i <= this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()); i += this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) / 500.0f) {
+    public void onModuleToggle(ClientEvent event) {
+        block4: {
+            block5: {
+                if (!(event.getFeature() instanceof Module)) break block4;
+                if (event.getStage() != 0) break block5;
+                for (float i = 0.0f; i <= (float)this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()); i += (float)this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) / 500.0f) {
                     if (this.moduleTimer.passedMs(1L)) {
-                        this.moduleProgressMap.put((Module)event.getFeature(), this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) - i);
+                        this.moduleProgressMap.put((Module)event.getFeature(), Float.valueOf((float)this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) - i));
                     }
                     this.timer.reset();
                 }
+                break block4;
             }
-            else if (event.getStage() == 1) {
-                for (float i = 0.0f; i <= this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()); i += this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) / 500.0f) {
-                    if (this.moduleTimer.passedMs(1L)) {
-                        this.moduleProgressMap.put((Module)event.getFeature(), this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) - i);
-                    }
-                    this.timer.reset();
+            if (event.getStage() != 1) break block4;
+            for (float i = 0.0f; i <= (float)this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()); i += (float)this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) / 500.0f) {
+                if (this.moduleTimer.passedMs(1L)) {
+                    this.moduleProgressMap.put((Module)event.getFeature(), Float.valueOf((float)this.renderer.getStringWidth(((Module)event.getFeature()).getDisplayName()) - i));
                 }
+                this.timer.reset();
             }
         }
     }
-    
+
     @Override
-    public void onRender2D(final Render2DEvent event) {
+    public void onRender2D(Render2DEvent event) {
+        int color;
+        String fpsText;
+        String text3;
+        Object text2;
+        String text;
+        int k = this.renderingUp.getValue() ? ((HUD.mc.currentScreen instanceof GuiChat) ? 0 : 0) : 0;
+        int j = this.renderingUp.getValue() ? 0 : ((HUD.mc.currentScreen instanceof GuiChat) ? 14 : 0);
         if (Feature.fullNullCheck()) {
             return;
         }
-        final int colorSpeed = 101 - this.rainbowSpeed.getValue();
-        final float hue = this.colorSync.getValue() ? Colors.INSTANCE.hue : (System.currentTimeMillis() % (360 * colorSpeed) / (360.0f * colorSpeed));
-        final int width = this.renderer.scaledWidth;
-        final int height = this.renderer.scaledHeight;
+        int colorSpeed = 101 - this.rainbowSpeed.getValue();
+        float hue = this.colorSync.getValue() != false ? Colors.INSTANCE.hue : (float)(System.currentTimeMillis() % (long)(360 * colorSpeed)) / (360.0f * (float)colorSpeed);
+        int width = this.renderer.scaledWidth;
+        int height = this.renderer.scaledHeight;
         float tempHue = hue;
         for (int i = 0; i <= height; ++i) {
-            if (this.colorSync.getValue()) {
-                this.colorMap.put(i, Color.HSBtoRGB(tempHue, Colors.INSTANCE.rainbowSaturation.getValue() / 255.0f, Colors.INSTANCE.rainbowBrightness.getValue() / 255.0f));
+            if (this.colorSync.getValue().booleanValue()) {
+                this.colorMap.put(i, Color.HSBtoRGB(tempHue, (float)Colors.INSTANCE.rainbowSaturation.getValue().intValue() / 255.0f, (float)Colors.INSTANCE.rainbowBrightness.getValue().intValue() / 255.0f));
+            } else {
+                this.colorMap.put(i, Color.HSBtoRGB(tempHue, (float)this.rainbowSaturation.getValue().intValue() / 255.0f, (float)this.rainbowBrightness.getValue().intValue() / 255.0f));
             }
-            else {
-                this.colorMap.put(i, Color.HSBtoRGB(tempHue, this.rainbowSaturation.getValue() / 255.0f, this.rainbowBrightness.getValue() / 255.0f));
-            }
-            tempHue += 1.0f / height * this.factor.getValue();
+            tempHue += 1.0f / (float)height * (float)this.factor.getValue().intValue();
         }
         GlStateManager.pushMatrix();
-        if (this.rainbow.getValue() && !this.rolling.getValue()) {
-            this.color = (this.colorSync.getValue() ? Colors.INSTANCE.getCurrentColorHex() : Color.HSBtoRGB(hue, this.rainbowSaturation.getValue() / 255.0f, this.rainbowBrightness.getValue() / 255.0f));
+        if (this.rainbow.getValue().booleanValue() && !this.rolling.getValue().booleanValue()) {
+            this.color = this.colorSync.getValue() != false ? Colors.INSTANCE.getCurrentColorHex() : Color.HSBtoRGB(hue, (float)this.rainbowSaturation.getValue().intValue() / 255.0f, (float)this.rainbowBrightness.getValue().intValue() / 255.0f);
+        } else if (!this.rainbow.getValue().booleanValue()) {
+            this.color = this.colorSync.getValue() != false ? Colors.INSTANCE.getCurrentColorHex() : ColorUtil.toRGBA(this.hudRed.getValue(), this.hudGreen.getValue(), this.hudBlue.getValue());
         }
-        else if (!this.rainbow.getValue()) {
-            this.color = (this.colorSync.getValue() ? Colors.INSTANCE.getCurrentColorHex() : ColorUtil.toRGBA(this.hudRed.getValue(), this.hudGreen.getValue(), this.hudBlue.getValue()));
-        }
-        final String grayString = this.grayNess.getValue() ? String.valueOf(ChatFormatting.GRAY) : "";
+        String grayString = this.grayNess.getValue() != false ? String.valueOf((Object)ChatFormatting.GRAY) : "";
         switch (this.watermark.getValue()) {
             case EXPERIUM: {
-                this.renderer.drawString("Experium " + (this.modeVer.getValue() ? "1.0.1" : ""), 2.0f, 2.0f, (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2)) : this.color, true);
-                break;
+                this.renderer.drawString("Experium " + (this.modeVer.getValue() != false ? "1.0.1" : ""), 2.0f, 2.0f, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2) : this.color, true);
             }
         }
-        if (this.textRadar.getValue()) {
-            this.drawTextRadar((ToolTips.getInstance().isOff() || !ToolTips.getInstance().shulkerSpy.getValue() || !ToolTips.getInstance().render.getValue()) ? 0 : ToolTips.getInstance().getTextRadarY());
+        if (this.textRadar.getValue().booleanValue()) {
+            this.drawTextRadar(ToolTips.getInstance().isOff() || ToolTips.getInstance().shulkerSpy.getValue() == false || ToolTips.getInstance().render.getValue() == false ? 0 : ToolTips.getInstance().getTextRadarY());
         }
-        int j = this.renderingUp.getValue() ? 0 : ((HUD.mc.currentScreen instanceof GuiChat) ? 14 : 0);
-        if (this.arrayList.getValue()) {
-            if (this.renderingUp.getValue()) {
-                for (int k = 0; k < (this.alphabeticalSorting.getValue() ? Experium.moduleManager.alphabeticallySortedModules.size() : Experium.moduleManager.sortedModules.size()); ++k) {
-                    final Module module = this.alphabeticalSorting.getValue() ? Experium.moduleManager.alphabeticallySortedModules.get(k) : Experium.moduleManager.sortedModules.get(k);
-                    final String text = module.getDisplayName() + ChatFormatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + ChatFormatting.WHITE + module.getDisplayInfo() + ChatFormatting.GRAY + "]") : "");
-                    final Color moduleColor = Experium.moduleManager.moduleColorMap.get(module);
-                    this.renderer.drawString(text, width - 2 - this.renderer.getStringWidth(text) + ((this.animationHorizontalTime.getValue() == 1) ? 0.0f : module.arrayListOffset), (float)(2 + j * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(MathUtil.clamp(2 + j * 10, 0, height))) : ((this.moduleColors.getValue() && moduleColor != null) ? moduleColor.getRGB() : this.color), true);
+        int n = this.renderingUp.getValue() != false ? 0 : (j = HUD.mc.currentScreen instanceof GuiChat ? 14 : 0);
+        if (this.arrayList.getValue().booleanValue()) {
+            Color moduleColor;
+            Module module;
+            if (this.renderingUp.getValue().booleanValue()) {
+                for (k = 0; k < (this.alphabeticalSorting.getValue() != false ? Experium.moduleManager.alphabeticallySortedModules.size() : Experium.moduleManager.sortedModules.size()); ++k) {
+                    module = this.alphabeticalSorting.getValue() != false ? Experium.moduleManager.alphabeticallySortedModules.get(k) : Experium.moduleManager.sortedModules.get(k);
+                    text = module.getDisplayName() + (Object)ChatFormatting.GRAY + (module.getDisplayInfo() != null ? " [" + (Object)ChatFormatting.WHITE + module.getDisplayInfo() + (Object)ChatFormatting.GRAY + "]" : "");
+                    moduleColor = Experium.moduleManager.moduleColorMap.get(module);
+                    this.renderer.drawString(text, width - 2 - this.renderer.getStringWidth(text) + ((this.animationHorizontalTime.getValue() == 1) ? 0.0f : module.arrayListOffset), (float) (2 + j * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? this.colorMap.get(MathUtil.clamp(2 + j * 10, 0, height)) : ((this.moduleColors.getValue() && moduleColor != null) ? moduleColor.getRGB() : this.color), true);
                     ++j;
                 }
-            }
-            else {
-                for (int k = 0; k < (this.alphabeticalSorting.getValue() ? Experium.moduleManager.alphabeticallySortedModules.size() : Experium.moduleManager.sortedModules.size()); ++k) {
-                    final Module module = this.alphabeticalSorting.getValue() ? Experium.moduleManager.alphabeticallySortedModules.get(Experium.moduleManager.alphabeticallySortedModules.size() - 1 - k) : Experium.moduleManager.sortedModules.get(k);
-                    final String text = module.getDisplayName() + ChatFormatting.GRAY + ((module.getDisplayInfo() != null) ? (" [" + ChatFormatting.WHITE + module.getDisplayInfo() + ChatFormatting.GRAY + "]") : "");
-                    final Color moduleColor = Experium.moduleManager.moduleColorMap.get(module);
-                    final TextManager renderer = this.renderer;
-                    final String text2 = text;
-                    final float x = width - 2 - this.renderer.getStringWidth(text) + ((this.animationHorizontalTime.getValue() == 1) ? 0.0f : module.arrayListOffset);
-                    final int n = height;
-                    j += 10;
-                    renderer.drawString(text2, x, (float)(n - j), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(MathUtil.clamp(height - j, 0, height))) : ((this.moduleColors.getValue() && moduleColor != null) ? moduleColor.getRGB() : this.color), true);
+            } else {
+                for (k = 0; k < (this.alphabeticalSorting.getValue() != false ? Experium.moduleManager.alphabeticallySortedModules.size() : Experium.moduleManager.sortedModules.size()); ++k) {
+                    module = this.alphabeticalSorting.getValue() != false ? Experium.moduleManager.alphabeticallySortedModules.get(Experium.moduleManager.alphabeticallySortedModules.size() - 1 - k) : Experium.moduleManager.sortedModules.get(k);
+                    text = module.getDisplayName() + (Object)ChatFormatting.GRAY + (module.getDisplayInfo() != null ? " [" + (Object)ChatFormatting.WHITE + module.getDisplayInfo() + (Object)ChatFormatting.GRAY + "]" : "");
+                    moduleColor = Experium.moduleManager.moduleColorMap.get(module);
+                    TextManager renderer = this.renderer;
+                    String text5 = text;
+                    float x = (float)(width - 2 - this.renderer.getStringWidth(text)) + (this.animationHorizontalTime.getValue() == 1 ? 0.0f : module.arrayListOffset);
+                    int n2 = height;
+                    renderer.drawString(text5, x, n2 - (j += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(MathUtil.clamp(height - j, 0, height)) : (this.moduleColors.getValue() != false && moduleColor != null ? moduleColor.getRGB() : this.color), true);
                 }
             }
         }
-        int k = this.renderingUp.getValue() ? ((HUD.mc.currentScreen instanceof GuiChat) ? 0 : 0) : 0;
-        if (this.renderingUp.getValue()) {
-            if (this.serverBrand.getValue()) {
-                final String text3 = grayString + "Server brand " + ChatFormatting.WHITE + Experium.serverManager.getServerBrand();
-                final TextManager renderer2 = this.renderer;
-                final String text4 = text3;
-                final float x2 = (float)(width - (this.renderer.getStringWidth(text3) + 2));
-                final int n2 = height - 2;
-                k += 10;
-                renderer2.drawString(text4, x2, (float)(n2 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+        int n3 = this.renderingUp.getValue().booleanValue() ? (HUD.mc.currentScreen instanceof GuiChat ? 0 : 0) : (k = 0);
+        if (this.renderingUp.getValue().booleanValue()) {
+            int itemDamage;
+            if (this.serverBrand.getValue().booleanValue()) {
+                text2 = grayString + "Server brand " + (Object)ChatFormatting.WHITE + Experium.serverManager.getServerBrand();
+                TextManager renderer2 = this.renderer;
+                Object text6 = text2;
+                float x2 = width - (this.renderer.getStringWidth((String)text2) + 2);
+                int n2 = height - 2;
+                renderer2.drawString((String)text6, x2, n2 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
             }
-            if (this.potions.getValue()) {
-                for (final PotionEffect effect : Experium.potionManager.getOwnPotions()) {
-                    final String text5 = this.altPotionsColors.getValue() ? Experium.potionManager.getPotionString(effect) : Experium.potionManager.getColoredPotionString(effect);
-                    final TextManager renderer3 = this.renderer;
-                    final String text6 = text5;
-                    final float x3 = (float)(width - (this.renderer.getStringWidth(text5) + 2));
-                    final int n3 = height - 2;
-                    k += 10;
-                    renderer3.drawString(text6, x3, (float)(n3 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : (this.altPotionsColors.getValue() ? this.potionColorMap.get(effect.getPotion()).getRGB() : this.color), true);
+            if (this.potions.getValue().booleanValue()) {
+                for (PotionEffect effect : Experium.potionManager.getOwnPotions()) {
+                    text3 = this.altPotionsColors.getValue() != false ? Experium.potionManager.getPotionString(effect) : Experium.potionManager.getColoredPotionString(effect);
+                    TextManager renderer3 = this.renderer;
+                    String text7 = text3;
+                    float x3 = width - (this.renderer.getStringWidth(text3) + 2);
+                    int n32 = height - 2;
+                    renderer3.drawString(text7, x3, n32 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : (this.altPotionsColors.getValue() != false ? this.potionColorMap.get((Object)effect.getPotion()).getRGB() : this.color), true);
                 }
             }
-            if (this.speed.getValue()) {
-                final String text3 = grayString + "Speed " + ChatFormatting.WHITE + Experium.speedManager.getSpeedKpH() + " km/h";
-                final TextManager renderer4 = this.renderer;
-                final String text7 = text3;
-                final float x4 = (float)(width - (this.renderer.getStringWidth(text3) + 2));
-                final int n4 = height - 2;
-                k += 10;
-                renderer4.drawString(text7, x4, (float)(n4 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+            if (this.speed.getValue().booleanValue()) {
+                text2 = grayString + "Speed " + (Object)ChatFormatting.WHITE + Experium.speedManager.getSpeedKpH() + " km/h";
+                TextManager renderer4 = this.renderer;
+                Object text8 = text2;
+                float x4 = width - (this.renderer.getStringWidth((String)text2) + 2);
+                int n4 = height - 2;
+                renderer4.drawString((String)text8, x4, n4 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
             }
-            if (this.time.getValue()) {
-                final String text3 = grayString + "Time " + ChatFormatting.WHITE + new SimpleDateFormat("h:mm a").format(new Date());
-                final TextManager renderer5 = this.renderer;
-                final String text8 = text3;
-                final float x5 = (float)(width - (this.renderer.getStringWidth(text3) + 2));
-                final int n5 = height - 2;
-                k += 10;
-                renderer5.drawString(text8, x5, (float)(n5 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+            if (this.time.getValue().booleanValue()) {
+                text2 = grayString + "Time " + (Object)ChatFormatting.WHITE + new SimpleDateFormat("h:mm a").format(new Date());
+                TextManager renderer5 = this.renderer;
+                Object text9 = text2;
+                float x5 = width - (this.renderer.getStringWidth((String)text2) + 2);
+                int n5 = height - 2;
+                renderer5.drawString((String)text9, x5, n5 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
             }
-            if (this.durability.getValue()) {
-                final int itemDamage = HUD.mc.player.getHeldItemMainhand().getMaxDamage() - HUD.mc.player.getHeldItemMainhand().getItemDamage();
-                if (itemDamage > 0) {
-                    final String text = grayString + "Durability " + ChatFormatting.RESET + itemDamage;
-                    final TextManager renderer6 = this.renderer;
-                    final String text9 = text;
-                    final float x6 = (float)(width - (this.renderer.getStringWidth(text) + 2));
-                    final int n6 = height - 2;
-                    k += 10;
-                    renderer6.drawString(text9, x6, (float)(n6 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
-                }
+            if (this.durability.getValue().booleanValue() && (itemDamage = HUD.mc.player.getHeldItemMainhand().getMaxDamage() - HUD.mc.player.getHeldItemMainhand().getItemDamage()) > 0) {
+                text = grayString + "Durability " + (Object)ChatFormatting.RESET + itemDamage;
+                TextManager renderer6 = this.renderer;
+                String text10 = text;
+                float x6 = width - (this.renderer.getStringWidth(text) + 2);
+                int n6 = height - 2;
+                renderer6.drawString(text10, x6, n6 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
             }
-            if (this.tps.getValue()) {
-                final String text3 = grayString + "TPS " + ChatFormatting.WHITE + Experium.serverManager.getTPS();
-                final TextManager renderer7 = this.renderer;
-                final String text10 = text3;
-                final float x7 = (float)(width - (this.renderer.getStringWidth(text3) + 2));
-                final int n7 = height - 2;
-                k += 10;
-                renderer7.drawString(text10, x7, (float)(n7 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+            if (this.tps.getValue().booleanValue()) {
+                String text22 = grayString + "TPS " + (Object)ChatFormatting.WHITE + Experium.serverManager.getTPS();
+                TextManager renderer7 = this.renderer;
+                String text11 = text22;
+                float x7 = width - (this.renderer.getStringWidth(text22) + 2);
+                int n7 = height - 2;
+                renderer7.drawString(text11, x7, n7 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
             }
-            final String fpsText = grayString + "FPS " + ChatFormatting.WHITE + Minecraft.debugFPS;
-            final String text = grayString + "Ping " + ChatFormatting.WHITE + (PingBypass.getInstance().isConnected() ? PingBypass.getInstance().getServerPing() : Experium.serverManager.getPing()) + (this.MS.getValue() ? "ms" : "");
+            fpsText = grayString + "FPS " + (Object)ChatFormatting.WHITE + Minecraft.debugFPS;
+            text = grayString + "Ping " + (Object)ChatFormatting.WHITE + (PingBypass.getInstance().isConnected() ? PingBypass.getInstance().getServerPing() : (long)Experium.serverManager.getPing()) + (this.MS.getValue() != false ? "ms" : "");
             if (this.renderer.getStringWidth(text) > this.renderer.getStringWidth(fpsText)) {
-                if (this.ping.getValue()) {
-                    final TextManager renderer8 = this.renderer;
-                    final String text11 = text;
-                    final float x8 = (float)(width - (this.renderer.getStringWidth(text) + 2));
-                    final int n8 = height - 2;
-                    k += 10;
-                    renderer8.drawString(text11, x8, (float)(n8 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+                if (this.ping.getValue().booleanValue()) {
+                    TextManager renderer8 = this.renderer;
+                    String text12 = text;
+                    float x8 = width - (this.renderer.getStringWidth(text) + 2);
+                    int n8 = height - 2;
+                    renderer8.drawString(text12, x8, n8 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
                 }
-                if (this.fps.getValue()) {
-                    final TextManager renderer9 = this.renderer;
-                    final String text12 = fpsText;
-                    final float x9 = (float)(width - (this.renderer.getStringWidth(fpsText) + 2));
-                    final int n9 = height - 2;
-                    k += 10;
-                    renderer9.drawString(text12, x9, (float)(n9 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+                if (this.fps.getValue().booleanValue()) {
+                    TextManager renderer9 = this.renderer;
+                    String text13 = fpsText;
+                    float x9 = width - (this.renderer.getStringWidth(fpsText) + 2);
+                    int n9 = height - 2;
+                    renderer9.drawString(text13, x9, n9 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
                 }
-            }
-            else {
-                if (this.fps.getValue()) {
-                    final TextManager renderer10 = this.renderer;
-                    final String text13 = fpsText;
-                    final float x10 = (float)(width - (this.renderer.getStringWidth(fpsText) + 2));
-                    final int n10 = height - 2;
-                    k += 10;
-                    renderer10.drawString(text13, x10, (float)(n10 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+            } else {
+                if (this.fps.getValue().booleanValue()) {
+                    TextManager renderer10 = this.renderer;
+                    String text14 = fpsText;
+                    float x10 = width - (this.renderer.getStringWidth(fpsText) + 2);
+                    int n10 = height - 2;
+                    renderer10.drawString(text14, x10, n10 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
                 }
-                if (this.ping.getValue()) {
-                    final TextManager renderer11 = this.renderer;
-                    final String text14 = text;
-                    final float x11 = (float)(width - (this.renderer.getStringWidth(text) + 2));
-                    final int n11 = height - 2;
-                    k += 10;
-                    renderer11.drawString(text14, x11, (float)(n11 - k), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(height - k)) : this.color, true);
+                if (this.ping.getValue().booleanValue()) {
+                    TextManager renderer11 = this.renderer;
+                    String text15 = text;
+                    float x11 = width - (this.renderer.getStringWidth(text) + 2);
+                    int n11 = height - 2;
+                    renderer11.drawString(text15, x11, n11 - (k += 10), this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(height - k) : this.color, true);
                 }
             }
-        }
-        else {
-            if (this.serverBrand.getValue()) {
-                final String text3 = grayString + "Server brand " + ChatFormatting.WHITE + Experium.serverManager.getServerBrand();
-                this.renderer.drawString(text3, (float)(width - (this.renderer.getStringWidth(text3) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+        } else {
+            int itemDamage;
+            if (this.serverBrand.getValue().booleanValue()) {
+                text2 = grayString + "Server brand " + (Object)ChatFormatting.WHITE + Experium.serverManager.getServerBrand();
+                this.renderer.drawString((String)text2, width - (this.renderer.getStringWidth((String)text2) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
             }
-            if (this.potions.getValue()) {
-                for (final PotionEffect effect : Experium.potionManager.getOwnPotions()) {
-                    final String text5 = this.altPotionsColors.getValue() ? Experium.potionManager.getPotionString(effect) : Experium.potionManager.getColoredPotionString(effect);
-                    this.renderer.drawString(text5, (float)(width - (this.renderer.getStringWidth(text5) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : (this.altPotionsColors.getValue() ? this.potionColorMap.get(effect.getPotion()).getRGB() : this.color), true);
+            if (this.potions.getValue().booleanValue()) {
+                for (PotionEffect effect : Experium.potionManager.getOwnPotions()) {
+                    text3 = this.altPotionsColors.getValue() != false ? Experium.potionManager.getPotionString(effect) : Experium.potionManager.getColoredPotionString(effect);
+                    this.renderer.drawString(text3, width - (this.renderer.getStringWidth(text3) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : (this.altPotionsColors.getValue() != false ? this.potionColorMap.get((Object)effect.getPotion()).getRGB() : this.color), true);
                 }
             }
-            if (this.speed.getValue()) {
-                final String text3 = grayString + "Speed " + ChatFormatting.WHITE + Experium.speedManager.getSpeedKpH() + " km/h";
-                this.renderer.drawString(text3, (float)(width - (this.renderer.getStringWidth(text3) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+            if (this.speed.getValue().booleanValue()) {
+                text2 = grayString + "Speed " + (Object)ChatFormatting.WHITE + Experium.speedManager.getSpeedKpH() + " km/h";
+                this.renderer.drawString((String)text2, width - (this.renderer.getStringWidth((String)text2) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
             }
-            if (this.time.getValue()) {
-                final String text3 = grayString + "Time " + ChatFormatting.WHITE + new SimpleDateFormat("h:mm a").format(new Date());
-                this.renderer.drawString(text3, (float)(width - (this.renderer.getStringWidth(text3) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+            if (this.time.getValue().booleanValue()) {
+                text2 = grayString + "Time " + (Object)ChatFormatting.WHITE + new SimpleDateFormat("h:mm a").format(new Date());
+                this.renderer.drawString((String)text2, width - (this.renderer.getStringWidth((String)text2) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
             }
-            if (this.durability.getValue()) {
-                final int itemDamage = HUD.mc.player.getHeldItemMainhand().getMaxDamage() - HUD.mc.player.getHeldItemMainhand().getItemDamage();
-                if (itemDamage > 0) {
-                    final String text = grayString + "Durability " + ChatFormatting.GREEN + itemDamage;
-                    this.renderer.drawString(text, (float)(width - (this.renderer.getStringWidth(text) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
-                }
+            if (this.durability.getValue().booleanValue() && (itemDamage = HUD.mc.player.getHeldItemMainhand().getMaxDamage() - HUD.mc.player.getHeldItemMainhand().getItemDamage()) > 0) {
+                text = grayString + "Durability " + (Object)ChatFormatting.GREEN + itemDamage;
+                this.renderer.drawString(text, width - (this.renderer.getStringWidth(text) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
             }
-            if (this.tps.getValue()) {
-                final String text3 = grayString + "TPS " + ChatFormatting.WHITE + Experium.serverManager.getTPS();
-                this.renderer.drawString(text3, (float)(width - (this.renderer.getStringWidth(text3) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+            if (this.tps.getValue().booleanValue()) {
+                String text23 = grayString + "TPS " + (Object)ChatFormatting.WHITE + Experium.serverManager.getTPS();
+                this.renderer.drawString(text23, width - (this.renderer.getStringWidth(text23) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
             }
-            final String fpsText = grayString + "FPS " + ChatFormatting.WHITE + Minecraft.debugFPS;
-            final String text = grayString + "Ping " + ChatFormatting.WHITE + Experium.serverManager.getPing();
+            fpsText = grayString + "FPS " + (Object)ChatFormatting.WHITE + Minecraft.debugFPS;
+            text = grayString + "Ping " + (Object)ChatFormatting.WHITE + Experium.serverManager.getPing();
             if (this.renderer.getStringWidth(text) > this.renderer.getStringWidth(fpsText)) {
-                if (this.ping.getValue()) {
-                    this.renderer.drawString(text, (float)(width - (this.renderer.getStringWidth(text) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+                if (this.ping.getValue().booleanValue()) {
+                    this.renderer.drawString(text, width - (this.renderer.getStringWidth(text) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
                 }
-                if (this.fps.getValue()) {
-                    this.renderer.drawString(fpsText, (float)(width - (this.renderer.getStringWidth(fpsText) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+                if (this.fps.getValue().booleanValue()) {
+                    this.renderer.drawString(fpsText, width - (this.renderer.getStringWidth(fpsText) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
                 }
-            }
-            else {
-                if (this.fps.getValue()) {
-                    this.renderer.drawString(fpsText, (float)(width - (this.renderer.getStringWidth(fpsText) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+            } else {
+                if (this.fps.getValue().booleanValue()) {
+                    this.renderer.drawString(fpsText, width - (this.renderer.getStringWidth(fpsText) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
                 }
-                if (this.ping.getValue()) {
-                    this.renderer.drawString(text, (float)(width - (this.renderer.getStringWidth(text) + 2)), (float)(2 + k++ * 10), (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2 + k * 10)) : this.color, true);
+                if (this.ping.getValue().booleanValue()) {
+                    this.renderer.drawString(text, width - (this.renderer.getStringWidth(text) + 2), 2 + k++ * 10, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2 + k * 10) : this.color, true);
                 }
             }
         }
-        final boolean inHell = HUD.mc.world.getBiome(HUD.mc.player.getPosition()).getBiomeName().equals("Hell");
-        final int posX = (int)HUD.mc.player.posX;
-        final int posY = (int)HUD.mc.player.posY;
-        final int posZ = (int)HUD.mc.player.posZ;
-        final float nether = inHell ? 8.0f : 0.125f;
-        final int hposX = (int)(HUD.mc.player.posX * nether);
-        final int hposZ = (int)(HUD.mc.player.posZ * nether);
-        if (this.renderingUp.getValue()) {
+        boolean inHell = HUD.mc.world.getBiome(HUD.mc.player.getPosition()).getBiomeName().equals("Hell");
+        int posX = (int)HUD.mc.player.posX;
+        int posY = (int)HUD.mc.player.posY;
+        int posZ = (int)HUD.mc.player.posZ;
+        float nether = inHell ? 8.0f : 0.125f;
+        int hposX = (int)(HUD.mc.player.posX * (double)nether);
+        int hposZ = (int)(HUD.mc.player.posZ * (double)nether);
+        if (this.renderingUp.getValue().booleanValue()) {
             Experium.notificationManager.handleNotifications(height - (k + 16));
-        }
-        else {
+        } else {
             Experium.notificationManager.handleNotifications(height - (j + 16));
         }
-        k = ((HUD.mc.currentScreen instanceof GuiChat) ? 14 : 0);
-        final String coordinates = String.valueOf(ChatFormatting.WHITE) + posX + ChatFormatting.GRAY + " [" + hposX + "], " + ChatFormatting.WHITE + posY + ChatFormatting.GRAY + ", " + ChatFormatting.WHITE + posZ + ChatFormatting.GRAY + " [" + hposZ + "]";
-        final String text15 = (this.direction.getValue() ? (Experium.rotationManager.getDirection4D(false) + " ") : "") + (this.coords.getValue() ? coordinates : "") + "";
-        final TextManager renderer12 = this.renderer;
-        final String text16 = text15;
-        final float x12 = 2.0f;
-        final int n12 = height;
-        k += 10;
-        final float y = (float)(n12 - k);
-        int color;
-        if (this.rolling.getValue() && this.rainbow.getValue()) {
-            final Map<Integer, Integer> colorMap = this.colorMap;
-            final int n13 = height;
-            k += 10;
-            color = colorMap.get(n13 - k);
-        }
-        else {
+        k = HUD.mc.currentScreen instanceof GuiChat ? 14 : 0;
+        String coordinates = String.valueOf((Object)ChatFormatting.WHITE) + posX + (Object)ChatFormatting.GRAY + " [" + hposX + "], " + (Object)ChatFormatting.WHITE + posY + (Object)ChatFormatting.GRAY + ", " + (Object)ChatFormatting.WHITE + posZ + (Object)ChatFormatting.GRAY + " [" + hposZ + "]";
+        String text4 = (this.direction.getValue() != false ? Experium.rotationManager.getDirection4D(false) + " " : "") + (this.coords.getValue() != false ? coordinates : "") + "";
+        TextManager renderer12 = this.renderer;
+        String text16 = text4;
+        float x12 = 2.0f;
+        int n12 = height;
+        float y = n12 - (k += 10);
+        if (this.rolling.getValue().booleanValue() && this.rainbow.getValue().booleanValue()) {
+            Map<Integer, Integer> colorMap = this.colorMap;
+            int n13 = height;
+            color = colorMap.get(n13 - (k += 10));
+        } else {
             color = this.color;
         }
         renderer12.drawString(text16, 2.0f, y, color, true);
-        if (this.armor.getValue()) {
+        if (this.armor.getValue().booleanValue()) {
             this.renderArmorHUD(this.percent.getValue());
         }
-        if (this.totems.getValue()) {
+        if (this.totems.getValue().booleanValue()) {
             this.renderTotemHUD();
         }
         if (this.greeter.getValue() != Greeter.NONE) {
@@ -485,18 +434,18 @@ public class HUD extends Module
         if (this.lag.getValue() != LagNotify.NONE) {
             this.renderLag();
         }
-        if (this.hitMarkers.getValue() && this.hitMarkerTimer > 0) {
+        if (this.hitMarkers.getValue().booleanValue() && this.hitMarkerTimer > 0) {
             this.drawHitMarkers();
         }
         GlStateManager.popMatrix();
     }
-    
+
     public Map<String, Integer> getTextRadarPlayers() {
         return EntityUtil.getTextRadarPlayers();
     }
-    
+
     public void renderGreeter() {
-        final int width = this.renderer.scaledWidth;
+        int width = this.renderer.scaledWidth;
         String text = "";
         switch (this.greeter.getValue()) {
             case TIME: {
@@ -512,68 +461,65 @@ public class HUD extends Module
                 break;
             }
             case CUSTOM: {
-                text += this.spoofGreeter.getValue();
+                text = text + this.spoofGreeter.getValue();
                 break;
             }
             default: {
                 text = text + "Welcome " + HUD.mc.player.getDisplayNameString();
-                break;
             }
         }
-        this.renderer.drawString(text, width / 2.0f - this.renderer.getStringWidth(text) / 2.0f + 2.0f, 2.0f, (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(2)) : this.color, true);
+        this.renderer.drawString(text, (float)width / 2.0f - (float)this.renderer.getStringWidth(text) / 2.0f + 2.0f, 2.0f, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(2) : this.color, true);
     }
-    
+
     public void renderLag() {
-        final int width = this.renderer.scaledWidth;
+        int width = this.renderer.scaledWidth;
         if (Experium.serverManager.isServerNotResponding()) {
-            final String text = ((this.lag.getValue() == LagNotify.GRAY) ? ChatFormatting.GRAY : ChatFormatting.RED) + "Server not responding: " + MathUtil.round(Experium.serverManager.serverRespondingTime() / 1000.0f, 1) + "s.";
-            this.renderer.drawString(text, width / 2.0f - this.renderer.getStringWidth(text) / 2.0f + 2.0f, 20.0f, (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(20)) : this.color, true);
+            String text = (Object)(this.lag.getValue() == LagNotify.GRAY ? ChatFormatting.GRAY : ChatFormatting.RED) + "Server not responding: " + MathUtil.round((float)Experium.serverManager.serverRespondingTime() / 1000.0f, 1) + "s.";
+            this.renderer.drawString(text, (float)width / 2.0f - (float)this.renderer.getStringWidth(text) / 2.0f + 2.0f, 20.0f, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(20) : this.color, true);
         }
     }
-    
+
     public void renderArrayList() {
     }
-    
+
     public void renderTotemHUD() {
-        final int width = this.renderer.scaledWidth;
-        final int height = this.renderer.scaledHeight;
+        int width = this.renderer.scaledWidth;
+        int height = this.renderer.scaledHeight;
         int totems = HUD.mc.player.inventory.mainInventory.stream().filter(itemStack -> itemStack.getItem() == Items.TOTEM_OF_UNDYING).mapToInt(ItemStack::getCount).sum();
         if (HUD.mc.player.getHeldItemOffhand().getItem() == Items.TOTEM_OF_UNDYING) {
             totems += HUD.mc.player.getHeldItemOffhand().getCount();
         }
         if (totems > 0) {
             GlStateManager.enableTexture2D();
-            final int i = width / 2;
-            final int iteration = 0;
-            final int y = height - 55 - ((HUD.mc.player.isInWater() && HUD.mc.playerController.gameIsSurvivalOrAdventure()) ? 10 : 0);
-            final int x = i - 189 + 180 + 2;
+            int i = width / 2;
+            boolean iteration = false;
+            int y = height - 55 - (HUD.mc.player.isInWater() && HUD.mc.playerController.gameIsSurvivalOrAdventure() ? 10 : 0);
+            int x = i - 189 + 180 + 2;
             GlStateManager.enableDepth();
             RenderUtil.itemRender.zLevel = 200.0f;
-            RenderUtil.itemRender.renderItemAndEffectIntoGUI(HUD.totem, x, y);
-            RenderUtil.itemRender.renderItemOverlayIntoGUI(HUD.mc.fontRenderer, HUD.totem, x, y, "");
+            RenderUtil.itemRender.renderItemAndEffectIntoGUI(totem, x, y);
+            RenderUtil.itemRender.renderItemOverlayIntoGUI(HUD.mc.fontRenderer, totem, x, y, "");
             RenderUtil.itemRender.zLevel = 0.0f;
             GlStateManager.enableTexture2D();
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
-            this.renderer.drawStringWithShadow(totems + "", (float)(x + 19 - 2 - this.renderer.getStringWidth(totems + "")), (float)(y + 9), 16777215);
+            this.renderer.drawStringWithShadow(totems + "", x + 19 - 2 - this.renderer.getStringWidth(totems + ""), y + 9, 0xFFFFFF);
             GlStateManager.enableDepth();
             GlStateManager.disableLighting();
         }
     }
-    
-    public void renderArmorHUD(final boolean percent) {
-        final int width = this.renderer.scaledWidth;
-        final int height = this.renderer.scaledHeight;
+
+    public void renderArmorHUD(boolean percent) {
+        int width = this.renderer.scaledWidth;
+        int height = this.renderer.scaledHeight;
         GlStateManager.enableTexture2D();
-        final int i = width / 2;
+        int i = width / 2;
         int iteration = 0;
-        final int y = height - 55 - ((HUD.mc.player.isInWater() && HUD.mc.playerController.gameIsSurvivalOrAdventure()) ? 10 : 0);
-        for (final ItemStack is : HUD.mc.player.inventory.armorInventory) {
+        int y = height - 55 - (HUD.mc.player.isInWater() && HUD.mc.playerController.gameIsSurvivalOrAdventure() ? 10 : 0);
+        for (ItemStack is : HUD.mc.player.inventory.armorInventory) {
             ++iteration;
-            if (is.isEmpty()) {
-                continue;
-            }
-            final int x = i - 90 + (9 - iteration) * 20 + 2;
+            if (is.isEmpty()) continue;
+            int x = i - 90 + (9 - iteration) * 20 + 2;
             GlStateManager.enableDepth();
             RenderUtil.itemRender.zLevel = 200.0f;
             RenderUtil.itemRender.renderItemAndEffectIntoGUI(is, x, y);
@@ -582,81 +528,68 @@ public class HUD extends Module
             GlStateManager.enableTexture2D();
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
-            final String s = (is.getCount() > 1) ? (is.getCount() + "") : "";
-            this.renderer.drawStringWithShadow(s, (float)(x + 19 - 2 - this.renderer.getStringWidth(s)), (float)(y + 9), 16777215);
-            if (!percent) {
-                continue;
-            }
+            String s = is.getCount() > 1 ? is.getCount() + "" : "";
+            this.renderer.drawStringWithShadow(s, x + 19 - 2 - this.renderer.getStringWidth(s), y + 9, 0xFFFFFF);
+            if (!percent) continue;
             int dmg = 0;
-            final int itemDurability = is.getMaxDamage() - is.getItemDamage();
-            final float green = (is.getMaxDamage() - (float)is.getItemDamage()) / is.getMaxDamage();
-            final float red = 1.0f - green;
-            if (percent) {
-                dmg = 100 - (int)(red * 100.0f);
-            }
-            else {
-                dmg = itemDurability;
-            }
-            this.renderer.drawStringWithShadow(dmg + "", (float)(x + 8 - this.renderer.getStringWidth(dmg + "") / 2), (float)(y - 11), ColorUtil.toRGBA((int)(red * 255.0f), (int)(green * 255.0f), 0));
+            int itemDurability = is.getMaxDamage() - is.getItemDamage();
+            float green = ((float)is.getMaxDamage() - (float)is.getItemDamage()) / (float)is.getMaxDamage();
+            float red = 1.0f - green;
+            dmg = percent ? 100 - (int)(red * 100.0f) : itemDurability;
+            this.renderer.drawStringWithShadow(dmg + "", x + 8 - this.renderer.getStringWidth(dmg + "") / 2, y - 11, ColorUtil.toRGBA((int)(red * 255.0f), (int)(green * 255.0f), 0));
         }
         GlStateManager.enableDepth();
         GlStateManager.disableLighting();
     }
-    
+
     public void drawHitMarkers() {
-        final ScaledResolution resolution = new ScaledResolution(HUD.mc);
-        RenderUtil.drawLine(resolution.getScaledWidth() / 2.0f - 4.0f, resolution.getScaledHeight() / 2.0f - 4.0f, resolution.getScaledWidth() / 2.0f - 8.0f, resolution.getScaledHeight() / 2.0f - 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
-        RenderUtil.drawLine(resolution.getScaledWidth() / 2.0f + 4.0f, resolution.getScaledHeight() / 2.0f - 4.0f, resolution.getScaledWidth() / 2.0f + 8.0f, resolution.getScaledHeight() / 2.0f - 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
-        RenderUtil.drawLine(resolution.getScaledWidth() / 2.0f - 4.0f, resolution.getScaledHeight() / 2.0f + 4.0f, resolution.getScaledWidth() / 2.0f - 8.0f, resolution.getScaledHeight() / 2.0f + 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
-        RenderUtil.drawLine(resolution.getScaledWidth() / 2.0f + 4.0f, resolution.getScaledHeight() / 2.0f + 4.0f, resolution.getScaledWidth() / 2.0f + 8.0f, resolution.getScaledHeight() / 2.0f + 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
+        ScaledResolution resolution = new ScaledResolution(mc);
+        RenderUtil.drawLine((float)resolution.getScaledWidth() / 2.0f - 4.0f, (float)resolution.getScaledHeight() / 2.0f - 4.0f, (float)resolution.getScaledWidth() / 2.0f - 8.0f, (float)resolution.getScaledHeight() / 2.0f - 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
+        RenderUtil.drawLine((float)resolution.getScaledWidth() / 2.0f + 4.0f, (float)resolution.getScaledHeight() / 2.0f - 4.0f, (float)resolution.getScaledWidth() / 2.0f + 8.0f, (float)resolution.getScaledHeight() / 2.0f - 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
+        RenderUtil.drawLine((float)resolution.getScaledWidth() / 2.0f - 4.0f, (float)resolution.getScaledHeight() / 2.0f + 4.0f, (float)resolution.getScaledWidth() / 2.0f - 8.0f, (float)resolution.getScaledHeight() / 2.0f + 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
+        RenderUtil.drawLine((float)resolution.getScaledWidth() / 2.0f + 4.0f, (float)resolution.getScaledHeight() / 2.0f + 4.0f, (float)resolution.getScaledWidth() / 2.0f + 8.0f, (float)resolution.getScaledHeight() / 2.0f + 8.0f, 1.0f, ColorUtil.toRGBA(255, 255, 255, 255));
     }
-    
-    public void drawTextRadar(final int yOffset) {
+
+    public void drawTextRadar(int yOffset) {
         if (!this.players.isEmpty()) {
             int y = this.renderer.getFontHeight() + 7 + yOffset;
-            for (final Map.Entry<String, Integer> player : this.players.entrySet()) {
-                final String text = player.getKey() + " ";
-                final int textheight = this.renderer.getFontHeight() + 1;
-                this.renderer.drawString(text, 2.0f, (float)y, (this.rolling.getValue() && this.rainbow.getValue()) ? ((int)this.colorMap.get(y)) : this.color, true);
+            for (Map.Entry<String, Integer> player : this.players.entrySet()) {
+                String text = player.getKey() + " ";
+                int textheight = this.renderer.getFontHeight() + 1;
+                this.renderer.drawString(text, 2.0f, y, this.rolling.getValue() != false && this.rainbow.getValue() != false ? this.colorMap.get(y) : this.color, true);
                 y += textheight;
             }
         }
     }
-    
-    static {
-        totem = new ItemStack(Items.TOTEM_OF_UNDYING);
-        codHitmarker = new ResourceLocation("experiumsounds", "cod_hitmarker");
-        csgoHitmarker = new ResourceLocation("experiumsounds", "csgo_hitmarker");
-        HUD.INSTANCE = new HUD();
-    }
-    
-    public enum Greeter
-    {
-        NONE, 
-        NAME, 
-        TIME, 
-        CHRISTMAS, 
-        LONG, 
-        CUSTOM;
-    }
-    
-    public enum LagNotify
-    {
-        NONE, 
-        RED, 
-        GRAY;
-    }
-    
-    public enum WaterMark
-    {
-        NONE, 
-        EXPERIUM;
-    }
-    
-    public enum Sound
-    {
-        NONE, 
-        COD, 
+
+    public static enum Sound {
+        NONE,
+        COD,
         CSGO;
+
+    }
+
+    public static enum WaterMark {
+        NONE,
+        EXPERIUM;
+
+    }
+
+    public static enum LagNotify {
+        NONE,
+        RED,
+        GRAY;
+
+    }
+
+    public static enum Greeter {
+        NONE,
+        NAME,
+        TIME,
+        CHRISTMAS,
+        LONG,
+        CUSTOM;
+
     }
 }
+

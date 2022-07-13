@@ -1,78 +1,83 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockObsidian
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.init.Items
+ *  net.minecraft.item.ItemEndCrystal
+ *  net.minecraft.item.ItemExpBottle
+ *  net.minecraft.item.ItemMinecart
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock
+ *  net.minecraft.util.EnumFacing
+ *  net.minecraft.util.EnumHand
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.RayTraceResult
+ */
 package dev._3000IQPlay.experium.features.modules.player;
 
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.util.InventoryUtil;
+import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemEndCrystal;
-import net.minecraft.item.ItemMinecart;
-import net.minecraft.block.BlockObsidian;
-import dev._3000IQPlay.experium.util.InventoryUtil;
 import net.minecraft.item.ItemExpBottle;
+import net.minecraft.item.ItemMinecart;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import dev._3000IQPlay.experium.features.setting.Setting;
-import dev._3000IQPlay.experium.features.modules.Module;
+import net.minecraft.util.math.RayTraceResult;
 
-public class FastUse extends Module
-{
-    private Setting<Boolean> all;
-    private Setting<Boolean> obby;
-    private Setting<Boolean> crystals;
-    private Setting<Boolean> exp;
-    private Setting<Boolean> minecart;
-    private Setting<Boolean> packetCrystal;
-    private Setting<Boolean> strict;
-    private BlockPos mousePos;
-    
+public class FastUse
+extends Module {
+    private Setting<Boolean> all = this.register(new Setting<Boolean>("All", false));
+    private Setting<Boolean> obby = this.register(new Setting<Object>("Obsidian", Boolean.valueOf(false), v -> this.all.getValue() == false));
+    private Setting<Boolean> crystals = this.register(new Setting<Object>("Crystals", Boolean.valueOf(false), v -> this.all.getValue() == false));
+    private Setting<Boolean> exp = this.register(new Setting<Object>("Experience", Boolean.valueOf(false), v -> this.all.getValue() == false));
+    private Setting<Boolean> minecart = this.register(new Setting<Object>("Minecarts", Boolean.valueOf(false), v -> this.all.getValue() == false));
+    private Setting<Boolean> packetCrystal = this.register(new Setting<Boolean>("PacketCrystal", false));
+    private Setting<Boolean> strict = this.register(new Setting<Boolean>("Strict", false));
+    private BlockPos mousePos = null;
+
     public FastUse() {
-        super("FastUse", "Allows you to use items faster", Category.PLAYER, true, false, false);
-        this.all = (Setting<Boolean>)this.register(new Setting("All", (T)false));
-        this.obby = (Setting<Boolean>)this.register(new Setting("Obsidian", (T)false, v -> !this.all.getValue()));
-        this.crystals = (Setting<Boolean>)this.register(new Setting("Crystals", (T)false, v -> !this.all.getValue()));
-        this.exp = (Setting<Boolean>)this.register(new Setting("Experience", (T)false, v -> !this.all.getValue()));
-        this.minecart = (Setting<Boolean>)this.register(new Setting("Minecarts", (T)false, v -> !this.all.getValue()));
-        this.packetCrystal = (Setting<Boolean>)this.register(new Setting("PacketCrystal", (T)false));
-        this.strict = (Setting<Boolean>)this.register(new Setting("Strict", (T)false));
-        this.mousePos = null;
+        super("FastUse", "Allows you to use items faster", Module.Category.PLAYER, true, false, false);
     }
-    
+
     @Override
     public void onUpdate() {
-        if (this.strict.getValue() && FastUse.mc.player.ticksExisted % 2 == 0) {
+        if (this.strict.getValue().booleanValue() && FastUse.mc.player.ticksExisted % 2 == 0) {
             return;
         }
-        if (fullNullCheck()) {
+        if (FastUse.fullNullCheck()) {
             return;
         }
-        if (InventoryUtil.holdingItem(ItemExpBottle.class) && this.exp.getValue()) {
+        if (InventoryUtil.holdingItem(ItemExpBottle.class) && this.exp.getValue().booleanValue()) {
             FastUse.mc.rightClickDelayTimer = 0;
         }
-        if (InventoryUtil.holdingItem(BlockObsidian.class) && this.obby.getValue()) {
+        if (InventoryUtil.holdingItem(BlockObsidian.class) && this.obby.getValue().booleanValue()) {
             FastUse.mc.rightClickDelayTimer = 0;
         }
-        if (InventoryUtil.holdingItem(ItemMinecart.class) && this.minecart.getValue()) {
+        if (InventoryUtil.holdingItem(ItemMinecart.class) && this.minecart.getValue().booleanValue()) {
             FastUse.mc.rightClickDelayTimer = 0;
         }
-        if (this.all.getValue()) {
+        if (this.all.getValue().booleanValue()) {
             FastUse.mc.rightClickDelayTimer = 0;
         }
-        if (InventoryUtil.holdingItem(ItemEndCrystal.class) && (this.crystals.getValue() || this.all.getValue())) {
+        if (InventoryUtil.holdingItem(ItemEndCrystal.class) && (this.crystals.getValue().booleanValue() || this.all.getValue().booleanValue())) {
             FastUse.mc.rightClickDelayTimer = 0;
         }
-        if (this.packetCrystal.getValue() && FastUse.mc.gameSettings.keyBindUseItem.isKeyDown()) {
-            final boolean bl;
-            final boolean offhand = bl = (FastUse.mc.player.getHeldItemOffhand().getItem() == Items.END_CRYSTAL);
+        if (this.packetCrystal.getValue().booleanValue() && FastUse.mc.gameSettings.keyBindUseItem.isKeyDown()) {
+            boolean offhand = FastUse.mc.player.getHeldItemOffhand().getItem() == Items.END_CRYSTAL;
+            boolean bl = offhand;
             if (offhand || FastUse.mc.player.getHeldItemMainhand().getItem() == Items.END_CRYSTAL) {
-                final RayTraceResult result = FastUse.mc.objectMouseOver;
+                RayTraceResult result = FastUse.mc.objectMouseOver;
                 if (result == null) {
                     return;
                 }
@@ -86,18 +91,13 @@ public class FastUse extends Module
                         break;
                     }
                     case ENTITY: {
-                        final Entity entity;
-                        if (this.mousePos == null || (entity = result.entityHit) == null) {
-                            break;
-                        }
-                        if (!this.mousePos.equals((Object)new BlockPos(entity.posX, entity.posY - 1.0, entity.posZ))) {
-                            break;
-                        }
+                        Entity entity;
+                        if (this.mousePos == null || (entity = result.entityHit) == null || !this.mousePos.equals((Object)new BlockPos(entity.posX, entity.posY - 1.0, entity.posZ))) break;
                         FastUse.mc.player.connection.sendPacket((Packet)new CPacketPlayerTryUseItemOnBlock(this.mousePos, EnumFacing.DOWN, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
-                        break;
                     }
                 }
             }
         }
     }
 }
+

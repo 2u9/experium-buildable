@@ -1,91 +1,77 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.movement;
 
-import dev._3000IQPlay.experium.features.Feature;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import dev._3000IQPlay.experium.event.events.MoveEvent;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Sprint extends Module
-{
-    private static Sprint INSTANCE;
-    public Setting<Mode> mode;
-    
+public class Sprint
+extends Module {
+    private static Sprint INSTANCE = new Sprint();
+    public Setting<Mode> mode = this.register(new Setting<Mode>("Mode", Mode.LEGIT));
+
     public Sprint() {
-        super("Sprint", "Modifies sprinting", Category.MOVEMENT, false, false, false);
-        this.mode = (Setting<Mode>)this.register(new Setting("Mode", (T)Mode.LEGIT));
+        super("Sprint", "Modifies sprinting", Module.Category.MOVEMENT, false, false, false);
         this.setInstance();
     }
-    
+
     public static Sprint getInstance() {
-        if (Sprint.INSTANCE == null) {
-            Sprint.INSTANCE = new Sprint();
+        if (INSTANCE == null) {
+            INSTANCE = new Sprint();
         }
-        return Sprint.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        Sprint.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @SubscribeEvent
-    public void onSprint(final MoveEvent event) {
+    public void onSprint(MoveEvent event) {
         if (event.getStage() == 1 && this.mode.getValue() == Mode.RAGE && (Sprint.mc.player.movementInput.moveForward != 0.0f || Sprint.mc.player.movementInput.moveStrafe != 0.0f)) {
             event.setCanceled(true);
         }
     }
-    
+
     @Override
     public void onUpdate() {
         switch (this.mode.getValue()) {
             case RAGE: {
-                if ((!Sprint.mc.gameSettings.keyBindForward.isKeyDown() && !Sprint.mc.gameSettings.keyBindBack.isKeyDown() && !Sprint.mc.gameSettings.keyBindLeft.isKeyDown() && !Sprint.mc.gameSettings.keyBindRight.isKeyDown()) || Sprint.mc.player.isSneaking() || Sprint.mc.player.collidedHorizontally) {
-                    break;
-                }
-                if (Sprint.mc.player.getFoodStats().getFoodLevel() <= 6.0f) {
-                    break;
-                }
+                if (!Sprint.mc.gameSettings.keyBindForward.isKeyDown() && !Sprint.mc.gameSettings.keyBindBack.isKeyDown() && !Sprint.mc.gameSettings.keyBindLeft.isKeyDown() && !Sprint.mc.gameSettings.keyBindRight.isKeyDown() || Sprint.mc.player.isSneaking() || Sprint.mc.player.collidedHorizontally || (float)Sprint.mc.player.getFoodStats().getFoodLevel() <= 6.0f) break;
                 Sprint.mc.player.setSprinting(true);
                 break;
             }
             case LEGIT: {
-                if (!Sprint.mc.gameSettings.keyBindForward.isKeyDown() || Sprint.mc.player.isSneaking() || Sprint.mc.player.isHandActive() || Sprint.mc.player.collidedHorizontally || Sprint.mc.player.getFoodStats().getFoodLevel() <= 6.0f) {
-                    break;
-                }
-                if (Sprint.mc.currentScreen != null) {
-                    break;
-                }
+                if (!Sprint.mc.gameSettings.keyBindForward.isKeyDown() || Sprint.mc.player.isSneaking() || Sprint.mc.player.isHandActive() || Sprint.mc.player.collidedHorizontally || (float)Sprint.mc.player.getFoodStats().getFoodLevel() <= 6.0f || Sprint.mc.currentScreen != null) break;
                 Sprint.mc.player.setSprinting(true);
-                break;
             }
         }
     }
-    
+
     @Override
     public void onDisable() {
-        if (!Feature.nullCheck()) {
+        if (!Sprint.nullCheck()) {
             Sprint.mc.player.setSprinting(false);
         }
     }
-    
+
     @Override
     public String getDisplayInfo() {
         return this.mode.currentEnumName();
     }
-    
-    static {
-        Sprint.INSTANCE = new Sprint();
-    }
-    
-    public enum Mode
-    {
-        LEGIT, 
+
+    public static enum Mode {
+        LEGIT,
         RAGE;
+
     }
 }
+

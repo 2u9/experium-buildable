@@ -1,26 +1,30 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.renderer.culling.ICamera
+ *  net.minecraft.client.renderer.entity.Render
+ *  net.minecraft.entity.Entity
+ */
 package dev._3000IQPlay.experium.mixin.mixins;
 
+import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import org.spongepowered.asm.mixin.Mixin;
-import net.minecraft.entity.Entity;
 
-@Mixin({ Render.class })
-public class MixinRender<T extends Entity>
-{
-    @Inject(method = { "shouldRender" }, at = { @At("HEAD") }, cancellable = true)
-    public void shouldRender(final T livingEntity, final ICamera camera, final double camX, final double camY, final double camZ, final CallbackInfoReturnable<Boolean> info) {
+@Mixin(value={Render.class})
+public class MixinRender<T extends Entity> {
+    @Inject(method={"shouldRender"}, at={@At(value="HEAD")}, cancellable=true)
+    public void shouldRender(T livingEntity, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> info) {
         if (livingEntity == null || camera == null || livingEntity.getRenderBoundingBox() == null) {
             info.setReturnValue(false);
         }
     }
 }
+

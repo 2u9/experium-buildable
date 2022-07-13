@@ -1,16 +1,19 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.fml.common.eventhandler.Cancelable
+ */
 package dev._3000IQPlay.experium.event.events;
 
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import dev._3000IQPlay.experium.event.EventStage;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 @Cancelable
-public class UpdateWalkingPlayerEvent extends EventStage
-{
-    public UpdateWalkingPlayerEvent(final int stage) {
+public class UpdateWalkingPlayerEvent
+extends EventStage {
+    public UpdateWalkingPlayerEvent(int stage) {
         super(stage);
     }
 }
+

@@ -1,83 +1,81 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.client.gui.GuiScreen
+ *  net.minecraft.client.gui.ScaledResolution
+ *  org.lwjgl.input.Mouse
+ */
 package dev._3000IQPlay.experium.features.gui;
 
-import java.io.IOException;
-import org.lwjgl.input.Mouse;
-import net.minecraft.client.gui.ScaledResolution;
+import dev._3000IQPlay.experium.Experium;
+import dev._3000IQPlay.experium.features.gui.components.Component;
+import dev._3000IQPlay.experium.features.gui.components.items.DescriptionDisplay;
+import dev._3000IQPlay.experium.features.gui.components.items.Item;
+import dev._3000IQPlay.experium.features.gui.components.items.buttons.ModuleButton;
+import dev._3000IQPlay.experium.features.gui.particle.ParticleSystem;
+import dev._3000IQPlay.experium.features.gui.particle.Snow;
+import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.modules.client.ClickGui;
+import dev._3000IQPlay.experium.features.modules.client.Colors;
 import dev._3000IQPlay.experium.util.RenderUtil;
 import java.awt.Color;
-import dev._3000IQPlay.experium.features.modules.client.Colors;
-import dev._3000IQPlay.experium.features.modules.client.ClickGui;
-import dev._3000IQPlay.experium.features.gui.components.items.Item;
-import java.util.Iterator;
-import dev._3000IQPlay.experium.features.gui.components.items.buttons.Button;
-import dev._3000IQPlay.experium.features.gui.components.items.buttons.ModuleButton;
-import dev._3000IQPlay.experium.features.modules.Module;
-import dev._3000IQPlay.experium.Experium;
-import java.util.Random;
-import dev._3000IQPlay.experium.features.gui.particle.Snow;
-import dev._3000IQPlay.experium.features.gui.particle.ParticleSystem;
-import dev._3000IQPlay.experium.features.gui.components.Component;
+import java.io.IOException;
 import java.util.ArrayList;
-import dev._3000IQPlay.experium.features.gui.components.items.DescriptionDisplay;
+import java.util.Random;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.input.Mouse;
 
-public class ExperiumGui extends GuiScreen
-{
+public class ExperiumGui
+extends GuiScreen {
     private static ExperiumGui experiumGui;
     private static ExperiumGui INSTANCE;
     private static DescriptionDisplay descriptionDisplay;
-    private final ArrayList<Component> components;
+    private final ArrayList<Component> components = new ArrayList();
     public ParticleSystem particleSystem;
-    private ArrayList<Snow> _snowList;
+    private ArrayList<Snow> _snowList = new ArrayList();
     private ExperiumGui ClickGuiMod;
-    
+
     public ExperiumGui() {
-        this.components = new ArrayList<Component>();
-        this._snowList = new ArrayList<Snow>();
         this.setInstance();
         this.load();
     }
-    
+
     public static ExperiumGui getInstance() {
-        if (ExperiumGui.INSTANCE == null) {
-            ExperiumGui.INSTANCE = new ExperiumGui();
+        if (INSTANCE == null) {
+            INSTANCE = new ExperiumGui();
         }
-        return ExperiumGui.INSTANCE;
+        return INSTANCE;
     }
-    
+
     public static ExperiumGui getClickGui() {
-        return getInstance();
+        return ExperiumGui.getInstance();
     }
-    
+
     private void setInstance() {
-        ExperiumGui.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     private void load() {
         int x = -109;
-        final Random random = new Random();
+        Random random = new Random();
         for (int i = 0; i < 100; ++i) {
             for (int y = 0; y < 3; ++y) {
-                final Snow snow = new Snow(25 * i, y * -50, random.nextInt(3) + 1, random.nextInt(2) + 1);
+                Snow snow = new Snow(25 * i, y * -50, random.nextInt(3) + 1, random.nextInt(2) + 1);
                 this._snowList.add(snow);
             }
         }
         for (final Module.Category category : Experium.moduleManager.getCategories()) {
-            final ArrayList<Component> components2 = this.components;
-            final String name = category.getName();
-            x += 115;
-            components2.add(new Component(name, x, 4, true) {
+            this.components.add(new Component(category.getName(), x += 115, 4, true){
+
                 @Override
                 public void setupItems() {
                     Experium.moduleManager.getModulesByCategory(category).forEach(module -> {
                         if (!module.hidden) {
-                            this.addButton(new ModuleButton(module));
+                            this.addButton(new ModuleButton((Module)module));
                         }
                     });
                 }
@@ -85,113 +83,103 @@ public class ExperiumGui extends GuiScreen
         }
         this.components.forEach(components -> components.getItems().sort((item1, item2) -> item1.getName().compareTo(item2.getName())));
     }
-    
-    public void updateModule(final Module module) {
-        for (final Component component : this.components) {
-            for (final Item item : component.getItems()) {
-                if (!(item instanceof ModuleButton)) {
-                    continue;
-                }
-                final ModuleButton button = (ModuleButton)item;
-                final Module mod = button.getModule();
-                if (module == null) {
-                    continue;
-                }
-                if (!module.equals(mod)) {
-                    continue;
-                }
+
+    public void updateModule(Module module) {
+        block0: for (Component component : this.components) {
+            for (Item item : component.getItems()) {
+                if (!(item instanceof ModuleButton)) continue;
+                ModuleButton button = (ModuleButton)item;
+                Module mod = button.getModule();
+                if (module == null || !module.equals(mod)) continue;
                 button.initSettings();
-                break;
+                continue block0;
             }
         }
     }
-    
-    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
-        final ClickGui clickGui = ClickGui.getInstance();
-        if (ClickGui.getInstance().guiBackground.getValue()) {
-            RenderUtil.drawRect(0.0f, 0.0f, (float)this.width, (float)this.height, ((boolean)ClickGui.getInstance().colorSync.getValue()) ? Colors.INSTANCE.getCurrentColor().getRGB() : new Color(ClickGui.getInstance().gbRed.getValue(), ClickGui.getInstance().gbGreen.getValue(), ClickGui.getInstance().gbBlue.getValue(), ClickGui.getInstance().gbAlpha.getValue()).getRGB());
+
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        ClickGui clickGui = ClickGui.getInstance();
+        if (ClickGui.getInstance().guiBackground.getValue().booleanValue()) {
+            RenderUtil.drawRect(0.0f, 0.0f, this.width, this.height, ClickGui.getInstance().colorSync.getValue() != false ? Colors.INSTANCE.getCurrentColor().getRGB() : new Color(ClickGui.getInstance().gbRed.getValue(), ClickGui.getInstance().gbGreen.getValue(), ClickGui.getInstance().gbBlue.getValue(), ClickGui.getInstance().gbAlpha.getValue()).getRGB());
         }
-        ExperiumGui.descriptionDisplay.setDraw(false);
+        descriptionDisplay.setDraw(false);
         this.checkMouseWheel();
         this.components.forEach(components -> components.drawScreen(mouseX, mouseY, partialTicks));
-        final ScaledResolution sr = new ScaledResolution(this.mc);
-        if (ClickGui.getInstance().gradiant.getValue()) {
-            this.drawGradientRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), 0, ((boolean)ClickGui.getInstance().colorSync.getValue()) ? Colors.INSTANCE.getCurrentColor().getRGB() : new Color(ClickGui.getInstance().gradiantRed.getValue(), ClickGui.getInstance().gradiantGreen.getValue(), ClickGui.getInstance().gradiantBlue.getValue(), ClickGui.getInstance().gradiantAlpha.getValue() / 2).getRGB());
+        ScaledResolution sr = new ScaledResolution(this.mc);
+        if (ClickGui.getInstance().gradiant.getValue().booleanValue()) {
+            this.drawGradientRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), 0, ClickGui.getInstance().colorSync.getValue() != false ? Colors.INSTANCE.getCurrentColor().getRGB() : new Color(ClickGui.getInstance().gradiantRed.getValue(), ClickGui.getInstance().gradiantGreen.getValue(), ClickGui.getInstance().gradiantBlue.getValue(), ClickGui.getInstance().gradiantAlpha.getValue() / 2).getRGB());
         }
-        if (ExperiumGui.descriptionDisplay.shouldDraw() && clickGui.moduleDescription.getValue()) {
-            ExperiumGui.descriptionDisplay.drawScreen(mouseX, mouseY, partialTicks);
+        if (descriptionDisplay.shouldDraw() && clickGui.moduleDescription.getValue().booleanValue()) {
+            descriptionDisplay.drawScreen(mouseX, mouseY, partialTicks);
         }
-        final ScaledResolution res = new ScaledResolution(this.mc);
-        if (!this._snowList.isEmpty() && ClickGui.getInstance().snowing.getValue()) {
+        ScaledResolution res = new ScaledResolution(this.mc);
+        if (!this._snowList.isEmpty() && ClickGui.getInstance().snowing.getValue().booleanValue()) {
             this._snowList.forEach(snow -> snow.Update(res));
         }
-        if (this.particleSystem != null && ClickGui.getInstance().particles.getValue()) {
+        if (this.particleSystem != null && ClickGui.getInstance().particles.getValue().booleanValue()) {
             this.particleSystem.render(mouseX, mouseY);
-        }
-        else {
+        } else {
             this.particleSystem = new ParticleSystem(new ScaledResolution(this.mc));
         }
     }
-    
-    public void mouseClicked(final int mouseX, final int mouseY, final int clickedButton) {
+
+    public void mouseClicked(int mouseX, int mouseY, int clickedButton) {
         this.components.forEach(components -> components.mouseClicked(mouseX, mouseY, clickedButton));
     }
-    
-    public void mouseReleased(final int mouseX, final int mouseY, final int releaseButton) {
+
+    public void mouseReleased(int mouseX, int mouseY, int releaseButton) {
         this.components.forEach(components -> components.mouseReleased(mouseX, mouseY, releaseButton));
     }
-    
+
     public boolean doesGuiPauseGame() {
         return false;
     }
-    
+
     public final ArrayList<Component> getComponents() {
         return this.components;
     }
-    
+
     public void checkMouseWheel() {
-        final int dWheel = Mouse.getDWheel();
+        int dWheel = Mouse.getDWheel();
         if (dWheel < 0) {
-            if (ClickGui.getInstance().scroll.getValue()) {
+            if (ClickGui.getInstance().scroll.getValue().booleanValue()) {
                 this.components.forEach(component -> component.setY(component.getY() - ClickGui.getInstance().scrollval.getValue()));
             }
-        }
-        else if (dWheel > 0 && ClickGui.getInstance().scroll.getValue()) {
+        } else if (dWheel > 0 && ClickGui.getInstance().scroll.getValue().booleanValue()) {
             this.components.forEach(component -> component.setY(component.getY() + ClickGui.getInstance().scrollval.getValue()));
         }
     }
-    
+
     public int getTextOffset() {
         return -6;
     }
-    
+
     public DescriptionDisplay getDescriptionDisplay() {
-        return ExperiumGui.descriptionDisplay;
+        return descriptionDisplay;
     }
-    
-    public Component getComponentByName(final String name) {
-        for (final Component component : this.components) {
-            if (!component.getName().equalsIgnoreCase(name)) {
-                continue;
-            }
+
+    public Component getComponentByName(String name) {
+        for (Component component : this.components) {
+            if (!component.getName().equalsIgnoreCase(name)) continue;
             return component;
         }
         return null;
     }
-    
-    public void keyTyped(final char typedChar, final int keyCode) throws IOException {
+
+    public void keyTyped(char typedChar, int keyCode) throws IOException {
         super.keyTyped(typedChar, keyCode);
         this.components.forEach(component -> component.onKeyTyped(typedChar, keyCode));
     }
-    
+
     public void updateScreen() {
         if (this.particleSystem != null) {
             this.particleSystem.update();
         }
     }
-    
+
     static {
-        ExperiumGui.INSTANCE = new ExperiumGui();
-        ExperiumGui.descriptionDisplay = new DescriptionDisplay("", 0.0f, 0.0f);
+        INSTANCE = new ExperiumGui();
+        descriptionDisplay = new DescriptionDisplay("", 0.0f, 0.0f);
     }
 }
+

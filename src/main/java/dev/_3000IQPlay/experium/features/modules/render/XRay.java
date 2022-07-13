@@ -1,74 +1,73 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.Block
+ *  net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+ */
 package dev._3000IQPlay.experium.features.modules.render;
 
-import java.util.Iterator;
-import net.minecraft.block.Block;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import dev._3000IQPlay.experium.features.command.Command;
 import dev._3000IQPlay.experium.Experium;
 import dev._3000IQPlay.experium.event.events.ClientEvent;
-import dev._3000IQPlay.experium.features.setting.Setting;
+import dev._3000IQPlay.experium.features.command.Command;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import net.minecraft.block.Block;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class XRay extends Module
-{
-    private static XRay INSTANCE;
-    public Setting<String> newBlock;
-    public Setting<Boolean> showBlocks;
-    
+public class XRay
+extends Module {
+    private static XRay INSTANCE = new XRay();
+    public Setting<String> newBlock = this.register(new Setting<String>("NewBlock", "Add Block..."));
+    public Setting<Boolean> showBlocks = this.register(new Setting<Boolean>("ShowBlocks", false));
+
     public XRay() {
-        super("XRay", "Lets you look through walls.", Category.RENDER, false, false, true);
-        this.newBlock = (Setting<String>)this.register(new Setting("NewBlock", (T)"Add Block..."));
-        this.showBlocks = (Setting<Boolean>)this.register(new Setting("ShowBlocks", (T)false));
+        super("XRay", "Lets you look through walls.", Module.Category.RENDER, false, false, true);
         this.setInstance();
     }
-    
+
     public static XRay getInstance() {
-        if (XRay.INSTANCE == null) {
-            XRay.INSTANCE = new XRay();
+        if (INSTANCE == null) {
+            INSTANCE = new XRay();
         }
-        return XRay.INSTANCE;
+        return INSTANCE;
     }
-    
+
     private void setInstance() {
-        XRay.INSTANCE = this;
+        INSTANCE = this;
     }
-    
+
     @Override
     public void onEnable() {
         XRay.mc.renderGlobal.loadRenderers();
     }
-    
+
     @Override
     public void onDisable() {
         XRay.mc.renderGlobal.loadRenderers();
     }
-    
+
     @SubscribeEvent
-    public void onSettingChange(final ClientEvent event) {
+    public void onSettingChange(ClientEvent event) {
         if (Experium.configManager.loadingConfig || Experium.configManager.savingConfig) {
             return;
         }
         if (event.getStage() == 2 && event.getSetting() != null && event.getSetting().getFeature() != null && event.getSetting().getFeature().equals(this)) {
             if (event.getSetting().equals(this.newBlock) && !this.shouldRender(this.newBlock.getPlannedValue())) {
-                this.register(new Setting(this.newBlock.getPlannedValue(), (T)true, v -> this.showBlocks.getValue()));
+                this.register(new Setting<Object>(this.newBlock.getPlannedValue(), Boolean.valueOf(true), v -> this.showBlocks.getValue()));
                 Command.sendMessage("<Xray> Added new Block: " + this.newBlock.getPlannedValue());
                 if (this.isOn()) {
                     XRay.mc.renderGlobal.loadRenderers();
                 }
                 event.setCanceled(true);
-            }
-            else {
-                final Setting setting = event.getSetting();
+            } else {
+                Setting setting = event.getSetting();
                 if (setting.equals(this.enabled) || setting.equals(this.drawn) || setting.equals(this.bind) || setting.equals(this.newBlock) || setting.equals(this.showBlocks)) {
                     return;
                 }
-                if (setting.getValue() instanceof Boolean && !setting.getPlannedValue()) {
+                if (setting.getValue() instanceof Boolean && !((Boolean)setting.getPlannedValue()).booleanValue()) {
                     this.unregister(setting);
                     if (this.isOn()) {
                         XRay.mc.renderGlobal.loadRenderers();
@@ -78,22 +77,17 @@ public class XRay extends Module
             }
         }
     }
-    
-    public boolean shouldRender(final Block block) {
+
+    public boolean shouldRender(Block block) {
         return this.shouldRender(block.getLocalizedName());
     }
-    
-    public boolean shouldRender(final String name) {
-        for (final Setting setting : this.getSettings()) {
-            if (!name.equalsIgnoreCase(setting.getName())) {
-                continue;
-            }
+
+    public boolean shouldRender(String name) {
+        for (Setting setting : this.getSettings()) {
+            if (!name.equalsIgnoreCase(setting.getName())) continue;
             return true;
         }
         return false;
     }
-    
-    static {
-        XRay.INSTANCE = new XRay();
-    }
 }
+

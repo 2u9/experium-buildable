@@ -1,64 +1,64 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  org.lwjgl.opengl.GL11
+ */
 package dev._3000IQPlay.experium.util;
 
-import org.lwjgl.opengl.GL11;
-import java.util.Iterator;
-import java.util.ArrayList;
 import java.awt.Color;
+import java.util.ArrayList;
+import org.lwjgl.opengl.GL11;
 
-public class ColorUtil
-{
-    public static int toRGBA(final double r, final double g, final double b, final double a) {
-        return toRGBA((float)r, (float)g, (float)b, (float)a);
+public class ColorUtil {
+    public static int toRGBA(double r, double g, double b, double a) {
+        return ColorUtil.toRGBA((float)r, (float)g, (float)b, (float)a);
     }
-    
-    public static int toRGBA(final int r, final int g, final int b) {
-        return toRGBA(r, g, b, 255);
+
+    public static int toRGBA(int r, int g, int b) {
+        return ColorUtil.toRGBA(r, g, b, 255);
     }
-    
-    public static int toRGBA(final int r, final int g, final int b, final int a) {
+
+    public static int toRGBA(int r, int g, int b, int a) {
         return (r << 16) + (g << 8) + b + (a << 24);
     }
-    
-    public static int toARGB(final int r, final int g, final int b, final int a) {
+
+    public static int toARGB(int r, int g, int b, int a) {
         return new Color(r, g, b, a).getRGB();
     }
-    
-    public static int toRGBA(final float r, final float g, final float b, final float a) {
-        return toRGBA((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f), (int)(a * 255.0f));
+
+    public static int toRGBA(float r, float g, float b, float a) {
+        return ColorUtil.toRGBA((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f), (int)(a * 255.0f));
     }
-    
-    public static int toRGBA(final float[] colors) {
+
+    public static int toRGBA(float[] colors) {
         if (colors.length != 4) {
             throw new IllegalArgumentException("colors[] must have a length of 4!");
         }
-        return toRGBA(colors[0], colors[1], colors[2], colors[3]);
+        return ColorUtil.toRGBA(colors[0], colors[1], colors[2], colors[3]);
     }
-    
-    public static int toRGBA(final double[] colors) {
+
+    public static int toRGBA(double[] colors) {
         if (colors.length != 4) {
             throw new IllegalArgumentException("colors[] must have a length of 4!");
         }
-        return toRGBA((float)colors[0], (float)colors[1], (float)colors[2], (float)colors[3]);
+        return ColorUtil.toRGBA((float)colors[0], (float)colors[1], (float)colors[2], (float)colors[3]);
     }
-    
-    public static int toRGBA(final Color color) {
-        return toRGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+
+    public static int toRGBA(Color color) {
+        return ColorUtil.toRGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
-    
-    public static int[] toRGBAArray(final int colorBuffer) {
-        return new int[] { colorBuffer >> 16 & 0xFF, colorBuffer >> 8 & 0xFF, colorBuffer & 0xFF, colorBuffer >> 24 & 0xFF };
+
+    public static int[] toRGBAArray(int colorBuffer) {
+        return new int[]{colorBuffer >> 16 & 0xFF, colorBuffer >> 8 & 0xFF, colorBuffer & 0xFF, colorBuffer >> 24 & 0xFF};
     }
-    
-    public static int changeAlpha(int origColor, final int userInputedAlpha) {
+
+    public static int changeAlpha(int origColor, int userInputedAlpha) {
         return userInputedAlpha << 24 | (origColor &= 0xFFFFFF);
     }
-    
+
     private ArrayList<ColorName> initColorList() {
-        final ArrayList<ColorName> colorList = new ArrayList<ColorName>();
+        ArrayList<ColorName> colorList = new ArrayList<ColorName>();
         colorList.add(new ColorName("AliceBlue", 240, 248, 255));
         colorList.add(new ColorName("AntiqueWhite", 250, 235, 215));
         colorList.add(new ColorName("Aqua", 0, 255, 255));
@@ -201,16 +201,14 @@ public class ColorUtil
         colorList.add(new ColorName("YellowGreen", 154, 205, 50));
         return colorList;
     }
-    
-    public String getColorNameFromRgb(final int r, final int g, final int b) {
-        final ArrayList<ColorName> colorList = this.initColorList();
+
+    public String getColorNameFromRgb(int r, int g, int b) {
+        ArrayList<ColorName> colorList = this.initColorList();
         ColorName closestMatch = null;
         int minMSE = Integer.MAX_VALUE;
-        for (final ColorName c : colorList) {
-            final int mse = c.computeMSE(r, g, b);
-            if (mse >= minMSE) {
-                continue;
-            }
+        for (ColorName c : colorList) {
+            int mse = c.computeMSE(r, g, b);
+            if (mse >= minMSE) continue;
             minMSE = mse;
             closestMatch = c;
         }
@@ -219,143 +217,127 @@ public class ColorUtil
         }
         return "No matched color name.";
     }
-    
-    public String getColorNameFromHex(final int hexColor) {
-        final int r = (hexColor & 0xFF0000) >> 16;
-        final int g = (hexColor & 0xFF00) >> 8;
-        final int b = hexColor & 0xFF;
+
+    public String getColorNameFromHex(int hexColor) {
+        int r = (hexColor & 0xFF0000) >> 16;
+        int g = (hexColor & 0xFF00) >> 8;
+        int b = hexColor & 0xFF;
         return this.getColorNameFromRgb(r, g, b);
     }
-    
-    public int colorToHex(final Color c) {
+
+    public int colorToHex(Color c) {
         return Integer.decode("0x" + Integer.toHexString(c.getRGB()).substring(2));
     }
-    
-    public String getColorNameFromColor(final Color color) {
+
+    public String getColorNameFromColor(Color color) {
         return this.getColorNameFromRgb(color.getRed(), color.getGreen(), color.getBlue());
     }
-    
-    public static class HueCycler
-    {
-        public int index;
+
+    public static class ColorName {
+        public int r;
+        public int g;
+        public int b;
+        public String name;
+
+        public ColorName(String name, int r, int g, int b) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.name = name;
+        }
+
+        public int computeMSE(int pixR, int pixG, int pixB) {
+            return ((pixR - this.r) * (pixR - this.r) + (pixG - this.g) * (pixG - this.g) + (pixB - this.b) * (pixB - this.b)) / 3;
+        }
+
+        public int getR() {
+            return this.r;
+        }
+
+        public int getG() {
+            return this.g;
+        }
+
+        public int getB() {
+            return this.b;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
+    public static class Colors {
+        public static final int WHITE = ColorUtil.toRGBA(255, 255, 255, 255);
+        public static final int BLACK = ColorUtil.toRGBA(0, 0, 0, 255);
+        public static final int RED = ColorUtil.toRGBA(255, 0, 0, 255);
+        public static final int GREEN = ColorUtil.toRGBA(0, 255, 0, 255);
+        public static final int BLUE = ColorUtil.toRGBA(0, 0, 255, 255);
+        public static final int ORANGE = ColorUtil.toRGBA(255, 128, 0, 255);
+        public static final int PURPLE = ColorUtil.toRGBA(163, 73, 163, 255);
+        public static final int GRAY = ColorUtil.toRGBA(127, 127, 127, 255);
+        public static final int DARK_RED = ColorUtil.toRGBA(64, 0, 0, 255);
+        public static final int YELLOW = ColorUtil.toRGBA(255, 255, 0, 255);
+        public static final int RAINBOW = Integer.MIN_VALUE;
+    }
+
+    public static class HueCycler {
+        public int index = 0;
         public int[] cycles;
-        
-        public HueCycler(final int cycles) {
-            this.index = 0;
+
+        public HueCycler(int cycles) {
             if (cycles <= 0) {
                 throw new IllegalArgumentException("cycles <= 0");
             }
             this.cycles = new int[cycles];
             double hue = 0.0;
-            final double add = 1.0 / cycles;
+            double add = 1.0 / (double)cycles;
             for (int i = 0; i < cycles; ++i) {
                 this.cycles[i] = Color.HSBtoRGB((float)hue, 1.0f, 1.0f);
                 hue += add;
             }
         }
-        
+
         public void reset() {
             this.index = 0;
         }
-        
-        public void reset(final int index) {
+
+        public void reset(int index) {
             this.index = index;
         }
-        
+
         public int next() {
-            final int a = this.cycles[this.index];
+            int a = this.cycles[this.index];
             ++this.index;
             if (this.index >= this.cycles.length) {
                 this.index = 0;
             }
             return a;
         }
-        
+
         public void setNext() {
-            final int rgb = this.next();
+            int rgb = this.next();
         }
-        
+
         public void set() {
-            final int rgb = this.cycles[this.index];
-            final float red = (rgb >> 16 & 0xFF) / 255.0f;
-            final float green = (rgb >> 8 & 0xFF) / 255.0f;
-            final float blue = (rgb & 0xFF) / 255.0f;
-            GL11.glColor3f(red, green, blue);
+            int rgb = this.cycles[this.index];
+            float red = (float)(rgb >> 16 & 0xFF) / 255.0f;
+            float green = (float)(rgb >> 8 & 0xFF) / 255.0f;
+            float blue = (float)(rgb & 0xFF) / 255.0f;
+            GL11.glColor3f((float)red, (float)green, (float)blue);
         }
-        
-        public void setNext(final float alpha) {
-            final int rgb = this.next();
-            final float red = (rgb >> 16 & 0xFF) / 255.0f;
-            final float green = (rgb >> 8 & 0xFF) / 255.0f;
-            final float blue = (rgb & 0xFF) / 255.0f;
-            GL11.glColor4f(red, green, blue, alpha);
+
+        public void setNext(float alpha) {
+            int rgb = this.next();
+            float red = (float)(rgb >> 16 & 0xFF) / 255.0f;
+            float green = (float)(rgb >> 8 & 0xFF) / 255.0f;
+            float blue = (float)(rgb & 0xFF) / 255.0f;
+            GL11.glColor4f((float)red, (float)green, (float)blue, (float)alpha);
         }
-        
+
         public int current() {
             return this.cycles[this.index];
         }
     }
-    
-    public static class Colors
-    {
-        public static final int WHITE;
-        public static final int BLACK;
-        public static final int RED;
-        public static final int GREEN;
-        public static final int BLUE;
-        public static final int ORANGE;
-        public static final int PURPLE;
-        public static final int GRAY;
-        public static final int DARK_RED;
-        public static final int YELLOW;
-        public static final int RAINBOW = Integer.MIN_VALUE;
-        
-        static {
-            WHITE = ColorUtil.toRGBA(255, 255, 255, 255);
-            BLACK = ColorUtil.toRGBA(0, 0, 0, 255);
-            RED = ColorUtil.toRGBA(255, 0, 0, 255);
-            GREEN = ColorUtil.toRGBA(0, 255, 0, 255);
-            BLUE = ColorUtil.toRGBA(0, 0, 255, 255);
-            ORANGE = ColorUtil.toRGBA(255, 128, 0, 255);
-            PURPLE = ColorUtil.toRGBA(163, 73, 163, 255);
-            GRAY = ColorUtil.toRGBA(127, 127, 127, 255);
-            DARK_RED = ColorUtil.toRGBA(64, 0, 0, 255);
-            YELLOW = ColorUtil.toRGBA(255, 255, 0, 255);
-        }
-    }
-    
-    public static class ColorName
-    {
-        public int r;
-        public int g;
-        public int b;
-        public String name;
-        
-        public ColorName(final String name, final int r, final int g, final int b) {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.name = name;
-        }
-        
-        public int computeMSE(final int pixR, final int pixG, final int pixB) {
-            return ((pixR - this.r) * (pixR - this.r) + (pixG - this.g) * (pixG - this.g) + (pixB - this.b) * (pixB - this.b)) / 3;
-        }
-        
-        public int getR() {
-            return this.r;
-        }
-        
-        public int getG() {
-            return this.g;
-        }
-        
-        public int getB() {
-            return this.b;
-        }
-        
-        public String getName() {
-            return this.name;
-        }
-    }
 }
+

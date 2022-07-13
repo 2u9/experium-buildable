@@ -1,28 +1,34 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.item.ItemBow
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketPlayerDigging
+ *  net.minecraft.network.play.client.CPacketPlayerDigging$Action
+ *  net.minecraft.network.play.client.CPacketPlayerTryUseItem
+ *  net.minecraft.util.math.BlockPos
+ */
 package dev._3000IQPlay.experium.features.modules.combat;
 
-import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
-import net.minecraft.network.Packet;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.network.play.client.CPacketPlayerDigging;
-import net.minecraft.item.ItemBow;
-import dev._3000IQPlay.experium.features.setting.Setting;
 import dev._3000IQPlay.experium.features.modules.Module;
+import dev._3000IQPlay.experium.features.setting.Setting;
+import net.minecraft.item.ItemBow;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
+import net.minecraft.util.math.BlockPos;
 
-public class BowSpam extends Module
-{
-    private final Setting<Integer> drawLength;
-    
+public class BowSpam
+extends Module {
+    private final Setting<Integer> drawLength = this.register(new Setting<Integer>("Draw Length", 3, 3, 21));
+
     public BowSpam() {
-        super("BowSpam", "", Category.COMBAT, true, false, false);
-        this.drawLength = (Setting<Integer>)this.register(new Setting("Draw Length", (T)3, (T)3, (T)21));
+        super("BowSpam", "", Module.Category.COMBAT, true, false, false);
     }
-    
+
     @Override
     public void onUpdate() {
         if (BowSpam.mc.player.getHeldItemMainhand().getItem() instanceof ItemBow && BowSpam.mc.player.isHandActive() && BowSpam.mc.player.getItemInUseMaxCount() >= this.drawLength.getValue()) {
@@ -32,3 +38,4 @@ public class BowSpam extends Module
         }
     }
 }
+

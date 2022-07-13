@@ -1,142 +1,149 @@
 //Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\Luni\Documents\1.12 stable mappings"!
 
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.state.IBlockState
+ *  net.minecraft.client.Minecraft
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.item.ItemBlock
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.network.Packet
+ *  net.minecraft.network.play.client.CPacketEntityAction
+ *  net.minecraft.network.play.client.CPacketEntityAction$Action
+ *  net.minecraft.network.play.client.CPacketHeldItemChange
+ *  net.minecraft.network.play.client.CPacketPlayer$Rotation
+ *  net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock
+ *  net.minecraft.util.EnumFacing
+ *  net.minecraft.util.EnumHand
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ */
 package dev._3000IQPlay.experium.util;
 
-import net.minecraft.network.play.client.CPacketHeldItemChange;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
-import net.minecraft.network.play.client.CPacketPlayer;
-import net.minecraft.util.math.MathHelper;
-import java.util.Iterator;
-import net.minecraft.block.state.IBlockState;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.network.Packet;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketEntityAction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.play.client.CPacketHeldItemChange;
+import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
-public class BurrowUtil
-{
-    public static final Minecraft mc;
-    
-    public static boolean placeBlock(final BlockPos pos, final EnumHand hand, final boolean rotate, final boolean packet, final boolean isSneaking) {
+public class BurrowUtil {
+    public static final Minecraft mc = Minecraft.getMinecraft();
+
+    public static boolean placeBlock(BlockPos pos, EnumHand hand, boolean rotate, boolean packet, boolean isSneaking) {
         boolean sneaking = false;
-        final EnumFacing side = getFirstFacing(pos);
+        EnumFacing side = BurrowUtil.getFirstFacing(pos);
         if (side == null) {
             return isSneaking;
         }
-        final BlockPos neighbour = pos.offset(side);
-        final EnumFacing opposite = side.getOpposite();
-        final Vec3d hitVec = new Vec3d((Vec3i)neighbour).add(0.5, 0.5, 0.5).add(new Vec3d(opposite.getDirectionVec()).scale(0.5));
-        final Block neighbourBlock = BurrowUtil.mc.world.getBlockState(neighbour).getBlock();
+        BlockPos neighbour = pos.offset(side);
+        EnumFacing opposite = side.getOpposite();
+        Vec3d hitVec = new Vec3d((Vec3i)neighbour).add(0.5, 0.5, 0.5).add(new Vec3d(opposite.getDirectionVec()).scale(0.5));
+        Block neighbourBlock = BurrowUtil.mc.world.getBlockState(neighbour).getBlock();
         if (!BurrowUtil.mc.player.isSneaking()) {
             BurrowUtil.mc.player.connection.sendPacket((Packet)new CPacketEntityAction((Entity)BurrowUtil.mc.player, CPacketEntityAction.Action.START_SNEAKING));
             BurrowUtil.mc.player.setSneaking(true);
             sneaking = true;
         }
         if (rotate) {
-            faceVector(hitVec, true);
+            BurrowUtil.faceVector(hitVec, true);
         }
-        rightClickBlock(neighbour, hitVec, hand, opposite, packet);
+        BurrowUtil.rightClickBlock(neighbour, hitVec, hand, opposite, packet);
         BurrowUtil.mc.player.swingArm(EnumHand.MAIN_HAND);
         BurrowUtil.mc.rightClickDelayTimer = 4;
         return sneaking || isSneaking;
     }
-    
-    public static List<EnumFacing> getPossibleSides(final BlockPos pos) {
-        final ArrayList<EnumFacing> facings = new ArrayList<EnumFacing>();
-        for (final EnumFacing side : EnumFacing.values()) {
-            final BlockPos neighbour = pos.offset(side);
-            if (BurrowUtil.mc.world.getBlockState(neighbour).getBlock().canCollideCheck(BurrowUtil.mc.world.getBlockState(neighbour), false)) {
-                final IBlockState blockState;
-                if (!(blockState = BurrowUtil.mc.world.getBlockState(neighbour)).getMaterial().isReplaceable()) {
-                    facings.add(side);
-                }
-            }
+
+    public static List<EnumFacing> getPossibleSides(BlockPos pos) {
+        ArrayList<EnumFacing> facings = new ArrayList<EnumFacing>();
+        for (EnumFacing side : EnumFacing.values()) {
+            IBlockState blockState;
+            BlockPos neighbour = pos.offset(side);
+            if (!BurrowUtil.mc.world.getBlockState(neighbour).getBlock().canCollideCheck(BurrowUtil.mc.world.getBlockState(neighbour), false) || (blockState = BurrowUtil.mc.world.getBlockState(neighbour)).getMaterial().isReplaceable()) continue;
+            facings.add(side);
         }
         return facings;
     }
-    
-    public static EnumFacing getFirstFacing(final BlockPos pos) {
-        final Iterator<EnumFacing> iterator = getPossibleSides(pos).iterator();
+
+    public static EnumFacing getFirstFacing(BlockPos pos) {
+        Iterator<EnumFacing> iterator = BurrowUtil.getPossibleSides(pos).iterator();
         if (iterator.hasNext()) {
-            final EnumFacing facing = iterator.next();
+            EnumFacing facing = iterator.next();
             return facing;
         }
         return null;
     }
-    
+
     public static Vec3d getEyesPos() {
-        return new Vec3d(BurrowUtil.mc.player.posX, BurrowUtil.mc.player.posY + BurrowUtil.mc.player.getEyeHeight(), BurrowUtil.mc.player.posZ);
+        return new Vec3d(BurrowUtil.mc.player.posX, BurrowUtil.mc.player.posY + (double)BurrowUtil.mc.player.getEyeHeight(), BurrowUtil.mc.player.posZ);
     }
-    
-    public static float[] getLegitRotations(final Vec3d vec) {
-        final Vec3d eyesPos = getEyesPos();
-        final double diffX = vec.x - eyesPos.x;
-        final double diffY = vec.y - eyesPos.y;
-        final double diffZ = vec.z - eyesPos.z;
-        final double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
-        final float yaw = (float)Math.toDegrees(Math.atan2(diffZ, diffX)) - 90.0f;
-        final float pitch = (float)(-Math.toDegrees(Math.atan2(diffY, diffXZ)));
-        return new float[] { BurrowUtil.mc.player.rotationYaw + MathHelper.wrapDegrees(yaw - BurrowUtil.mc.player.rotationYaw), BurrowUtil.mc.player.rotationPitch + MathHelper.wrapDegrees(pitch - BurrowUtil.mc.player.rotationPitch) };
+
+    public static float[] getLegitRotations(Vec3d vec) {
+        Vec3d eyesPos = BurrowUtil.getEyesPos();
+        double diffX = vec.x - eyesPos.x;
+        double diffY = vec.y - eyesPos.y;
+        double diffZ = vec.z - eyesPos.z;
+        double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
+        float yaw = (float)Math.toDegrees(Math.atan2(diffZ, diffX)) - 90.0f;
+        float pitch = (float)(-Math.toDegrees(Math.atan2(diffY, diffXZ)));
+        return new float[]{BurrowUtil.mc.player.rotationYaw + MathHelper.wrapDegrees((float)(yaw - BurrowUtil.mc.player.rotationYaw)), BurrowUtil.mc.player.rotationPitch + MathHelper.wrapDegrees((float)(pitch - BurrowUtil.mc.player.rotationPitch))};
     }
-    
-    public static void faceVector(final Vec3d vec, final boolean normalizeAngle) {
-        final float[] rotations = getLegitRotations(vec);
-        BurrowUtil.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Rotation(rotations[0], normalizeAngle ? ((float)MathHelper.normalizeAngle((int)rotations[1], 360)) : rotations[1], BurrowUtil.mc.player.onGround));
+
+    public static void faceVector(Vec3d vec, boolean normalizeAngle) {
+        float[] rotations = BurrowUtil.getLegitRotations(vec);
+        BurrowUtil.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Rotation(rotations[0], normalizeAngle ? (float)MathHelper.normalizeAngle((int)((int)rotations[1]), (int)360) : rotations[1], BurrowUtil.mc.player.onGround));
     }
-    
-    public static void rightClickBlock(final BlockPos pos, final Vec3d vec, final EnumHand hand, final EnumFacing direction, final boolean packet) {
+
+    public static void rightClickBlock(BlockPos pos, Vec3d vec, EnumHand hand, EnumFacing direction, boolean packet) {
         if (packet) {
-            final float f = (float)(vec.x - pos.getX());
-            final float f2 = (float)(vec.y - pos.getY());
-            final float f3 = (float)(vec.z - pos.getZ());
-            BurrowUtil.mc.player.connection.sendPacket((Packet)new CPacketPlayerTryUseItemOnBlock(pos, direction, hand, f, f2, f3));
-        }
-        else {
+            float f = (float)(vec.x - (double)pos.getX());
+            float f1 = (float)(vec.y - (double)pos.getY());
+            float f2 = (float)(vec.z - (double)pos.getZ());
+            BurrowUtil.mc.player.connection.sendPacket((Packet)new CPacketPlayerTryUseItemOnBlock(pos, direction, hand, f, f1, f2));
+        } else {
             BurrowUtil.mc.playerController.processRightClickBlock(BurrowUtil.mc.player, BurrowUtil.mc.world, pos, direction, vec, hand);
         }
         BurrowUtil.mc.player.swingArm(EnumHand.MAIN_HAND);
         BurrowUtil.mc.rightClickDelayTimer = 4;
     }
-    
-    public static int findHotbarBlock(final Class clazz) {
+
+    public static int findHotbarBlock(Class clazz) {
         for (int i = 0; i < 9; ++i) {
-            final ItemStack stack = BurrowUtil.mc.player.inventory.getStackInSlot(i);
-            if (stack != ItemStack.EMPTY) {
-                if (clazz.isInstance(stack.getItem())) {
-                    return i;
-                }
-                if (stack.getItem() instanceof ItemBlock) {
-                    final Block block;
-                    if (clazz.isInstance(block = ((ItemBlock)stack.getItem()).getBlock())) {
-                        return i;
-                    }
-                }
+            Block block;
+            ItemStack stack = BurrowUtil.mc.player.inventory.getStackInSlot(i);
+            if (stack == ItemStack.EMPTY) continue;
+            if (clazz.isInstance((Object)stack.getItem())) {
+                return i;
             }
+            if (!(stack.getItem() instanceof ItemBlock) || !clazz.isInstance((Object)(block = ((ItemBlock)stack.getItem()).getBlock()))) continue;
+            return i;
         }
         return -1;
     }
-    
-    public static void switchToSlot(final int slot) {
+
+    public static void switchToSlot(int slot) {
         BurrowUtil.mc.player.connection.sendPacket((Packet)new CPacketHeldItemChange(slot));
         BurrowUtil.mc.player.inventory.currentItem = slot;
         BurrowUtil.mc.playerController.updateController();
     }
-    
-    static {
-        mc = Minecraft.getMinecraft();
-    }
 }
+

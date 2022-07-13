@@ -1,17 +1,21 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  net.minecraftforge.common.MinecraftForge
+ *  net.minecraftforge.fml.common.eventhandler.Event
+ */
 package dev._3000IQPlay.experium.features.setting;
 
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.common.MinecraftForge;
 import dev._3000IQPlay.experium.event.events.ClientEvent;
 import dev._3000IQPlay.experium.features.Feature;
+import dev._3000IQPlay.experium.features.setting.Bind;
+import dev._3000IQPlay.experium.features.setting.EnumConverter;
 import java.util.function.Predicate;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
-public class Setting<T>
-{
+public class Setting<T> {
     private final String name;
     private final T defaultValue;
     private T value;
@@ -23,24 +27,24 @@ public class Setting<T>
     private Predicate<T> visibility;
     private String description;
     private Feature feature;
-    
-    public Setting(final String name, final T defaultValue) {
+
+    public Setting(String name, T defaultValue) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.plannedValue = defaultValue;
         this.description = "";
     }
-    
-    public Setting(final String name, final T defaultValue, final String description) {
+
+    public Setting(String name, T defaultValue, String description) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.plannedValue = defaultValue;
         this.description = description;
     }
-    
-    public Setting(final String name, final T defaultValue, final T min, final T max, final String description) {
+
+    public Setting(String name, T defaultValue, T min, T max, String description) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
@@ -50,8 +54,8 @@ public class Setting<T>
         this.description = description;
         this.hasRestriction = true;
     }
-    
-    public Setting(final String name, final T defaultValue, final T min, final T max) {
+
+    public Setting(String name, T defaultValue, T min, T max) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
@@ -61,8 +65,8 @@ public class Setting<T>
         this.description = "";
         this.hasRestriction = true;
     }
-    
-    public Setting(final String name, final T defaultValue, final T min, final T max, final Predicate<T> visibility, final String description) {
+
+    public Setting(String name, T defaultValue, T min, T max, Predicate<T> visibility, String description) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
@@ -73,8 +77,8 @@ public class Setting<T>
         this.description = description;
         this.hasRestriction = true;
     }
-    
-    public Setting(final String name, final T defaultValue, final T min, final T max, final Predicate<T> visibility) {
+
+    public Setting(String name, T defaultValue, T min, T max, Predicate<T> visibility) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
@@ -85,24 +89,24 @@ public class Setting<T>
         this.description = "";
         this.hasRestriction = true;
     }
-    
-    public Setting(final String name, final T defaultValue, final Predicate<T> visibility) {
+
+    public Setting(String name, T defaultValue, Predicate<T> visibility) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.visibility = visibility;
         this.plannedValue = defaultValue;
     }
-    
+
     public String getName() {
         return this.name;
     }
-    
+
     public T getValue() {
         return this.value;
     }
-    
-    public void setValue(final T value) {
+
+    public void setValue(T value) {
         this.setPlannedValue(value);
         if (this.hasRestriction) {
             if (((Number)this.min).floatValue() > ((Number)value).floatValue()) {
@@ -112,41 +116,40 @@ public class Setting<T>
                 this.setPlannedValue(this.max);
             }
         }
-        final ClientEvent event = new ClientEvent(this);
+        ClientEvent event = new ClientEvent(this);
         MinecraftForge.EVENT_BUS.post((Event)event);
         if (!event.isCanceled()) {
             this.value = this.plannedValue;
-        }
-        else {
+        } else {
             this.plannedValue = this.value;
         }
     }
-    
+
     public T getPlannedValue() {
         return this.plannedValue;
     }
-    
-    public void setPlannedValue(final T value) {
+
+    public void setPlannedValue(T value) {
         this.plannedValue = value;
     }
-    
+
     public T getMin() {
         return this.min;
     }
-    
-    public void setMin(final T min) {
+
+    public void setMin(T min) {
         this.min = min;
     }
-    
+
     public T getMax() {
         return this.max;
     }
-    
-    public void setMax(final T max) {
+
+    public void setMax(T max) {
         this.max = max;
     }
-    
-    public void setValueNoEvent(final T value) {
+
+    public void setValueNoEvent(T value) {
         this.setPlannedValue(value);
         if (this.hasRestriction) {
             if (((Number)this.min).floatValue() > ((Number)value).floatValue()) {
@@ -158,113 +161,117 @@ public class Setting<T>
         }
         this.value = this.plannedValue;
     }
-    
+
     public Feature getFeature() {
         return this.feature;
     }
-    
-    public void setFeature(final Feature feature) {
+
+    public void setFeature(Feature feature) {
         this.feature = feature;
     }
-    
-    public int getEnum(final String input) {
+
+    public int getEnum(String input) {
         for (int i = 0; i < this.value.getClass().getEnumConstants().length; ++i) {
-            final Enum e = (Enum)this.value.getClass().getEnumConstants()[i];
-            if (e.name().equalsIgnoreCase(input)) {
-                return i;
-            }
+            Enum e = (Enum)this.value.getClass().getEnumConstants()[i];
+            if (!e.name().equalsIgnoreCase(input)) continue;
+            return i;
         }
         return -1;
     }
-    
-    public void setEnumValue(final String value) {
-        for (final Enum e : (Enum[])((Enum)this.value).getClass().getEnumConstants()) {
-            if (e.name().equalsIgnoreCase(value)) {
-                this.value = (T)e;
-            }
+
+    public void setEnumValue(String value) {
+        for (Enum e : (Enum[]) ((Enum) this.value).getClass().getEnumConstants()) {
+            if (!e.name().equalsIgnoreCase(value)) continue;
+            this.value = (T) e;
         }
     }
-    
+
     public String currentEnumName() {
         return EnumConverter.getProperName((Enum)this.value);
     }
-    
+
     public int currentEnum() {
         return EnumConverter.currentEnum((Enum)this.value);
     }
-    
+
     public void increaseEnum() {
-        this.plannedValue = (T)EnumConverter.increaseEnum((Enum)this.value);
-        final ClientEvent event = new ClientEvent(this);
+        this.plannedValue = (T) EnumConverter.increaseEnum((Enum)this.value);
+        ClientEvent event = new ClientEvent(this);
         MinecraftForge.EVENT_BUS.post((Event)event);
         if (!event.isCanceled()) {
             this.value = this.plannedValue;
-        }
-        else {
+        } else {
             this.plannedValue = this.value;
         }
     }
-    
+
     public void increaseEnumNoEvent() {
-        this.value = (T)EnumConverter.increaseEnum((Enum)this.value);
+        this.value = (T) EnumConverter.increaseEnum((Enum)this.value);
     }
-    
+
     public String getType() {
         if (this.isEnumSetting()) {
             return "Enum";
         }
         return this.getClassName(this.defaultValue);
     }
-    
-    public <T> String getClassName(final T value) {
+
+    public <T> String getClassName(T value) {
         return value.getClass().getSimpleName();
     }
-    
+
     public String getDescription() {
         if (this.description == null) {
             return "";
         }
         return this.description;
     }
-    
+
     public boolean isNumberSetting() {
         return this.value instanceof Double || this.value instanceof Integer || this.value instanceof Short || this.value instanceof Long || this.value instanceof Float;
     }
-    
+
     public boolean isEnumSetting() {
         return !this.isNumberSetting() && !(this.value instanceof String) && !(this.value instanceof Bind) && !(this.value instanceof Character) && !(this.value instanceof Boolean);
     }
-    
+
     public boolean isStringSetting() {
         return this.value instanceof String;
     }
-    
+
     public T getDefaultValue() {
         return this.defaultValue;
     }
-    
+
     public String getValueAsString() {
         return this.value.toString();
     }
-    
+
     public boolean hasRestriction() {
         return this.hasRestriction;
     }
-    
-    public void setVisibility(final Predicate<T> visibility) {
+
+    public void setVisibility(Predicate<T> visibility) {
         this.visibility = visibility;
     }
-    
-    public Setting<T> setRenderName(final boolean renderName) {
+
+    public Setting<T> setRenderName(boolean renderName) {
         this.shouldRenderStringName = renderName;
         return this;
     }
-    
+
     public boolean shouldRenderName() {
-        return !this.isStringSetting() || this.shouldRenderStringName;
+        if (!this.isStringSetting()) {
+            return true;
+        }
+        return this.shouldRenderStringName;
     }
-    
+
     public boolean isVisible() {
-        return this.visibility == null || this.visibility.test(this.getValue());
+        if (this.visibility == null) {
+            return true;
+        }
+        return this.visibility.test(this.getValue());
     }
 }
+

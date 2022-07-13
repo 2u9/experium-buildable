@@ -1,152 +1,144 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
+/*
+ * Decompiled with CFR 0.150.
+ */
 package dev._3000IQPlay.experium.util;
 
 import java.util.Random;
 import java.util.regex.Pattern;
 
-public class TextUtil
-{
-    public static final String SECTIONSIGN = "§";
-    public static final String BLACK = "§0";
-    public static final String DARK_BLUE = "§1";
-    public static final String DARK_GREEN = "§2";
-    public static final String DARK_AQUA = "§3";
-    public static final String DARK_RED = "§4";
-    public static final String DARK_PURPLE = "§5";
-    public static final String GOLD = "§6";
-    public static final String GRAY = "§7";
-    public static final String DARK_GRAY = "§8";
-    public static final String BLUE = "§9";
-    public static final String GREEN = "§a";
-    public static final String AQUA = "§b";
-    public static final String RED = "§c";
-    public static final String LIGHT_PURPLE = "§d";
-    public static final String YELLOW = "§e";
-    public static final String WHITE = "§f";
-    public static final String OBFUSCATED = "§k";
-    public static final String BOLD = "§l";
-    public static final String STRIKE = "§m";
-    public static final String UNDERLINE = "§n";
-    public static final String ITALIC = "§o";
-    public static final String RESET = "§r";
-    public static final String RAINBOW = "§+";
-    private static final Pattern STRIP_COLOR_PATTERN;
-    private static final Random rand;
-    public static String shrug;
-    
-    public static String stripColor(final String input) {
+public class TextUtil {
+    public static final String SECTIONSIGN = "\u00a7";
+    public static final String BLACK = "\u00a70";
+    public static final String DARK_BLUE = "\u00a71";
+    public static final String DARK_GREEN = "\u00a72";
+    public static final String DARK_AQUA = "\u00a73";
+    public static final String DARK_RED = "\u00a74";
+    public static final String DARK_PURPLE = "\u00a75";
+    public static final String GOLD = "\u00a76";
+    public static final String GRAY = "\u00a77";
+    public static final String DARK_GRAY = "\u00a78";
+    public static final String BLUE = "\u00a79";
+    public static final String GREEN = "\u00a7a";
+    public static final String AQUA = "\u00a7b";
+    public static final String RED = "\u00a7c";
+    public static final String LIGHT_PURPLE = "\u00a7d";
+    public static final String YELLOW = "\u00a7e";
+    public static final String WHITE = "\u00a7f";
+    public static final String OBFUSCATED = "\u00a7k";
+    public static final String BOLD = "\u00a7l";
+    public static final String STRIKE = "\u00a7m";
+    public static final String UNDERLINE = "\u00a7n";
+    public static final String ITALIC = "\u00a7o";
+    public static final String RESET = "\u00a7r";
+    public static final String RAINBOW = "\u00a7+";
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)\u00a7[0-9A-FK-OR]");
+    private static final Random rand = new Random();
+    public static String shrug = "\u00af\\_(\u30c4)_/\u00af";
+
+    public static String stripColor(String input) {
         if (input == null) {
             return null;
         }
-        return TextUtil.STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
+        return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
     }
-    
-    public static String coloredString(final String string, final Color color) {
+
+    public static String coloredString(String string, Color color) {
         String coloredString = string;
         switch (color) {
             case AQUA: {
-                coloredString = "§b" + coloredString + "§r";
+                coloredString = AQUA + coloredString + RESET;
                 break;
             }
             case WHITE: {
-                coloredString = "§f" + coloredString + "§r";
+                coloredString = WHITE + coloredString + RESET;
                 break;
             }
             case BLACK: {
-                coloredString = "§0" + coloredString + "§r";
+                coloredString = BLACK + coloredString + RESET;
                 break;
             }
             case DARK_BLUE: {
-                coloredString = "§1" + coloredString + "§r";
+                coloredString = DARK_BLUE + coloredString + RESET;
                 break;
             }
             case DARK_GREEN: {
-                coloredString = "§2" + coloredString + "§r";
+                coloredString = DARK_GREEN + coloredString + RESET;
                 break;
             }
             case DARK_AQUA: {
-                coloredString = "§3" + coloredString + "§r";
+                coloredString = DARK_AQUA + coloredString + RESET;
                 break;
             }
             case DARK_RED: {
-                coloredString = "§4" + coloredString + "§r";
+                coloredString = DARK_RED + coloredString + RESET;
                 break;
             }
             case DARK_PURPLE: {
-                coloredString = "§5" + coloredString + "§r";
+                coloredString = DARK_PURPLE + coloredString + RESET;
                 break;
             }
             case GOLD: {
-                coloredString = "§6" + coloredString + "§r";
+                coloredString = GOLD + coloredString + RESET;
                 break;
             }
             case DARK_GRAY: {
-                coloredString = "§8" + coloredString + "§r";
+                coloredString = DARK_GRAY + coloredString + RESET;
                 break;
             }
             case GRAY: {
-                coloredString = "§7" + coloredString + "§r";
+                coloredString = GRAY + coloredString + RESET;
                 break;
             }
             case BLUE: {
-                coloredString = "§9" + coloredString + "§r";
+                coloredString = BLUE + coloredString + RESET;
                 break;
             }
             case RED: {
-                coloredString = "§c" + coloredString + "§r";
+                coloredString = RED + coloredString + RESET;
                 break;
             }
             case GREEN: {
-                coloredString = "§a" + coloredString + "§r";
+                coloredString = GREEN + coloredString + RESET;
                 break;
             }
             case LIGHT_PURPLE: {
-                coloredString = "§d" + coloredString + "§r";
+                coloredString = LIGHT_PURPLE + coloredString + RESET;
                 break;
             }
             case YELLOW: {
-                coloredString = "§e" + coloredString + "§r";
-                break;
+                coloredString = YELLOW + coloredString + RESET;
             }
         }
         return coloredString;
     }
-    
-    public static String cropMaxLengthMessage(final String s, final int i) {
+
+    public static String cropMaxLengthMessage(String s, int i) {
         String output = "";
         if (s.length() >= 256 - i) {
             output = s.substring(0, 256 - i);
         }
         return output;
     }
-    
-    static {
-        STRIP_COLOR_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]");
-        rand = new Random();
-        TextUtil.shrug = "¯\\_(\u30c4)_/¯";
-    }
-    
-    public enum Color
-    {
-        NONE, 
-        WHITE, 
-        BLACK, 
-        DARK_BLUE, 
-        DARK_GREEN, 
-        DARK_AQUA, 
-        DARK_RED, 
-        DARK_PURPLE, 
-        GOLD, 
-        GRAY, 
-        DARK_GRAY, 
-        BLUE, 
-        GREEN, 
-        AQUA, 
-        RED, 
-        LIGHT_PURPLE, 
+
+    public static enum Color {
+        NONE,
+        WHITE,
+        BLACK,
+        DARK_BLUE,
+        DARK_GREEN,
+        DARK_AQUA,
+        DARK_RED,
+        DARK_PURPLE,
+        GOLD,
+        GRAY,
+        DARK_GRAY,
+        BLUE,
+        GREEN,
+        AQUA,
+        RED,
+        LIGHT_PURPLE,
         YELLOW;
+
     }
 }
+
